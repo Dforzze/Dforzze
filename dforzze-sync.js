@@ -18,7 +18,8 @@ var DforzzeSync = (function(){
     return {
       'Content-Type': 'application/json',
       'X-Master-Key': MASTER_KEY,
-      'X-Access-Key': ACCESS_KEY
+      'X-Access-Key': ACCESS_KEY,
+      'X-Bin-Meta': 'false'
     };
   }
 
@@ -27,7 +28,7 @@ var DforzzeSync = (function(){
     fetch(BASE + BINS[bin] + '/latest', { headers: headers() })
       .then(function(r){ return r.json(); })
       .then(function(d){ cb(null, d.record); })
-      .catch(function(e){ cb(e, null); });
+      .catch(function(e){ console.error('JSONBin read error:', e); cb(e, null); });
   }
 
   // ── Escribir bin (reemplaza todo) ─────────────────────────
@@ -38,8 +39,12 @@ var DforzzeSync = (function(){
       body: JSON.stringify(data)
     })
       .then(function(r){ return r.json(); })
-      .then(function(d){ if(cb) cb(null, d); })
-      .catch(function(e){ if(cb) cb(e, null); });
+      .then(function(d){ 
+        if(d.message) console.error('JSONBin write error:', d.message);
+        else console.log('JSONBin write OK:', bin);
+        if(cb) cb(null, d); 
+      })
+      .catch(function(e){ console.error('JSONBin write error:', e); if(cb) cb(e, null); });
   }
 
   // ══════════════════════════════════════════════════════════
