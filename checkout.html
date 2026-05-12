@@ -928,7 +928,9 @@ async function placeOrder(){
 
   setConfirmLoading(true);
 
-  const expressEl = document.querySelector('input[value="express"]');
+  // ── MODO PRUEBA: ir directo al fallback local sin pasarela ──
+  placeOrderFallback(cart);
+  return;
   const shippingMethod = (expressEl && expressEl.checked) ? 'express' : 'standard';
   const fname = document.getElementById('fname')?.value.trim() || '';
   const lname = document.getElementById('lname')?.value.trim() || '';
