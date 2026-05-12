@@ -1,6 +1,7 @@
 // ============================================================
 // DFORZZE SYNC — Base de datos compartida via JSONBin.io
 // Todos los usuarios ven los mismos datos en tiempo real
+// v3 — permisos correctos
 // ============================================================
 
 var DforzzeSync = (function(){
