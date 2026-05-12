@@ -1041,39 +1041,20 @@ function normalizeAdminProduct(p){
   };
 }
 
-// Carga productos: backend primero, localStorage como fallback
+// Carga productos: JSONBin primero, localStorage como fallback
 function loadAdminProducts(callback){
-  fetch(DFORZZE_API + '/products?limit=100')
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(data.success && data.data && data.data.products){
-        var backendProducts = data.data.products.map(normalizeAdminProduct);
-
-        // El localStorage tiene prioridad — preservar tallas y stock editados por admin
-        var stored = localStorage.getItem('dforzze_products');
-        var localProducts = stored ? JSON.parse(stored) : [];
-
-        var merged = backendProducts.map(function(bp){
-          var local = localProducts.find(function(lp){ return lp.id === bp.id; });
-          if(local && local.sizes && local.sizes.length > 0){
-            bp.sizes = local.sizes; // conservar tallas detalladas del admin
-          }
-          return bp;
-        });
-
-        // Agregar productos locales nuevos que aún no están en Railway
-        var localOnly = localProducts.filter(function(lp){
-          return !merged.find(function(bp){ return bp.id === lp.id; });
-        });
-
-        var final = merged.concat(localOnly);
-        localStorage.setItem('dforzze_products', JSON.stringify(final));
-        if(callback) callback(final);
-      } else { throw new Error('invalid'); }
-    })
-    .catch(function(){
-      if(callback) callback(getProducts());
+  if(typeof DforzzeSync !== 'undefined'){
+    DforzzeSync.getProducts(function(cloudProducts){
+      if(cloudProducts && cloudProducts.length > 0){
+        localStorage.setItem('dforzze_products', JSON.stringify(cloudProducts));
+        if(callback) callback(cloudProducts);
+      } else {
+        if(callback) callback(getProducts());
+      }
     });
+    return;
+  }
+  if(callback) callback(getProducts());
 }
 
 function getProducts(){
@@ -1087,7 +1068,25 @@ function getProducts(){
 
 function saveProducts(products){
   localStorage.setItem('dforzze_products', JSON.stringify(products));
-  localStorage.setItem('dforzze_products_updated', Date.now()); // invalidar cache del catálogo
+  localStorage.setItem('dforzze_products_updated', Date.now());
+  // Sync a JSONBin — todos los dispositivos ven los productos actualizados
+  if(typeof DforzzeSync !== 'undefined'){
+    DforzzeSync.saveProducts(products, function(err){
+      if(err) console.error('Error sync productos:', err);
+      else console.log('Productos sincronizados a la nube');
+    });
+  }
+}
+
+// Cargar productos desde JSONBin al iniciar el admin
+function loadProductsFromCloud(cb){
+  if(typeof DforzzeSync === 'undefined'){ if(cb) cb(getProducts()); return; }
+  DforzzeSync.getProducts(function(cloudProducts){
+    if(cloudProducts && cloudProducts.length > 0){
+      localStorage.setItem('dforzze_products', JSON.stringify(cloudProducts));
+    }
+    if(cb) cb(getProducts());
+  });
 }
 
 function getTotalStock(product){

@@ -129,6 +129,7 @@ button{font-family:inherit;cursor:pointer}
   .milestone-label{font-size:9px!important}
 }
 </style>
+<script src="dforzze-sync.js?v=3"></script>
 </head>
 <body>
 
@@ -549,61 +550,31 @@ var _catalogLoadedFromBackend = false;
 var _catalogLastUpdate = null;
 
 function loadCatalogProducts(callback){
-  // Invalidar cache si el admin actualizó productos
-  var adminUpdate = localStorage.getItem('dforzze_products_updated');
-  if(adminUpdate && adminUpdate !== _catalogLastUpdate){
-    _catalogProductsCache = null;
-    _catalogLastUpdate = adminUpdate;
-  }
-
-  // Intentar backend
-  fetch(DFORZZE_API + '/products?limit=100')
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(data.success && data.data && data.data.products){
-        var backendProducts = data.data.products.map(normalizeBackendProduct);
-
-        // Mezclar con productos locales — el localStorage tiene prioridad en stock y tallas
-        var stored = localStorage.getItem('dforzze_products');
-        var localProducts = stored ? JSON.parse(stored) : [];
-
-        var merged = backendProducts.map(function(bp){
-          // Si existe versión local, usar sus tallas/stock (el admin los editó)
-          var local = localProducts.find(function(lp){ return lp.id === bp.id; });
-          if(local && local.sizes && local.sizes.length > 0){
-            bp.sizes = local.sizes;
-            bp.stockTotal = local.sizes.reduce(function(s,sz){ return s+(sz.stock||0); }, 0);
-          }
-          return bp;
-        });
-
-        // Agregar productos locales que no están en el backend (nuevos sin sincronizar)
-        var localOnly = localProducts.filter(function(lp){
-          return !merged.find(function(bp){ return bp.id === lp.id; });
-        });
-
-        var final = merged.concat(localOnly.map(normalizeBackendProduct));
-        _catalogProductsCache = final;
-        _catalogLoadedFromBackend = true;
-        localStorage.setItem('dforzze_products', JSON.stringify(final));
-        callback(final);
+  // Usar JSONBin como fuente principal
+  if(typeof DforzzeSync !== 'undefined'){
+    DforzzeSync.getProducts(function(products){
+      if(products && products.length > 0){
+        _catalogProductsCache = products;
+        localStorage.setItem('dforzze_products', JSON.stringify(products));
+        callback(products);
       } else {
-        throw new Error('Respuesta inválida');
+        // Fallback localStorage o defaults
+        var stored = localStorage.getItem('dforzze_products');
+        var prods = stored ? JSON.parse(stored) : DEFAULT_PRODUCTS;
+        _catalogProductsCache = prods;
+        callback(prods);
       }
-    })
-    .catch(function(){
-      // Fallback: localStorage o defaults
-      var stored = localStorage.getItem('dforzze_products');
-      var products = stored ? JSON.parse(stored).map(normalizeBackendProduct) : DEFAULT_PRODUCTS;
-      if(!stored) localStorage.setItem('dforzze_products', JSON.stringify(DEFAULT_PRODUCTS));
-      _catalogProductsCache = products;
-      _catalogLoadedFromBackend = false;
-      callback(products);
     });
+    return;
+  }
+  // Fallback sin sync
+  var stored = localStorage.getItem('dforzze_products');
+  var products = stored ? JSON.parse(stored) : DEFAULT_PRODUCTS;
+  _catalogProductsCache = products;
+  callback(products);
 }
 
 function getCatalogProducts(){
-  // Versión síncrona — usa cache o localStorage
   if(_catalogProductsCache) return _catalogProductsCache;
   var stored = localStorage.getItem('dforzze_products');
   if(stored) return JSON.parse(stored);

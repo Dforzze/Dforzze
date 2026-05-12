@@ -760,6 +760,11 @@ function decrementStockLocal(cart){
 
     localStorage.setItem('dforzze_products', JSON.stringify(products));
     localStorage.setItem('dforzze_inv_movements', JSON.stringify(movements.slice(0, 500)));
+
+    // Sync stock actualizado a JSONBin
+    if(typeof DforzzeSync !== 'undefined'){
+      DforzzeSync.saveProducts(products, null);
+    }
   }catch(e){ console.error('Error al descontar stock:', e); }
 }
 
