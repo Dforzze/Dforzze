@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFORZZE - Con Backend (Datos en la Nube)</title>
+<link id="dfz-favicon" rel="icon" type="image/png" href="images/logo.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:100px}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+input{font-family:inherit}
+
+@keyframes splashLogoIn{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
+@keyframes loadingBar{0%{width:0}100%{width:100%}}
+@keyframes heroFadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes heroFadeInUp{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes modalIn{0%{opacity:0;transform:scale(.95) translateY(10px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+
+.hero-fade{animation:heroFadeIn 1s ease-out forwards;opacity:0}
+.hero-up{animation:heroFadeInUp 1.2s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+.modal-anim{animation:modalIn .3s ease-out forwards}
+
+/* Splash */
+#splash{position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s;cursor:pointer}
+
+/* Header */
+.header{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(12px);background:rgba(255,255,255,.95);transition:all .5s}
+.header-inner{max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{display:flex;align-items:center;gap:8px}
+.logo img{height:40px;width:auto;object-fit:contain}
+.logo span{color:rgba(0,0,0,.7);font-weight:700;letter-spacing:.3em;text-transform:uppercase;font-size:12px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 24px;border-radius:9999px;border:none;font-weight:600;font-size:12px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.btn-primary{background:#000;color:#fff}
+.btn-primary:hover{background:rgba(0,0,0,.8)}
+.btn-secondary{background:#fff;color:#000;border:2px solid #000}
+.btn-secondary:hover{background:#000;color:#fff}
+.btn-ghost{background:rgba(255,255,255,.05);color:rgba(0,0,0,.6);border:1px solid rgba(0,0,0,.1)}
+.btn-sm{padding:8px 16px;font-size:11px}
+
+/* Hero */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#000 0%,#1a1a2e 50%,#16213e 100%)}
+.hero-content{position:relative;z-index:10;text-align:center;padding:80px 24px 0;max-width:800px;margin:0 auto}
+.hero-title{font-size:clamp(48px,10vw,96px);font-weight:800;letter-spacing:-.02em;line-height:1.05;margin-bottom:24px}
+.hero-subtitle{font-size:18px;line-height:1.625;color:rgba(255,255,255,.7);margin-bottom:40px;max-width:512px;margin-left:auto;margin-right:auto}
+
+/* Auth Modal */
+.modal-overlay{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:0 0 80px rgba(0,0,0,.5);overflow:hidden;width:100%;max-width:400px}
+.modal-header{padding:24px 24px 0;text-align:center}
+.modal-title{font-size:24px;font-weight:700;margin-bottom:8px}
+.modal-subtitle{color:rgba(255,255,255,.4);font-size:13px}
+.modal-tabs{display:flex;gap:8px;padding:16px 24px}
+.tab-btn{flex:1;padding:10px;border:none;border-radius:8px;font-weight:600;font-size:12px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .3s;background:rgba(255,255,255,.04);color:rgba(255,255,255,.4)}
+.tab-btn.active{background:#fff;color:#000}
+.modal-body{padding:0 24px 24px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:6px}
+.form-input{width:100%;padding:12px 14px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.04);color:#fff;font-size:14px;transition:all .2s}
+.form-input:focus{outline:none;border-color:rgba(168,85,247,.5);background:rgba(168,85,247,.08)}
+.error-msg{color:#ef4444;font-size:12px;margin-top:8px;text-align:center;display:none}
+.success-msg{color:#4ade80;font-size:12px;margin-top:8px;text-align:center}
+
+/* Profile Modal */
+.profile-overlay{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:16px}
+.profile-box{background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:16px;width:100%;max-width:420px;overflow:hidden}
+.profile-header{padding:24px;display:flex;align-items:center;gap:16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#a855f7,#6366f1);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700}
+.profile-info h3{font-size:18px;font-weight:700;margin-bottom:4px}
+.profile-info p{color:rgba(255,255,255,.4);font-size:13px}
+.profile-stats{padding:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.stat-item{text-align:center}
+.stat-value{font-size:28px;font-weight:800;color:#a855f7}
+.stat-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-top:4px}
+.rank-badge{display:inline-block;padding:6px 14px;border-radius:9999px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.rank-none{background:rgba(255,255,255,.06);color:rgba(255,255,255,.4)}
+.rank-initiated{background:rgba(52,211,153,.15);color:#34d399}
+.rank-builder{background:rgba(251,191,36,.15);color:#fbbf24}
+.rank-inner{background:rgba(192,132,252,.15);color:#c084fc}
+.profile-actions{padding:16px 24px 24px;display:flex;flex-direction:column;gap:8px}
+
+/* Products Grid */
+.products-section{padding:80px 24px;max-width:1280px;margin:0 auto}
+.section-title{font-size:32px;font-weight:700;margin-bottom:24px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px}
+.product-card{background:#111;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;transition:all .3s}
+.product-card:hover{border-color:rgba(168,85,247,.3);transform:translateY(-4px)}
+.product-image{height:180px;background:#0a0a0a;display:flex;align-items:center;justify-content:center}
+.product-image img{max-height:140px;max-width:90%;object-fit:contain}
+.product-info{padding:16px}
+.product-name{font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:8px}
+.product-price{font-weight:800;font-size:20px}
+.product-stock{font-size:11px;color:rgba(255,255,255,.4);margin-top:4px}
+
+/* Connection Status */
+.connection-status{position:fixed;bottom:20px;left:20px;padding:8px 14px;border-radius:8px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:8px;z-index:100;transition:all .3s}
+.connected{background:rgba(74,222,128,.15);color:#4ade80}
+.disconnected{background:rgba(239,68,68,.15);color:#ef4444}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* Dashboard Section */
+.dashboard{padding:100px 24px 40px;max-width:800px;margin:0 auto}
+.dashboard-header{text-align:center;margin-bottom:40px}
+.dashboard-header h1{font-size:32px;font-weight:800;margin-bottom:8px}
+.dashboard-header p{color:rgba(255,255,255,.4)}
+.dashboard-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:32px}
+.stat-card{background:#111;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;text-align:center}
+
+/* Stickers */
+.stickers-grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+.sticker-item{background:#111;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.sticker-emoji{font-size:24px}
+
+/* Redeem */
+.redeem-section{background:#111;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;margin-bottom:32px}
+.redeem-form{display:flex;gap:10px;margin-top:12px}
+.redeem-input{flex:1;padding:10px 14px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.04);color:#fff;font-size:14px}
+
+/* Close button */
+.btn-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:20px;line-height:1;padding:4px}
+.btn-close:hover{color:rgba(255,255,255,.7)}
+
+/* Hidden */
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" onclick="killSplash()" style="animation:fadeIn 1s ease-out">
+  <div style="animation:splashLogoIn 1s ease-out forwards">
+    <img src="images/logo.png" alt="DFORZZE" style="height:96px;width:auto;filter:brightness(0) invert(1)">
+  </div>
+  <div style="margin-top:32px;width:128px;height:2px;background:rgba(255,255,255,.1);border-radius:9999px;overflow:hidden">
+    <div style="height:100%;background:rgba(255,255,255,.8);border-radius:9999px;animation:loadingBar 2s ease-in-out forwards"></div>
+  </div>
+  <p style="margin-top:20px;color:rgba(255,255,255,.25);font-size:11px;letter-spacing:.1em;text-transform:uppercase">Click para entrar</p>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <img src="images/logo.png" alt="DFORZZE">
+      <span>DFORZZE</span>
+    </div>
+    <nav id="userNav" style="display:none;align-items:center;gap:16px">
+      <button class="btn btn-sm btn-ghost" onclick="openProfile()" style="background:rgba(255,255,255,.05);color:rgba(0,0,0,.7)">
+        <span id="navUserName">Usuario</span>
+      </button>
+      <button class="btn btn-sm" onclick="handleLogout()" style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)">Salir</button>
+    </nav>
+    <button id="ctaBtn" class="btn btn-primary" onclick="openAuth('register')">Entrar al proceso</button>
+  </div>
+</header>
+
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal-overlay">
+  <div class="modal-box modal-anim">
+    <button class="btn-close" onclick="closeAuth()">✕</button>
+    <div class="modal-header">
+      <h2 class="modal-title">Bienvenido</h2>
+      <p class="modal-subtitle">Inicia sesión para acceder a tu cuenta</p>
+    </div>
+    <div class="modal-tabs">
+      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Iniciar Sesión</button>
+      <button class="tab-btn" id="tabRegister" onclick="switchTab('register')">Registrarse</button>
+    </div>
+    <div class="modal-body">
+      <form id="authForm" onsubmit="handleAuth(event)">
+        <div id="nameField" class="form-group" style="display:none">
+          <label class="form-label">Nombre</label>
+          <input type="text" class="form-input" id="authName" placeholder="Tu nombre">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="authEmail" placeholder="tu@email.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="password" class="form-input" id="authPassword" placeholder="••••••••" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%" id="authSubmitBtn">Iniciar Sesión</button>
+        <p id="authError" class="error-msg"></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="profile-overlay">
+  <div class="profile-box modal-anim">
+    <button class="btn-close" onclick="closeProfile()">✕</button>
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">U</div>
+      <div class="profile-info">
+        <h3 id="profileName">Usuario</h3>
+        <p id="profileEmail">email@ejemplo.com</p>
+      </div>
+    </div>
+    <div class="profile-stats">
+      <div class="stat-item">
+        <p class="stat-value" id="profileStickers">0</p>
+        <p class="stat-label">Stickers</p>
+      </div>
+      <div class="stat-item">
+        <p class="stat-value" id="profileOrders">0</p>
+        <p class="stat-label">Pedidos</p>
+      </div>
+      <div class="stat-item">
+        <div class="rank-badge rank-none" id="profileRank">Sin Rango</div>
+        <p class="stat-label">Rango</p>
+      </div>
+    </div>
+    <div style="padding:0 24px">
+      <div class="redeem-section" style="margin-bottom:0">
+        <p style="font-weight:600">🎴 Canjear Código de Sticker</p>
+        <div class="redeem-form">
+          <input type="text" class="redeem-input" id="redeemCode" placeholder="DFZ-XXXXXX">
+          <button class="btn btn-primary btn-sm" onclick="handleRedeem()">Canjear</button>
+        </div>
+        <p id="redeemMsg" style="font-size:12px;margin-top:8px"></p>
+      </div>
+    </div>
+    <div class="profile-actions">
+      <a href="admin.html" id="adminLink" class="btn btn-ghost" style="display:none;text-align:center">
+        🛠️ Panel de Administración
+      </a>
+      <button class="btn" onclick="handleLogout()" style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)">Cerrar Sesión</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="loggedOutContent">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <p class="hero-fade" style="color:rgba(255,255,255,.5);font-weight:500;font-size:14px;letter-spacing:.25em;text-transform:uppercase;margin-bottom:20px;animation-delay:.3s">Membresía DFORZZE</p>
+      <h1 class="hero-title">
+        <span class="hero-up" style="display:inline-block;animation-delay:.5s">ENTRA AL</span><br>
+        <span class="hero-up" style="display:inline-block;animation-delay:.7s">PROCESO</span>
+      </h1>
+      <p class="hero-fade hero-subtitle" style="animation-delay:.9s">
+        Más que comprar ropa. DFORZZE construye una comunidad con acceso, progreso y beneficios reales.
+        <br><br>
+        <span style="color:#a855f7">✨ Ahora con backend - Tus datos se guardan en la nube</span>
+      </p>
+      <div class="hero-fade" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;animation-delay:1.1s">
+        <button class="btn btn-secondary" onclick="openAuth('register')">Entrar al proceso →</button>
+        <a href="catalogo.html" class="btn btn-primary">Explorar Tienda →</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- DASHBOARD (Logged In) -->
+<div id="loggedInContent" class="hidden">
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <h1 id="welcomeTitle">¡Hola!</h1>
+      <p id="welcomeSubtitle">Tu progreso en DFORZZE</p>
+    </div>
+    
+    <div class="dashboard-stats">
+      <div class="stat-card">
+        <div class="rank-badge rank-none" id="dashboardRank">Sin Rango</div>
+        <p class="stat-label" style="margin-top:12px">Tu Rango</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-value" id="dashboardStickers">0</p>
+        <p class="stat-label">Stickers</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-value" id="dashboardOrders">0</p>
+        <p class="stat-label">Pedidos</p>
+      </div>
+      <div class="stat-card">
+        <p class="stat-value" style="color:#fbbf24" id="dashboardSpent">S/. 0</p>
+        <p class="stat-label">Total Gastado</p>
+      </div>
+    </div>
+    
+    <!-- Redeem -->
+    <div class="redeem-section">
+      <p style="font-weight:700">🎴 Canjear Código de Sticker</p>
+      <div class="redeem-form">
+        <input type="text" class="redeem-input" id="dashboardRedeemCode" placeholder="DFZ-XXXXXX">
+        <button class="btn btn-primary" onclick="handleDashboardRedeem()">Canjear</button>
+      </div>
+      <p id="dashboardRedeemMsg" style="font-size:12px;margin-top:8px"></p>
+    </div>
+    
+    <!-- Stickers -->
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">🎴 Mis Stickers</h3>
+    <div id="stickersGrid" class="stickers-grid">
+      <p style="color:rgba(255,255,255,.3)">Cargando...</p>
+    </div>
+  </div>
+  
+  <!-- Products Section -->
+  <div class="products-section">
+    <h2 class="section-title">📦 Productos Disponibles</h2>
+    <div id="productsGrid" class="products-grid">
+      <p style="color:rgba(255,255,255,.3)">Cargando productos...</p>
+    </div>
+  </div>
+</div>
+
+<!-- CONNECTION STATUS -->
+<div id="connectionStatus" class="connection-status disconnected">
+  <span class="status-dot"></span>
+  <span>Sin conexión</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DFORZZE - Sistema con Backend (Datos en la Nube)
+// ═══════════════════════════════════════════════════════════════
+
+// ⚠️ URL del servidor en Railway
+const API_URL = 'https://dforzze-backend-production.up.railway.app/api';
+
+let token = localStorage.getItem('dforzze_token');
+let user = null;
+let authMode = 'login';
+
+// ── Init ──────────────────────────────────────────────────────
+function killSplash() {
+  const splash = document.getElementById('splash');
+  if (splash) {
+    splash.style.opacity = '0';
+    setTimeout(() => splash.remove(), 500);
+  }
+}
+setTimeout(killSplash, 3000);
+
+// ── API ───────────────────────────────────────────────────────
+async function api(method, path, body = null) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  
+  const options = { method, headers };
+  if (body) options.body = JSON.stringify(body);
+  
+  const res = await fetch(`${API_URL}${path}`, options);
+  const data = await res.json();
+  
+  if (!res.ok) {
+    throw new Error(data.error || data.message || 'Error del servidor');
+  }
+  
+  updateConnectionStatus(true);
+  return data;
+}
+
+function updateConnectionStatus(connected) {
+  const status = document.getElementById('connectionStatus');
+  if (connected) {
+    status.className = 'connection-status connected';
+    status.innerHTML = '<span class="status-dot"></span><span>Conectado al servidor</span>';
+  } else {
+    status.className = 'connection-status disconnected';
+    status.innerHTML = '<span class="status-dot"></span><span>Sin conexión</span>';
+  }
+}
+
+// ── Auth ──────────────────────────────────────────────────────
+function openAuth(mode) {
+  authMode = mode;
+  switchTab(mode);
+  document.getElementById('authModal').style.display = 'flex';
+  document.getElementById('authError').style.display = 'none';
+}
+
+function closeAuth() {
+  document.getElementById('authModal').style.display = 'none';
+}
+
+function switchTab(mode) {
+  authMode = mode;
+  const loginTab = document.getElementById('tabLogin');
+  const registerTab = document.getElementById('tabRegister');
+  const nameField = document.getElementById('nameField');
+  const submitBtn = document.getElementById('authSubmitBtn');
+  
+  if (mode === 'login') {
+    loginTab.classList.add('active');
+    registerTab.classList.remove('active');
+    nameField.style.display = 'none';
+    submitBtn.textContent = 'Iniciar Sesión';
+  } else {
+    loginTab.classList.remove('active');
+    registerTab.classList.add('active');
+    nameField.style.display = 'block';
+    submitBtn.textContent = 'Crear Cuenta';
+  }
+}
+
+async function handleAuth(e) {
+  e.preventDefault();
+  const btn = document.getElementById('authSubmitBtn');
+  const error = document.getElementById('authError');
+  
+  btn.disabled = true;
+  btn.textContent = authMode === 'login' ? 'Iniciando...' : 'Creando...';
+  error.style.display = 'none';
+  
+  try {
+    const email = document.getElementById('authEmail').value;
+    const password = document.getElementById('authPassword').value;
+    const name = document.getElementById('authName').value;
+    
+    const endpoint = authMode === 'login' ? '/auth/login' : '/auth/register';
+    const body = authMode === 'login' 
+      ? { email, password } 
+      : { name, email, password };
+    
+    const data = await api('POST', endpoint, body);
+    
+    token = data.data.token;
+    user = data.data.user;
+    
+    localStorage.setItem('dforzze_token', token);
+    localStorage.setItem('dforzze_user', JSON.stringify(user));
+    
+    closeAuth();
+    showLoggedIn();
+    
+  } catch (err) {
+    error.textContent = err.message;
+    error.style.display = 'block';
+    updateConnectionStatus(false);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = authMode === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta';
+  }
+}
+
+async function handleLogout() {
+  try {
+    await api('POST', '/auth/logout');
+  } catch (err) {}
+  
+  token = null;
+  user = null;
+  localStorage.removeItem('dforzze_token');
+  localStorage.removeItem('dforzze_user');
+  
+  showLoggedOut();
+}
+
+// ── UI State ──────────────────────────────────────────────────
+function showLoggedIn() {
+  document.getElementById('loggedOutContent').classList.add('hidden');
+  document.getElementById('loggedInContent').classList.remove('hidden');
+  document.getElementById('ctaBtn').style.display = 'none';
+  document.getElementById('userNav').style.display = 'flex';
+  document.getElementById('navUserName').textContent = user?.name || 'Usuario';
+  
+  updateDashboard();
+  loadProducts();
+  loadStickers();
+  loadOrders();
+}
+
+function showLoggedOut() {
+  document.getElementById('loggedOutContent').classList.remove('hidden');
+  document.getElementById('loggedInContent').classList.add('hidden');
+  document.getElementById('ctaBtn').style.display = 'block';
+  document.getElementById('userNav').style.display = 'none';
+}
+
+// ── Profile ───────────────────────────────────────────────────
+function openProfile() {
+  if (!user) return;
+  
+  document.getElementById('profileAvatar').textContent = user.name.charAt(0).toUpperCase();
+  document.getElementById('profileName').textContent = user.name;
+  document.getElementById('profileEmail').textContent = user.email;
+  document.getElementById('profileStickers').textContent = user.stickerCount || 0;
+  
+  updateRankBadge('profileRank', user.rank);
+  
+  document.getElementById('adminLink').style.display = user.role === 'ADMIN' ? 'block' : 'none';
+  document.getElementById('profileModal').style.display = 'flex';
+}
+
+function closeProfile() {
+  document.getElementById('profileModal').style.display = 'none';
+}
+
+// ── Dashboard ─────────────────────────────────────────────────
+async function updateDashboard() {
+  if (!user) return;
+  
+  document.getElementById('welcomeTitle').textContent = `¡Hola, ${user.name}!`;
+  document.getElementById('dashboardStickers').textContent = user.stickerCount || 0;
+  updateRankBadge('dashboardRank', user.rank);
+}
+
+function updateRankBadge(elementId, rank) {
+  const badge = document.getElementById(elementId);
+  if (!badge) return;
+  
+  const ranks = {
+    'NONE': { class: 'rank-none', text: 'Sin Rango' },
+    'INITIATED': { class: 'rank-initiated', text: 'Initiated' },
+    'BUILDER': { class: 'rank-builder', text: 'Builder' },
+    'INNER': { class: 'rank-inner', text: 'INNER' }
+  };
+  
+  const r = ranks[rank] || ranks['NONE'];
+  badge.className = `rank-badge ${r.class}`;
+  badge.textContent = r.text;
+}
+
+// ── Products ──────────────────────────────────────────────────
+async function loadProducts() {
+  try {
+    const data = await api('GET', '/products');
+    renderProducts(data.data.products || data.data);
+  } catch (err) {
+    document.getElementById('productsGrid').innerHTML = 
+      '<p style="color:#ef4444">Error cargando productos. Verifica que el servidor esté corriendo en http://localhost:3000</p>';
+    updateConnectionStatus(false);
+  }
+}
+
+function renderProducts(products) {
+  const grid = document.getElementById('productsGrid');
+  
+  if (!products || products.length === 0) {
+    grid.innerHTML = '<p style="color:rgba(255,255,255,.3)">No hay productos</p>';
+    return;
+  }
+  
+  grid.innerHTML = products.map(p => {
+    const img = p.images?.[0] || `images/1.png`;
+    const stockColor = p.stock === 0 ? '#ef4444' : p.stock <= 5 ? '#fbbf24' : '#4ade80';
+    
+    return `
+      <div class="product-card">
+        <div class="product-image">
+          <img src="${img}" alt="${p.name}" onerror="this.src='images/logo.png'">
+        </div>
+        <div class="product-info">
+          <p class="product-name">${p.name}</p>
+          <p class="product-price">S/. ${parseFloat(p.price).toFixed(0)}</p>
+          <p class="product-stock" style="color:${stockColor}">${p.stock === 0 ? 'Agotado' : p.stock + ' disponibles'}</p>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Stickers ──────────────────────────────────────────────────
+async function loadStickers() {
+  try {
+    const data = await api('GET', '/stickers/my-collection');
+    renderStickers(data.data);
+    document.getElementById('profileStickers').textContent = data.data.total || 0;
+    document.getElementById('dashboardStickers').textContent = data.data.total || 0;
+  } catch (err) {
+    document.getElementById('stickersGrid').innerHTML = 
+      '<p style="color:rgba(255,255,255,.3)">Aún no tienes stickers</p>';
+  }
+}
+
+function renderStickers(data) {
+  const grid = document.getElementById('stickersGrid');
+  
+  if (!data?.stickers?.length) {
+    grid.innerHTML = '<p style="color:rgba(255,255,255,.3)">Aún no tienes stickers. ¡Haz una compra!</p>';
+    return;
+  }
+  
+  // Group by name
+  const grouped = {};
+  data.stickers.forEach(s => {
+    if (!grouped[s.name]) grouped[s.name] = { ...s, count: 0 };
+    grouped[s.name].count++;
+  });
+  
+  grid.innerHTML = Object.values(grouped).map(s => `
+    <div class="sticker-item">
+      <span class="sticker-emoji">${s.emoji || '🎴'}</span>
+      <div>
+        <p style="font-weight:600;font-size:13px">${s.name}</p>
+        <span style="font-size:11px;color:rgba(255,255,255,.4)">×${s.count}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Orders ────────────────────────────────────────────────────
+async function loadOrders() {
+  try {
+    const data = await api('GET', '/orders');
+    const orders = data.data.orders || [];
+    
+    document.getElementById('dashboardOrders').textContent = orders.length;
+    
+    let total = 0;
+    orders.forEach(o => total += parseFloat(o.total));
+    document.getElementById('dashboardSpent').textContent = `S/. ${total.toFixed(0)}`;
+  } catch (err) {}
+}
+
+// ── Redeem ────────────────────────────────────────────────────
+async function handleRedeem() {
+  const code = document.getElementById('redeemCode').value.trim();
+  const msg = document.getElementById('redeemMsg');
+  
+  if (!code) return;
+  
+  msg.style.color = 'rgba(255,255,255,.4)';
+  msg.textContent = 'Canjeando...';
+  
+  try {
+    const data = await api('POST', '/stickers/redeem', { code });
+    msg.style.color = '#4ade80';
+    msg.textContent = `¡Sticker canjeado! ${data.data.emoji} ${data.data.name}`;
+    document.getElementById('redeemCode').value = '';
+    await loadStickers();
+  } catch (err) {
+    msg.style.color = '#ef4444';
+    msg.textContent = err.message;
+  }
+}
+
+async function handleDashboardRedeem() {
+  const code = document.getElementById('dashboardRedeemCode').value.trim();
+  const msg = document.getElementById('dashboardRedeemMsg');
+  
+  if (!code) return;
+  
+  msg.style.color = 'rgba(255,255,255,.4)';
+  msg.textContent = 'Canjeando...';
+  
+  try {
+    const data = await api('POST', '/stickers/redeem', { code });
+    msg.style.color = '#4ade80';
+    msg.textContent = `¡Sticker canjeado! ${data.data.emoji} ${data.data.name}`;
+    document.getElementById('dashboardRedeemCode').value = '';
+    await loadStickers();
+  } catch (err) {
+    msg.style.color = '#ef4444';
+    msg.textContent = err.message;
+  }
+}
+
+// ── Init ──────────────────────────────────────────────────────
+async function init() {
+  // Check for stored token
+  const storedUser = localStorage.getItem('dforzze_user');
+  if (storedUser) {
+    try {
+      user = JSON.parse(storedUser);
+    } catch (err) {}
+  }
+  
+  if (token && user) {
+    try {
+      // Verify token is still valid
+      await api('GET', '/products');
+      showLoggedIn();
+    } catch (err) {
+      // Token expired, show login
+      showLoggedOut();
+      updateConnectionStatus(false);
+    }
+  } else {
+    showLoggedOut();
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>

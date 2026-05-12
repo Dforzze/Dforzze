@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Task 9 - Panel Administrativo Mejorado</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .subtitle {
+      color: rgba(255, 255, 255, 0.3);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: #161616;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .card h2 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.3);
+      margin-bottom: 16px;
+    }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .metric:last-child {
+      border-bottom: none;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .metric-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #a855f7;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #a855f7;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: #9333ea;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.6);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: rgba(239, 68, 68, 0.8);
+    }
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+    .section {
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid rgba(168, 85, 247, 0.2);
+    }
+    .input-group {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    input, select {
+      flex: 1;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 12px;
+    }
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+    .output {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 12px;
+    }
+    .success {
+      color: #4ade80;
+    }
+    .error {
+      color: #ef4444;
+    }
+    .warning {
+      color: #fbbf24;
+    }
+    .rank-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .rank-none { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.5); }
+    .rank-initiated { background: rgba(52, 211, 153, 0.1); color: #34d399; }
+    .rank-builder { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+    .rank-inner { background: rgba(192, 132, 252, 0.1); color: #c084fc; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th {
+      text-align: left;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.3);
+    }
+    td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🧪 Test Task 9: Panel Administrativo Mejorado</h1>
+  <p class="subtitle">Interfaz interactiva para probar analytics, gestión masiva y auditoría</p>
+
+  <!-- SECCIÓN 1: ANALYTICS -->
+  <div class="section">
+    <div class="section-title">📊 Analytics Dashboard</div>
+    
+    <div class="grid">
+      <div class="card">
+        <h2>Métricas Generales</h2>
+        <div class="metric">
+          <span class="metric-label">Total Usuarios</span>
+          <span class="metric-value" id="totalUsers">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Total Stickers</span>
+          <span class="metric-value" id="totalStickers">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Promedio/Usuario</span>
+          <span class="metric-value" id="avgStickers">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Engagement Rate</span>
+          <span class="metric-value" id="engagementRate">0%</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Distribución por Rangos</h2>
+        <div class="metric">
+          <span class="metric-label">Sin Rango</span>
+          <span class="metric-value" id="rankNone">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Initiated</span>
+          <span class="metric-value" id="rankInitiated">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Builder</span>
+          <span class="metric-value" id="rankBuilder">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Inner</span>
+          <span class="metric-value" id="rankInner">0</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Engagement Metrics</h2>
+        <div class="metric">
+          <span class="metric-label">Usuarios Activos</span>
+          <span class="metric-value" id="activeUsers">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Usuarios Inactivos</span>
+          <span class="metric-value" id="inactiveUsers">0</span>
+        </div>
+        <div class="metric">
+          <span class="metric-label">Promedio/Rango</span>
+          <span class="metric-value" id="avgPerRank">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <button class="btn" onclick="generateTestData()">Generar Datos de Prueba</button>
+      <button class="btn btn-secondary" onclick="refreshAnalytics()">Actualizar Analytics</button>
+      <button class="btn btn-danger" onclick="clearAllData()">Limpiar Todo</button>
+    </div>
+
+    <div class="output" id="analyticsOutput"></div>
+  </div>
+
+  <!-- SECCIÓN 2: GESTIÓN MASIVA -->
+  <div class="section">
+    <div class="section-title">🔧 Gestión Masiva de Usuarios</div>
+    
+    <div class="card">
+      <h2>Operaciones Bulk</h2>
+      
+      <div class="input-group">
+        <input type="number" id="bulkStickers" placeholder="Cantidad de stickers" min="0" max="50" value="5">
+        <button class="btn" onclick="bulkAddStickers()">Añadir Stickers a Todos</button>
+      </div>
+
+      <div class="input-group">
+        <input type="number" id="bulkRemoveStickers" placeholder="Cantidad a remover" min="0" max="50" value="2">
+        <button class="btn btn-danger" onclick="bulkRemoveStickers()">Remover Stickers de Todos</button>
+      </div>
+
+      <div class="input-group">
+        <button class="btn" onclick="bulkBlockUsers()">Bloquear Todos los Usuarios</button>
+        <button class="btn btn-secondary" onclick="bulkUnblockUsers()">Desbloquear Todos</button>
+      </div>
+
+      <div class="output" id="bulkOutput"></div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3: EVENTOS ESPECIALES -->
+  <div class="section">
+    <div class="section-title">🎉 Eventos Especiales</div>
+    
+    <div class="card">
+      <h2>Crear Eventos</h2>
+      
+      <div class="input-group">
+        <input type="text" id="eventName" placeholder="Nombre del evento" value="Evento Especial">
+        <input type="number" id="eventReward" placeholder="Stickers a recompensar" min="1" max="10" value="2">
+        <button class="btn" onclick="createSpecialEvent()">Crear Evento</button>
+      </div>
+
+      <div class="input-group">
+        <button class="btn" onclick="createSeasonalBonus('Verano')">Bono Verano</button>
+        <button class="btn" onclick="createSeasonalBonus('Invierno')">Bono Invierno</button>
+        <button class="btn" onclick="createMilestoneBonus()">Bono Milestone</button>
+      </div>
+
+      <div class="output" id="eventsOutput"></div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 4: AUDITORÍA -->
+  <div class="section">
+    <div class="section-title">🔐 Sistema de Auditoría</div>
+    
+    <div class="card">
+      <h2>Audit Trail</h2>
+      
+      <div class="input-group">
+        <button class="btn" onclick="viewAuditLog()">Ver Audit Log</button>
+        <button class="btn btn-secondary" onclick="viewSecurityAlerts()">Ver Alertas de Seguridad</button>
+        <button class="btn btn-secondary" onclick="exportAuditLog()">Exportar Audit Log</button>
+      </div>
+
+      <div class="output" id="auditOutput"></div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 5: IMPORTACIÓN/EXPORTACIÓN -->
+  <div class="section">
+    <div class="section-title">💾 Importación/Exportación de Datos</div>
+    
+    <div class="card">
+      <h2>Data Management</h2>
+      
+      <div class="input-group">
+        <button class="btn" onclick="exportAllData()">Exportar Todos los Datos</button>
+        <button class="btn btn-secondary" onclick="createBackup()">Crear Respaldo</button>
+        <button class="btn btn-secondary" onclick="viewBackups()">Ver Respaldos</button>
+      </div>
+
+      <div class="output" id="dataOutput"></div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 6: USUARIOS DE PRUEBA -->
+  <div class="section">
+    <div class="section-title">👥 Usuarios Registrados</div>
+    
+    <div class="card">
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rango</th>
+            <th>Stickers</th>
+            <th>Bloqueado</th>
+            <th>Última Actividad</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <tr><td colspan="6" style="text-align: center; color: rgba(255,255,255,0.3);">No hay usuarios</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="admin-enhanced.js"></script>
+<script>
+// ===== FUNCIONES DE PRUEBA =====
+
+function generateTestData() {
+  const testUsers = [
+    { name: 'Alice Johnson', email: 'alice@test.com', rank: 'INNER', stickerCount: 20, blocked: false, lastActivity: new Date().toISOString() },
+    { name: 'Bob Smith', email: 'bob@test.com', rank: 'BUILDER', stickerCount: 10, blocked: false, lastActivity: new Date(Date.now() - 5*24*60*60*1000).toISOString() },
+    { name: 'Carol White', email: 'carol@test.com', rank: 'INITIATED', stickerCount: 5, blocked: false, lastActivity: new Date(Date.now() - 15*24*60*60*1000).toISOString() },
+    { name: 'David Brown', email: 'david@test.com', rank: 'NONE', stickerCount: 1, blocked: false, lastActivity: new Date(Date.now() - 45*24*60*60*1000).toISOString() },
+    { name: 'Eve Davis', email: 'eve@test.com', rank: 'BUILDER', stickerCount: 8, blocked: false, lastActivity: new Date().toISOString() },
+    { name: 'Frank Miller', email: 'frank@test.com', rank: 'INITIATED', stickerCount: 4, blocked: true, lastActivity: new Date(Date.now() - 60*24*60*60*1000).toISOString() }
+  ];
+
+  localStorage.setItem('dforzze_users', JSON.stringify(testUsers));
+  localStorage.setItem('dforzze_admin_email', 'admin@dforzze.com');
+  
+  log('✓ Datos de prueba generados', 'success');
+  refreshAnalytics();
+  updateUsersTable();
+}
+
+function refreshAnalytics() {
+  const users = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+  const metrics = AdminAnalytics.calculateMetrics(users);
+  
+  document.getElementById('totalUsers').textContent = metrics.totalUsers;
+  document.getElementById('totalStickers').textContent = metrics.totalStickers;
+  document.getElementById('avgStickers').textContent = metrics.avgStickers;
+  document.getElementById('engagementRate').textContent = metrics.engagementMetrics.engagementRate + '%';
+  
+  document.getElementById('rankNone').textContent = metrics.rankDistribution.NONE;
+  document.getElementById('rankInitiated').textContent = metrics.rankDistribution.INITIATED;
+  document.getElementById('rankBuilder').textContent = metrics.rankDistribution.BUILDER;
+  document.getElementById('rankInner').textContent = metrics.rankDistribution.INNER;
+  
+  document.getElementById('activeUsers').textContent = metrics.engagementMetrics.activeUsers;
+  document.getElementById('inactiveUsers').textContent = metrics.engagementMetrics.inactiveUsers;
+  
+  const avgPerRank = Object.values(metrics.engagementMetrics.avgStickersPerRank).reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / 4;
+  document.getElementById('avgPerRank').textContent = avgPerRank.toFixed(2);
+  
+  log('Analytics actualizados correctamente', 'success');
+}
+
+function bulkAddStickers() {
+  const users = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+  const userEmails = users.map(u => u.email);
+  const count = parseInt(document.getElementById('bulkStickers').value) || 1;
+  
+  const result = AdminBulkOperations.addStickersToUsers(userEmails, count);
+  
+  if (result.success) {
+    log(`✓ ${result.updated} usuarios actualizados con +${count} stickers`, 'success');
+    refreshAnalytics();
+    updateUsersTable();
+  } else {
+    log(`✗ Error: ${result.error}`, 'error');
+  }
+}
+
+function bulkRemoveStickers() {
+  const users = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+  const userEmails = users.map(u => u.email);
+  const count = parseInt(document.getElementById('bulkRemoveStickers').value) || 1;
+  
+  const result = AdminBulkOperations.removeStickersFromUsers(userEmails, count);
+  
+  if (result.success) {
+    log(`✓ ${result.updated} usuarios actualizados con -${count} stickers`, 'success');
+    refreshAnalytics();
+    updateUsersTable();
+  } else {
+    log(`✗ Error: ${result.error}`, 'error');
+  }
+}
+
+function bulkBlockUsers() {
+  const users = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+  const userEmails = users.map(u => u.email);
+  
+  const result = AdminBulkOperations.blockUsers(userEmails);
+  
+  if (result.success) {
+    log(`✓ ${result.blocked} usuarios bloqueados`, 'success');
+    updateUsersTable();
+  } else {
+    log(`✗ Error: ${result.error}`, 'error');
+  }
+}
+
+function bulkUnblockUsers() {
+  const users = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+  const userEmails = users.map(u => u.email);
+  
+  const result = AdminBulkOperations.unblockUsers(userEmails);
+  
+  if (result.success) {
+    log(`✓ ${result.unblocked} usuarios desbloqueados`, 'success');
+    updateUsersTable();
+  } else {
+    log(`✗ Error: ${result.error}`, 'error');
+  }
+}
+
+function createSpecialEvent() {
+  const eventName = document.getElementById('eventName').value || 'Evento Especial';
+  const reward = parseInt(document.getElementById('eventReward').value) || 1;
+  
+  const result = AdminSpecialEvents.createEvent(eventName, reward);
+  
+  if (result.success) {
+    log(`✓ Evento "${eventName}" creado para ${result.updated} usuarios`, 'success');
+    refreshAnalytics();
+    updateUsersTable();
+  } else {
+    log(`✗ Error: ${result.error}`, 'error');
+  }
+}
+
+function createSeasonalBonus(season) {
+  const result = AdminSpecialEvents.createSeasonalBonus(season);
+  
+  if (result.success) {
+    log(`✓ Bono ${season} aplicado a ${result.updated} usuarios`, 'success');
+    refreshAnalytics();
+    updateUsersTable();
+  } else {
+    log(`✗ Error: ${result.error}`, 'error');
+  }
+}
+
+function createMilestoneBonus() {
+  const result = AdminSpecialEvents.createMilestoneBonus('first_inner');
+  
+  if (result.success) {
+    log(`✓ Bono Milestone aplicado a ${result.updated} usuarios`, 'success');
+    refreshAnalytics();
+    updateUsersTable();
+  } else {
+    log(`✗ Error: ${result.error}`, 'error');
+  }
+}
+
+function viewAuditLog() {
+  const log = AdminAuditTrail.getLog(20);
+  
+  if (log.length === 0) {
+    log('No hay entradas en el audit log', 'warning');
+    return;
+  }
+  
+  let output = '<strong>Últimas 20 entradas del Audit Log:</strong>\n\n';
+  log.forEach((entry, i) => {
+    output += `${i+1}. [${entry.severity.toUpperCase()}] ${entry.action}\n`;
+    output += `   Timestamp: ${entry.timestamp}\n`;
+    output += `   Admin: ${entry.admin}\n`;
+    output += `   Details: ${JSON.stringify(entry.details)}\n\n`;
+  });
+  
+  document.getElementById('auditOutput').innerHTML = '<pre>' + output + '</pre>';
+}
+
+function viewSecurityAlerts() {
+  const alerts = AdminAuditTrail.getSecurityAlerts(10);
+  
+  if (alerts.length === 0) {
+    log('No hay alertas de seguridad', 'warning');
+    return;
+  }
+  
+  let output = '<strong>Últimas 10 Alertas de Seguridad:</strong>\n\n';
+  alerts.forEach((alert, i) => {
+    output += `${i+1}. [${alert.severity.toUpperCase()}] ${alert.type}\n`;
+    output += `   ${alert.description}\n`;
+    output += `   Timestamp: ${alert.timestamp}\n\n`;
+  });
+  
+  document.getElementById('auditOutput').innerHTML = '<pre>' + output + '</pre>';
+}
+
+function exportAuditLog() {
+  const csv = AdminAuditTrail.exportLog('csv');
+  
+  if (!csv) {
+    log('No hay datos para exportar', 'warning');
+    return;
+  }
+  
+  downloadFile(csv, 'audit-log.csv', 'text/csv');
+  log('✓ Audit log exportado', 'success');
+}
+
+function exportAllData() {
+  const json = AdminDataManagement.exportAllData('json');
+  
+  if (!json) {
+    log('Error al exportar datos', 'error');
+    return;
+  }
+  
+  downloadFile(json, 'dforzze-data-export.json', 'application/json');
+  log('✓ Datos exportados', 'success');
+}
+
+function createBackup() {
+  const result = AdminDataManagement.backupData();
+  
+  if (result.success) {
+    log(`✓ Respaldo creado: ${result.backupKey}`, 'success');
+  } else {
+    log(`✗ Error: ${result.error}`, 'error');
+  }
+}
+
+function viewBackups() {
+  const backups = AdminDataManagement.getAvailableBackups();
+  
+  if (backups.length === 0) {
+    log('No hay respaldos disponibles', 'warning');
+    return;
+  }
+  
+  let output = '<strong>Respaldos Disponibles:</strong>\n\n';
+  backups.forEach((backup, i) => {
+    output += `${i+1}. ${backup.key}\n`;
+    output += `   Fecha: ${backup.timestamp}\n`;
+    output += `   Tamaño: ${(backup.size / 1024).toFixed(2)} KB\n\n`;
+  });
+  
+  document.getElementById('dataOutput').innerHTML = '<pre>' + output + '</pre>';
+}
+
+function updateUsersTable() {
+  const users = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+  const tbody = document.getElementById('usersTableBody');
+  
+  if (users.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: rgba(255,255,255,0.3);">No hay usuarios</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = users.map(user => `
+    <tr>
+      <td>${user.name}</td>
+      <td>${user.email}</td>
+      <td><span class="rank-badge rank-${user.rank.toLowerCase()}">${user.rank}</span></td>
+      <td>${user.stickerCount || 0}</td>
+      <td>${user.blocked ? '✓ Bloqueado' : '—'}</td>
+      <td>${user.lastActivity ? new Date(user.lastActivity).toLocaleDateString() : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+function clearAllData() {
+  if (confirm('¿Estás seguro de que quieres limpiar todos los datos?')) {
+    const keysToRemove = Object.keys(localStorage).filter(k => k.startsWith('dforzze_'));
+    keysToRemove.forEach(k => localStorage.removeItem(k));
+    
+    log('✓ Todos los datos han sido eliminados', 'success');
+    document.getElementById('usersTableBody').innerHTML = '<tr><td colspan="6" style="text-align: center; color: rgba(255,255,255,0.3);">No hay usuarios</td></tr>';
+    refreshAnalytics();
+  }
+}
+
+function downloadFile(content, filename, type) {
+  const blob = new Blob([content], { type: type });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+}
+
+function log(message, type = 'info') {
+  const output = document.getElementById('analyticsOutput');
+  const timestamp = new Date().toLocaleTimeString();
+  const className = type === 'success' ? 'success' : type === 'error' ? 'error' : 'warning';
+  output.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+  output.scrollTop = output.scrollHeight;
+}
+
+// Inicializar
+window.addEventListener('load', () => {
+  refreshAnalytics();
+  updateUsersTable();
+});
+</script>
+
+</body>
+</html>

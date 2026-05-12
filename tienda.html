@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFORZZE — Tienda</title>
+<link id="dfz-favicon" rel="icon" type="image/png" href="images/logo.png">
+<script>
+(function(){
+  var img = new Image();
+  img.onload = function(){
+    var c = document.createElement('canvas');
+    c.width = 64; c.height = 64;
+    var ctx = c.getContext('2d');
+    // Círculo negro
+    ctx.beginPath();
+    ctx.arc(32,32,32,0,Math.PI*2);
+    ctx.fillStyle='#000';
+    ctx.fill();
+    // Logo encima
+    ctx.drawImage(img,8,8,48,48);
+    // Teñir logo de blanco (source-atop pinta solo donde hay píxeles del logo)
+    ctx.globalCompositeOperation='source-atop';
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,64,64);
+    // Círculo negro de fondo (destination-over pone detrás)
+    ctx.globalCompositeOperation='destination-over';
+    ctx.beginPath();
+    ctx.arc(32,32,32,0,Math.PI*2);
+    ctx.fillStyle='#000';
+    ctx.fill();
+    var link=document.getElementById('dfz-favicon');
+    if(link) link.href=c.toDataURL('image/png');
+  };
+  img.src='images/logo.png';
+})();
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:100px}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+
+/* TICKER */
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-track{display:flex;width:max-content;animation:ticker 22s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+
+/* SPLASH */
+@keyframes splashLogoIn{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
+@keyframes loadingBar{0%{width:0}100%{width:100%}}
+
+/* SAKURA */
+@keyframes sakuraFall{
+  0%{transform:translateY(-60px) translateX(0) rotate(0deg);opacity:1}
+  80%{opacity:.8}
+  100%{transform:translateY(110vh) translateX(var(--drift)) rotate(var(--spin));opacity:0}
+}
+@keyframes sakuraSway{
+  0%,100%{margin-left:0}
+  25%{margin-left:18px}
+  75%{margin-left:-18px}
+}
+.sakura-petal{
+  position:fixed;
+  top:-60px;
+  pointer-events:none;
+  z-index:999;
+  animation:sakuraFall var(--fall-dur) ease-in var(--delay) forwards, sakuraSway var(--sway-dur) ease-in-out var(--delay) infinite;
+  will-change:transform;
+}
+
+/* HERO */
+@keyframes fadeUp{0%{opacity:0;transform:translateY(24px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+.fade-up{opacity:0;animation:fadeUp 1s cubic-bezier(.16,1,.3,1) forwards}
+.fade-in{opacity:0;animation:fadeIn 1s ease forwards}
+
+/* NAV */
+.nav-link{color:rgba(255,255,255,.55);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;transition:color .25s}
+.nav-link:hover{color:#fff}
+.nav-link.active{color:#fff}
+</style>
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash" onclick="killSplash()" style="position:fixed;inset:0;z-index:9999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s;cursor:pointer">
+  <div style="animation:splashLogoIn 1s ease-out forwards">
+    <img src="images/logo.png" alt="DFORZZE" style="height:96px;width:auto;filter:brightness(0) invert(1)">
+  </div>
+  <div style="margin-top:32px;width:128px;height:2px;background:rgba(255,255,255,.1);border-radius:9999px;overflow:hidden">
+    <div style="height:100%;background:rgba(255,255,255,.8);border-radius:9999px;animation:loadingBar 2s ease-in-out forwards"></div>
+  </div>
+  <p style="margin-top:20px;color:rgba(255,255,255,.25);font-size:11px;letter-spacing:.1em;text-transform:uppercase">Click para entrar</p>
+</div>
+<script>
+function killSplash(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){try{s.remove()}catch(e){}},600)}}
+setTimeout(killSplash,3000);
+</script>
+
+<!-- TICKER -->
+<div style="background:#fff;overflow:hidden;height:36px;display:flex;align-items:center;position:relative;z-index:60">
+  <div class="ticker-track">
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">10% OFF EN TU PRIMERA COMPRA</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">ENVÍOS NACIONALES ACTIVOS</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">COLECCIÓN 01 DISPONIBLE</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">DROPS LIMITADOS</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">PIEZAS ÚNICAS SIN RESTOCK</span>
+    <!-- repeat for seamless loop -->
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">10% OFF EN TU PRIMERA COMPRA</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">ENVÍOS NACIONALES ACTIVOS</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">COLECCIÓN 01 DISPONIBLE</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">DROPS LIMITADOS</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">PIEZAS ÚNICAS SIN RESTOCK</span>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header style="position:sticky;top:0;z-index:50;background:rgba(0,0,0,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,.06)">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px">
+
+    <!-- Logo -->
+    <a href="dforzze.html" style="display:flex;align-items:center;gap:6px;flex:1">
+      <img src="images/logo.png" alt="DFORZZE" style="height:36px;width:auto;filter:brightness(0) invert(1)">
+      <span style="color:rgba(255,255,255,.4);font-weight:700;font-size:9px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+    </a>
+
+    <!-- Nav center -->
+    <nav style="display:flex;align-items:center;gap:32px;flex:1;justify-content:center">
+      <a href="about.html" class="nav-link">About</a>
+      <a href="dforzze.html" class="nav-link">Membership</a>
+      <a href="tienda.html" class="nav-link active">Tienda</a>
+    </nav>
+
+    <!-- CTA -->
+    <div style="flex:1;display:flex;justify-content:flex-end;align-items:center;gap:12px">
+      <a href="catalogo.html" style="background:#fff;color:#000;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 22px;border-radius:9999px;border:none;transition:all .2s;text-decoration:none" onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">Explorar →</a>
+    </div>
+
+  </div>
+</header>
+
+<!-- HERO -->
+<section style="height:100vh;min-height:700px;position:relative;background:#000;overflow:hidden">
+
+  <!-- Image full background -->
+  <img src="images/banner.png" alt="DFORZZE Studio" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center">
+  <div style="position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to top,rgba(0,0,0,.5) 0%,transparent 100%)"></div>
+
+  <!-- Text — left side -->
+  <div style="position:absolute;top:0;left:0;width:58%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:60px 48px 60px 72px">
+
+    <!-- Top label with line -->
+    <div class="fade-up" style="display:flex;align-items:center;gap:16px;margin-bottom:32px;animation-delay:.1s">
+      <div style="width:32px;height:1px;background:rgba(255,255,255,.4)"></div>
+      <p style="color:rgba(255,255,255,.45);font-size:10px;font-weight:500;letter-spacing:.3em;text-transform:uppercase">2025</p>
+    </div>
+
+    <!-- Main title -->
+    <div class="fade-up" style="animation-delay:.25s;margin-bottom:28px">
+      <div style="font-weight:900;font-size:clamp(56px,7vw,104px);letter-spacing:-.04em;color:rgba(255,255,255,.7);line-height:.95;text-transform:uppercase">NEW</div>
+      <div style="font-weight:900;font-size:clamp(72px,9vw,132px);letter-spacing:-.05em;color:#fff;line-height:.88;text-transform:uppercase;text-shadow:0 0 80px rgba(255,255,255,.08)">ARRIVAL</div>
+    </div>
+
+    <!-- Divider -->
+    <div class="fade-up" style="width:48px;height:1px;background:rgba(255,255,255,.25);margin-bottom:24px;animation-delay:.4s"></div>
+
+    <p class="fade-up" style="color:rgba(255,255,255,.55);font-size:14px;line-height:1.75;max-width:300px;margin-bottom:40px;animation-delay:.5s;font-weight:400;letter-spacing:.01em">Piezas que no se repiten.<br>Acceso limitado.<br>Lo que llevas dice dónde estás.</p>
+
+    <div class="fade-up" style="display:flex;flex-wrap:wrap;gap:12px;animation-delay:.65s">
+      <a href="catalogo.html" style="display:inline-flex;align-items:center;gap:10px;background:#fff;color:#000;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:14px 32px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.88)';this.style.gap='14px'" onmouseout="this.style.background='#fff';this.style.gap='10px'">
+        Explorar tienda
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </a>
+      <a href="dforzze.html" style="display:inline-flex;align-items:center;color:rgba(255,255,255,.35);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:14px 16px;transition:color .3s;border:1px solid rgba(255,255,255,.12);border-radius:9999px;padding:14px 24px" onmouseover="this.style.color='rgba(255,255,255,.8)';this.style.borderColor='rgba(255,255,255,.3)'" onmouseout="this.style.color='rgba(255,255,255,.35)';this.style.borderColor='rgba(255,255,255,.12)'">Members Club →</a>
+    </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- FEATURE CARDS — justo debajo del hero -->
+<!-- 2 CARDS GRANDES -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#111;margin:0;padding:0">
+
+  <!-- Card 1 — Motora -->
+  <div style="position:relative;overflow:hidden;aspect-ratio:4/5;cursor:pointer">
+    <img src="images/motora.jpg" alt="DFORZZE" style="width:100%;height:100%;object-fit:cover;object-position:center 60%;transition:transform .8s cubic-bezier(.16,1,.3,1)">
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%)"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:40px 48px">
+      <p style="color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;line-height:1.2;margin-bottom:24px">No es moda.<br>Es posición.</p>
+      <a href="catalogo.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px 28px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.88)'" onmouseout="this.style.background='#fff'">Ver colección</a>
+    </div>
+  </div>
+
+  <!-- Card 2 — Verano -->
+  <div style="position:relative;overflow:hidden;aspect-ratio:4/5;cursor:pointer">
+    <img src="images/verano.jpg" alt="DFORZZE" style="width:100%;height:100%;object-fit:cover;object-position:center 60%;transition:transform .8s cubic-bezier(.16,1,.3,1)">
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%)"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;padding:40px 48px">
+      <p style="color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;line-height:1.2;margin-bottom:24px">Lo que llevas<br>dice quién eres.</p>
+      <a href="catalogo.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px 28px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.88)'" onmouseout="this.style.background='#fff'">Explorar</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- COLECCION PLACEHOLDER -->
+<!-- FOOTER -->
+<footer style="background:#000;border-top:1px solid rgba(255,255,255,.04);padding:32px 0">
+<div style="max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+  <div style="display:flex;align-items:center;gap:4px">
+    <img src="images/logo.png" alt="DFORZZE" style="height:18px;width:auto;filter:brightness(0) invert(1);opacity:.25">
+    <span style="color:rgba(255,255,255,.2);font-weight:700;font-size:8px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+  </div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap">
+    <a href="terminos.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Términos</a>
+    <a href="envios.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Envíos</a>
+    <a href="privacidad.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Privacidad</a>
+  </div>
+  <p style="color:rgba(255,255,255,.12);font-size:10px;letter-spacing:.05em">© 2025 DFORZZE.</p>
+</div>
+</footer>
+
+<!-- MODAL AUTH TIENDA -->
+<div id="tiendaAuthM" onclick="if(event.target===this)closeTiendaAuth()" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:16px">
+  <div onclick="event.stopPropagation()" style="background:#fff;border-radius:4px;width:100%;max-width:420px;position:relative;animation:tAuthIn .25s ease-out">
+    <button onclick="closeTiendaAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(0,0,0,.3);cursor:pointer;font-size:20px;padding:4px;transition:color .2s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.3)'">✕</button>
+    <div style="padding:40px 36px 32px">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:32px">
+        <img src="images/logo.png" alt="DFORZZE" style="height:28px;width:auto;object-fit:contain">
+        <span style="color:#000;font-weight:800;font-size:10px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+      </div>
+      <div style="display:flex;gap:0;margin-bottom:28px;border-bottom:2px solid #f0f0f0">
+        <button id="taTReg" onclick="tiendaAuthTab('register')" style="flex:1;padding:10px 0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;background:none;cursor:pointer;color:#000;border-bottom:2px solid #000;margin-bottom:-2px;font-family:inherit">Crear cuenta</button>
+        <button id="taTLog" onclick="tiendaAuthTab('login')" style="flex:1;padding:10px 0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;background:none;cursor:pointer;color:rgba(0,0,0,.3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit">Iniciar sesión</button>
+      </div>
+      <div id="taErr" style="display:none;margin-bottom:16px;padding:12px;background:#fff0f0;border-left:3px solid #e00;font-size:12px;color:#c00;font-weight:500"></div>
+      <form onsubmit="doTiendaAuth(event)" style="display:flex;flex-direction:column;gap:14px">
+        <div id="taNmF">
+          <label style="display:block;color:#000;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Nombre</label>
+          <input type="text" id="taNm" placeholder="Tu nombre" maxlength="20" style="width:100%;border:1.5px solid #e0e0e0;border-radius:2px;padding:12px 14px;font-size:14px;color:#000;outline:none;font-family:inherit" onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#e0e0e0'">
+        </div>
+        <div>
+          <label style="display:block;color:#000;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Email</label>
+          <input type="email" id="taEm" required placeholder="tu@email.com" style="width:100%;border:1.5px solid #e0e0e0;border-radius:2px;padding:12px 14px;font-size:14px;color:#000;outline:none;font-family:inherit" onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#e0e0e0'">
+        </div>
+        <div>
+          <label style="display:block;color:#000;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Contraseña</label>
+          <input type="password" id="taPw" required minlength="6" placeholder="Mínimo 6 caracteres" style="width:100%;border:1.5px solid #e0e0e0;border-radius:2px;padding:12px 14px;font-size:14px;color:#000;outline:none;font-family:inherit" onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#e0e0e0'">
+        </div>
+        <button type="submit" id="taSub" style="width:100%;background:#000;color:#fff;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:15px;border:none;border-radius:2px;cursor:pointer;margin-top:4px;font-family:inherit" onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">Crear cuenta</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PERFIL TIENDA -->
+<div id="tiendaProfM" onclick="if(event.target===this)closeTiendaProfile()" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px">
+  <div onclick="event.stopPropagation()" style="background:#fff;border-radius:4px;width:100%;max-width:400px;position:relative;animation:tAuthIn .25s ease-out;overflow:hidden;max-height:90vh;overflow-y:auto">
+    <button onclick="closeTiendaProfile()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:20px;z-index:2;padding:4px;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'">✕</button>
+    <div style="background:#000;padding:28px 28px 24px;display:flex;flex-direction:column;align-items:center">
+      <div id="tpAv" style="width:80px;height:80px;border-radius:50%;background:#222;border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:28px;font-weight:800;color:#fff;text-transform:uppercase;margin-bottom:14px"></div>
+      <p id="tpNm" style="color:#fff;font-weight:800;font-size:18px;margin-bottom:2px"></p>
+      <p id="tpEm" style="color:rgba(255,255,255,.35);font-size:12px;margin-bottom:12px"></p>
+      <span id="tpRank" style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:2px"></span>
+    </div>
+    <div style="padding:20px 28px;border-bottom:1px solid #f0f0f0">
+      <div style="display:flex;justify-content:space-between;margin-bottom:10px">
+        <span style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#000">Progreso</span>
+        <span id="tpProgTxt" style="font-size:12px;font-weight:800;color:#000"></span>
+      </div>
+      <div style="height:8px;background:#f0f0f0;overflow:hidden;margin-bottom:8px">
+        <div id="tpProgBar" style="height:100%;background:#000;transition:width .6s ease-out"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span style="font-size:9px;color:rgba(0,0,0,.3);font-weight:600;text-transform:uppercase">Initiated</span>
+        <span style="font-size:9px;color:rgba(0,0,0,.3);font-weight:600;text-transform:uppercase">Builder</span>
+        <span style="font-size:9px;color:rgba(0,0,0,.3);font-weight:600;text-transform:uppercase">Inner</span>
+      </div>
+      <p id="tpProgHint" style="font-size:11px;color:rgba(0,0,0,.4);margin-top:8px;text-align:center"></p>
+    </div>
+    <div style="padding:16px 28px;display:flex;flex-direction:column;gap:8px">
+      <a href="catalogo.html" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid #e8e8e8;border-radius:2px;background:#fff;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#e8e8e8'">
+        <div style="width:36px;height:36px;background:#000;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        </div>
+        <span style="font-weight:700;font-size:13px;color:#000">Ir a la tienda</span>
+      </a>
+      <a href="dforzze.html" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid #e8e8e8;border-radius:2px;background:#fff;text-decoration:none;transition:all .2s" onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='#e8e8e8'">
+        <div style="width:36px;height:36px;background:#000;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <span style="font-weight:700;font-size:13px;color:#000">Ver perfil completo</span>
+      </a>
+      <button onclick="tiendaLogout()" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid #fee2e2;border-radius:2px;background:#fff;cursor:pointer;transition:all .2s;width:100%;text-align:left" onmouseover="this.style.background='#fff5f5'" onmouseout="this.style.background='#fff'">
+        <div style="width:36px;height:36px;background:#fee2e2;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+        <span style="font-weight:700;font-size:13px;color:#ef4444">Cerrar sesión</span>
+      </button>
+    </div>
+  </div>
+</div>
+<style>@keyframes tAuthIn{0%{opacity:0;transform:scale(.96) translateY(8px)}100%{opacity:1;transform:scale(1) translateY(0)}}</style>
+
+<script>
+// ── AUTH TIENDA ────────────────────────────────────────────────
+var _tTab = 'register';
+
+function getUser(){ try{ return JSON.parse(localStorage.getItem('dforzze_user')); }catch(e){ return null; } }
+
+function updateTiendaUI(){
+  var u = getUser();
+  var cta = document.getElementById('tiendaCtaBtn');
+  var prof = document.getElementById('tiendaProfBtn');
+  if(u){
+    cta.style.display = 'none';
+    prof.style.display = 'flex';
+    var av = document.getElementById('tiendaProfAv');
+    av.innerHTML = u.image ? '<img src="'+u.image+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">' : u.name.charAt(0).toUpperCase();
+    document.getElementById('tiendaProfNm').textContent = u.name;
+  } else {
+    cta.style.display = 'inline-flex';
+    prof.style.display = 'none';
+  }
+}
+
+function openTiendaAuth(tab){
+  _tTab = tab || 'register';
+  tiendaAuthTab(_tTab);
+  document.getElementById('tiendaAuthM').style.display = 'flex';
+  document.getElementById('taErr').style.display = 'none';
+  document.body.style.overflow = 'hidden';
+}
+function closeTiendaAuth(){
+  document.getElementById('tiendaAuthM').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function tiendaAuthTab(t){
+  _tTab = t;
+  document.getElementById('taTReg').style.color = t==='register'?'#000':'rgba(0,0,0,.3)';
+  document.getElementById('taTReg').style.borderBottomColor = t==='register'?'#000':'transparent';
+  document.getElementById('taTLog').style.color = t==='login'?'#000':'rgba(0,0,0,.3)';
+  document.getElementById('taTLog').style.borderBottomColor = t==='login'?'#000':'transparent';
+  document.getElementById('taNmF').style.display = t==='register'?'block':'none';
+  document.getElementById('taSub').textContent = t==='register'?'Crear cuenta':'Iniciar sesión';
+  document.getElementById('taErr').style.display = 'none';
+}
+function doTiendaAuth(e){
+  e.preventDefault();
+  var nm = document.getElementById('taNm').value.trim();
+  var em = document.getElementById('taEm').value.trim();
+  var pw = document.getElementById('taPw').value;
+  var err = document.getElementById('taErr');
+  if(_tTab==='register'&&!nm){ err.textContent='Ingresa un nombre'; err.style.display='block'; return; }
+  if(!em){ err.textContent='Ingresa tu email'; err.style.display='block'; return; }
+  if(pw.length<6){ err.textContent='Mínimo 6 caracteres'; err.style.display='block'; return; }
+  if(em==='admin@dforzze.com'&&pw==='dforzze2025'){
+    var U={name:'Admin',email:em,rank:'INNER',stickerCount:0,stickers:[],image:null,role:'ADMIN',createdAt:new Date().toLocaleDateString('es-PE'),blocked:false};
+    try{ localStorage.setItem('dforzze_user',JSON.stringify(U)); var l=JSON.parse(localStorage.getItem('dforzze_users')||'[]'); var ix=l.findIndex(function(x){return x.email===em;}); if(ix>=0)l[ix]=U; else l.push(U); localStorage.setItem('dforzze_users',JSON.stringify(l)); }catch(ex){}
+    closeTiendaAuth(); updateTiendaUI(); return;
+  }
+  var uList=JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+  var existing=uList.find(function(x){return x.email===em;});
+  if(existing&&existing.blocked){ err.textContent='Cuenta bloqueada. Contacta al administrador.'; err.style.display='block'; return; }
+  var U = existing || {name:_tTab==='register'?nm:em.split('@')[0],email:em,rank:'NONE',stickerCount:0,stickers:[],image:null,role:'USER',createdAt:new Date().toLocaleDateString('es-PE'),blocked:false};
+  if(!existing){ uList.push(U); localStorage.setItem('dforzze_users',JSON.stringify(uList)); }
+  try{ localStorage.setItem('dforzze_user',JSON.stringify(U)); }catch(ex){}
+  closeTiendaAuth(); updateTiendaUI();
+}
+
+function openTiendaProfile(){
+  var u = getUser();
+  if(!u){ openTiendaAuth('register'); return; }
+  var av = document.getElementById('tpAv');
+  av.innerHTML = u.image ? '<img src="'+u.image+'" style="width:100%;height:100%;object-fit:cover">' : u.name.charAt(0).toUpperCase();
+  document.getElementById('tpNm').textContent = u.name;
+  document.getElementById('tpEm').textContent = u.email;
+  var RANKS={NONE:{l:'Sin Rango',c:'rgba(255,255,255,.5)',bg:'rgba(255,255,255,.08)'},INITIATED:{l:'Initiated',c:'#34d399',bg:'rgba(52,211,153,.15)'},BUILDER:{l:'Builder',c:'#fbbf24',bg:'rgba(251,191,36,.15)'},INNER:{l:'Inner',c:'#c084fc',bg:'rgba(192,132,252,.15)'}};
+  var RANK_STK={NONE:0,INITIATED:3,BUILDER:7,INNER:15};
+  var RANK_ORDER=['NONE','INITIATED','BUILDER','INNER'];
+  var rk=RANKS[u.rank||'NONE'];
+  var rb=document.getElementById('tpRank'); rb.textContent=rk.l; rb.style.color=rk.c; rb.style.background=rk.bg;
+  var cnt=u.stickerCount||0;
+  var curIdx=RANK_ORDER.indexOf(u.rank||'NONE');
+  var nextRank=RANK_ORDER[Math.min(curIdx+1,3)];
+  if(u.rank==='INNER'){
+    document.getElementById('tpProgTxt').textContent='Rango máximo';
+    document.getElementById('tpProgBar').style.width='100%';
+    document.getElementById('tpProgHint').textContent='¡Eres Inner Circle!';
+  } else {
+    var needed=RANK_STK[nextRank];
+    document.getElementById('tpProgTxt').textContent=cnt+' / '+needed+' stickers';
+    document.getElementById('tpProgBar').style.width=Math.min(cnt/needed*100,100)+'%';
+    document.getElementById('tpProgHint').textContent='Te faltan '+(needed-cnt)+' stickers para '+RANKS[nextRank].l;
+  }
+  document.getElementById('tiendaProfM').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeTiendaProfile(){
+  document.getElementById('tiendaProfM').style.display='none';
+  document.body.style.overflow='';
+}
+function tiendaLogout(){
+  localStorage.removeItem('dforzze_user');
+  closeTiendaProfile();
+  updateTiendaUI();
+}
+
+// Init
+updateTiendaUI();
+</script>
+
+<script>
+document.querySelectorAll('.fade-up,.fade-in').forEach(el=>{
+  el.style.animationPlayState='running';
+});
+
+// SAKURA
+(function(){
+  const container = document.body;
+  const colors = ['#ffb7c5','#ff9eb5','#ffc8d5','#ff85a1','#ffd6e0','#ffadc5'];
+
+  // SVG petal shapes
+  function petalSVG(color){
+    const shapes = [
+      `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><ellipse cx="7" cy="7" rx="3.5" ry="6" fill="${color}" opacity="0.85" transform="rotate(0 7 7)"/></svg>`,
+      `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="16" viewBox="0 0 12 16"><ellipse cx="6" cy="8" rx="3" ry="7" fill="${color}" opacity="0.8"/></svg>`,
+      `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="12" viewBox="0 0 16 12"><ellipse cx="8" cy="6" rx="7" ry="4" fill="${color}" opacity="0.75"/></svg>`,
+      `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><path d="M7 1 C10 1 13 4 13 7 C13 10 10 13 7 13 C4 13 1 10 1 7 C1 4 4 1 7 1 Z" fill="${color}" opacity="0.7"/></svg>`,
+    ];
+    return shapes[Math.floor(Math.random()*shapes.length)];
+  }
+
+  function spawnPetal(){
+    const el = document.createElement('div');
+    el.className = 'sakura-petal';
+    const color = colors[Math.floor(Math.random()*colors.length)];
+    const size = 10 + Math.random()*10;
+    const left = Math.random()*100;
+    const fallDur = 4 + Math.random()*5;
+    const swayDur = 2 + Math.random()*2;
+    const delay = Math.random()*0.5;
+    const drift = (Math.random()-0.5)*120;
+    const spin = (Math.random()-0.5)*720;
+
+    el.style.cssText = `
+      left:${left}vw;
+      width:${size}px;
+      height:${size}px;
+      --fall-dur:${fallDur}s;
+      --sway-dur:${swayDur}s;
+      --delay:${delay}s;
+      --drift:${drift}px;
+      --spin:${spin}deg;
+    `;
+    el.innerHTML = petalSVG(color);
+    container.appendChild(el);
+    setTimeout(()=>el.remove(),(fallDur+delay+0.5)*1000);
+  }
+
+  // Initial burst — 60 petals over 3 seconds
+  let spawned = 0;
+  const burst = setInterval(()=>{
+    spawnPetal();
+    spawned++;
+    if(spawned>=60) clearInterval(burst);
+  }, 50);
+
+  // Then continuous gentle fall
+  setTimeout(()=>{
+    setInterval(spawnPetal, 300);
+  }, 3000);
+})();
+</script>
+
+</body>
+</html>

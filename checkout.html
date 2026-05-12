@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — DFORZZE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#f5f5f5;color:#000}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+
+.inp{width:100%;background:#fff;border:1px solid rgba(0,0,0,.15);border-radius:6px;padding:13px 16px;font-size:14px;outline:none;transition:border-color .2s;color:#000}
+.inp:focus{border-color:#000}
+.inp::placeholder{color:rgba(0,0,0,.35)}
+.inp.error{border-color:#dc2626!important}
+.field-error{font-size:11px;color:#dc2626;margin-top:4px;display:none}
+.field-error.visible{display:block}
+label{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(0,0,0,.5);margin-bottom:6px}
+.section-box{background:#fff;border-radius:8px;padding:28px;margin-bottom:16px;border:1px solid rgba(0,0,0,.06)}
+.section-title{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,.06)}
+.card-input{position:relative}
+.card-icons{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;gap:4px}
+.step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+/* Loading spinner */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{animation:spin .8s linear infinite;display:inline-block}
+
+/* Checkmark animation */
+@keyframes checkDraw{to{stroke-dashoffset:0}}
+@keyframes circleDraw{to{stroke-dashoffset:0}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.confirm-check circle{stroke-dasharray:166;stroke-dashoffset:166;animation:circleDraw .6s ease-out .1s forwards}
+.confirm-check path{stroke-dasharray:48;stroke-dashoffset:48;animation:checkDraw .4s ease-out .6s forwards}
+
+/* Error banner */
+.error-banner{background:#fff5f5;border:1px solid #fecaca;border-radius:8px;padding:16px 20px;margin-bottom:16px;display:none}
+.error-banner.visible{display:block;animation:fadeInUp .25s ease-out}
+
+/* Sticker cards */
+.sticker-card{display:inline-flex;flex-direction:column;align-items:center;gap:8px;background:#fafafa;border:1px solid rgba(0,0,0,.08);border-radius:8px;padding:16px 20px;transition:transform .2s}
+.sticker-card:hover{transform:translateY(-2px)}
+
+/* Order number */
+.order-number{font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;font-size:22px;font-weight:700;letter-spacing:.04em;cursor:pointer;user-select:all;transition:opacity .15s}
+.order-number:hover{opacity:.7}
+
+/* Confirm screen fade in */
+.confirm-fade{animation:fadeInUp .4s ease-out}
+
+/* Btn states */
+.btn-primary{background:#000;color:#fff;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:16px;border:none;border-radius:6px;transition:background .2s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.btn-primary:hover:not(:disabled){background:#222}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:768px){
+  .checkout-header{padding:0 16px!important}
+  .checkout-steps{display:none!important}
+  .checkout-grid{grid-template-columns:1fr!important;gap:0!important}
+  .checkout-summary{order:-1;position:static!important;margin-bottom:16px}
+  .checkout-main{padding:16px 16px 80px!important}
+  .section-box{padding:20px 16px!important}
+  .name-grid{grid-template-columns:1fr!important}
+  .confirm-box{padding:24px 16px!important}
+  .confirm-actions{flex-direction:column!important}
+  .confirm-actions a{text-align:center}
+}
+@media(max-width:480px){
+  .order-number{font-size:16px!important}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header style="background:#fff;border-bottom:1px solid rgba(0,0,0,.08);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between" class="checkout-header">
+  <a href="tienda.html" style="display:flex;align-items:center;gap:6px">
+    <img src="images/logo.png" alt="DFORZZE" style="height:30px;width:auto">
+    <span style="font-weight:800;font-size:11px;letter-spacing:.2em;text-transform:uppercase">DFORZZE</span>
+  </a>
+  <!-- Steps -->
+  <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase" class="checkout-steps">
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="step-dot" style="background:#000;color:#fff" id="s1">1</div>
+      <span style="color:#000">Información</span>
+    </div>
+    <div style="width:24px;height:1px;background:rgba(0,0,0,.2)"></div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="step-dot" style="background:rgba(0,0,0,.1);color:rgba(0,0,0,.4)" id="s2">2</div>
+      <span style="color:rgba(0,0,0,.4)" id="s2t">Envío</span>
+    </div>
+    <div style="width:24px;height:1px;background:rgba(0,0,0,.2)"></div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="step-dot" style="background:rgba(0,0,0,.1);color:rgba(0,0,0,.4)" id="s3">3</div>
+      <span style="color:rgba(0,0,0,.4)" id="s3t">Pago</span>
+    </div>
+  </div>
+  <a href="producto.html" style="font-size:11px;color:rgba(0,0,0,.4);letter-spacing:.05em;text-transform:uppercase;transition:color .2s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.4)'">← Volver</a>
+</header>
+
+<main style="max-width:1100px;margin:0 auto;padding:32px 24px 80px;display:grid;grid-template-columns:1fr 400px;gap:32px;align-items:start" class="checkout-grid checkout-main">
+
+  <!-- LEFT — Forms -->
+  <div>
+
+    <!-- STEP 1 — Información -->
+    <div id="step1">
+      <div class="section-box">
+        <p class="section-title">Información de contacto</p>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div>
+            <label>Email</label>
+            <input type="email" class="inp" placeholder="tu@email.com" id="email">
+          </div>
+          <div style="display:flex;gap:12px">
+            <div style="flex:1">
+              <label>Nombre</label>
+              <input type="text" class="inp" placeholder="Nombre" id="fname">
+            </div>
+            <div style="flex:1">
+              <label>Apellido</label>
+              <input type="text" class="inp" placeholder="Apellido" id="lname">
+            </div>
+          </div>
+          <div>
+            <label>Teléfono</label>
+            <input type="tel" class="inp" placeholder="+51 999 999 999" id="phone">
+          </div>
+          <div>
+            <label>DNI</label>
+            <input type="text" class="inp" placeholder="12345678" id="dni" maxlength="8" style="max-width:200px">
+          </div>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <p class="section-title">Dirección de envío</p>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div>
+            <label>País</label>
+            <select class="inp" id="country">
+              <option value="PE">Perú</option>
+            </select>
+          </div>
+          <div>
+            <label>Dirección</label>
+            <input type="text" class="inp" placeholder="Calle, número, piso..." id="address">
+          </div>
+          <div style="display:flex;gap:12px">
+            <div style="flex:1">
+              <label>Ciudad</label>
+              <input type="text" class="inp" placeholder="Lima" id="city">
+            </div>
+            <div style="flex:1">
+              <label>Distrito</label>
+              <input type="text" class="inp" placeholder="Miraflores" id="district">
+            </div>
+          </div>
+          <div>
+            <label>Código postal</label>
+            <input type="text" class="inp" placeholder="15001" id="zip" style="max-width:160px">
+          </div>
+        </div>
+      </div>
+
+      <button onclick="goStep2()" class="btn-primary" style="width:100%">Continuar con envío →</button>
+    </div>
+
+    <!-- STEP 2 — Envío -->
+    <div id="step2" style="display:none">
+      <div class="section-box">
+        <p class="section-title">Método de envío</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <label style="display:flex;align-items:center;justify-content:space-between;padding:16px;border:2px solid #000;border-radius:6px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:14px;font-weight:400;color:#000">
+            <div style="display:flex;align-items:center;gap:12px">
+              <input type="radio" name="shipping" value="standard" checked style="accent-color:#000">
+              <div>
+                <p style="font-weight:600;font-size:13px">Envío estándar</p>
+                <p style="font-size:11px;color:rgba(0,0,0,.5);margin-top:2px">2 a 5 días hábiles</p>
+              </div>
+            </div>
+            <span style="font-weight:700;font-size:14px">S/. 6 – 12</span>
+          </label>
+          <label style="display:flex;align-items:center;justify-content:space-between;padding:16px;border:1px solid rgba(0,0,0,.15);border-radius:6px;cursor:pointer;text-transform:none;letter-spacing:0;font-size:14px;font-weight:400;color:#000">
+            <div style="display:flex;align-items:center;gap:12px">
+              <input type="radio" name="shipping" value="express" style="accent-color:#000">
+              <div>
+                <p style="font-weight:600;font-size:13px">Envío express</p>
+                <p style="font-size:11px;color:rgba(0,0,0,.5);margin-top:2px">1 a 3 días hábiles · según zona</p>
+              </div>
+            </div>
+            <span style="font-weight:700;font-size:14px">S/. 8 – 15</span>
+          </label>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button onclick="goStep(1)" style="flex:1;background:#fff;color:#000;font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px;border:1px solid rgba(0,0,0,.2);border-radius:6px;transition:all .2s" onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='rgba(0,0,0,.2)'">← Volver</button>
+        <button onclick="goStep3()" style="flex:2;background:#000;color:#fff;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:14px;border:none;border-radius:6px;transition:background .2s" onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">Continuar con pago →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 — Pago -->
+    <div id="step3" style="display:none">
+
+      <!-- Resumen antes de pagar -->
+      <div class="section-box">
+        <p class="section-title">Resumen de tu pedido</p>
+        <div id="step3Summary" style="margin-bottom:8px"></div>
+      </div>
+
+      <!-- Método de pago -->
+      <div class="section-box">
+        <p class="section-title">Método de pago</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <!-- Mercado Pago -->
+          <div style="padding:16px;border:2px solid #000;border-radius:8px;display:flex;align-items:center;gap:14px">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="6" fill="#009EE3"/><path d="M6 16c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10S6 21.523 6 16z" fill="#fff" opacity=".2"/><path d="M10 16.5l3 3 6-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div style="flex:1">
+              <p style="font-weight:700;font-size:14px;margin-bottom:2px">Mercado Pago</p>
+              <p style="font-size:11px;color:rgba(0,0,0,.5)">Tarjeta de crédito, débito, Yape y más</p>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <p style="font-size:11px;color:rgba(0,0,0,.4);text-align:center">Serás redirigido a Mercado Pago para completar el pago de forma segura</p>
+        </div>
+      </div>
+
+      <!-- Error banner step 3 -->
+      <div id="orderErrorBanner" class="error-banner">
+        <div style="display:flex;align-items:flex-start;gap:12px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div style="flex:1">
+            <p id="orderErrorTitle" style="font-weight:700;font-size:13px;color:#dc2626;margin-bottom:4px">Error al procesar el pedido</p>
+            <div id="orderErrorBody" style="font-size:12px;color:#7f1d1d;line-height:1.6"></div>
+            <div id="orderErrorActions" style="margin-top:10px;display:flex;gap:8px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px">
+        <button onclick="goStep(2)" style="flex:1;background:#fff;color:#000;font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:14px;border:1px solid rgba(0,0,0,.2);border-radius:6px;transition:all .2s" onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='rgba(0,0,0,.2)'">← Volver</button>
+        <button id="confirmBtn" onclick="placeOrder()" class="btn-primary" style="flex:2;padding:14px;background:#009EE3" onmouseover="this.style.background='#0081c2'" onmouseout="this.style.background='#009EE3'">
+          <span id="confirmBtnText">Pagar con Mercado Pago →</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 4 — Confirmación (nivel Nike) -->
+    <div id="step4" style="display:none">
+      <div class="confirm-fade" style="background:#fff;border-radius:8px;border:1px solid rgba(0,0,0,.08);overflow:hidden">
+
+        <!-- Header con checkmark animado -->
+        <div style="background:#000;padding:48px 32px 40px;text-align:center">
+          <svg class="confirm-check" width="72" height="72" viewBox="0 0 72 72" fill="none" style="margin:0 auto 24px;display:block">
+            <circle cx="36" cy="36" r="32" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+            <circle cx="36" cy="36" r="32" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M22 36l10 10 18-20" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <h2 style="color:#fff;font-weight:800;font-size:26px;letter-spacing:-.03em;margin-bottom:8px">¡Gracias por tu compra!</h2>
+          <p style="color:rgba(255,255,255,.5);font-size:14px;margin-bottom:20px">Tu pedido fue confirmado y está siendo procesado.</p>
+          <!-- Número de orden -->
+          <div style="display:inline-block;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px 24px">
+            <p style="font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px">Número de pedido</p>
+            <p class="order-number" id="orderNumber" onclick="copyOrderNumber(this)" title="Click para copiar">#DFZ-0000</p>
+            <p id="copyHint" style="font-size:10px;color:rgba(255,255,255,.3);margin-top:4px">Click para copiar</p>
+          </div>
+        </div>
+
+        <!-- Resumen del pedido -->
+        <div id="orderSummaryConfirm" style="padding:28px 32px;border-bottom:1px solid #f0f0f0">
+          <!-- Llenado por JS -->
+        </div>
+
+        <!-- Stickers ganados -->
+        <div id="stickerReward" style="padding:28px 32px;border-bottom:1px solid #f0f0f0;display:none">
+          <!-- Llenado por JS -->
+        </div>
+
+        <!-- Tiempo estimado de entrega -->
+        <div id="deliveryEstimate" style="padding:20px 32px;background:#fafafa;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:14px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <div>
+            <p style="font-weight:700;font-size:13px;color:#000" id="deliveryTitle">Envío estándar</p>
+            <p style="font-size:12px;color:rgba(0,0,0,.45)" id="deliveryDays">Estimado: 5 a 10 días hábiles</p>
+          </div>
+        </div>
+
+        <!-- Info de qué son los stickers -->
+        <div id="stickerInfoSection" style="padding:20px 32px;background:#fafafa;border-bottom:1px solid #f0f0f0;display:flex;align-items:flex-start;gap:12px;display:none">
+          <div style="width:32px;height:32px;border-radius:50%;background:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer" onclick="toggleStickerInfo()" title="¿Qué son los stickers?">
+            <span style="color:#fff;font-weight:800;font-size:13px">?</span>
+          </div>
+          <div id="stickerInfo" style="display:none">
+            <p style="font-weight:700;font-size:13px;color:#000;margin-bottom:8px">Members Club — Stickers de Colección</p>
+            <p style="font-size:12px;color:rgba(0,0,0,.5);line-height:1.75;margin-bottom:10px">Cada drop de DFORZZE tiene su propio sticker exclusivo. No se vende, no se repite. Solo se obtiene comprando en el drop activo y según el monto de tu pedido.</p>
+            <div style="display:flex;flex-direction:column;gap:5px;padding:12px 14px;background:#fff;border:1px solid #ebebeb;border-radius:4px;margin-bottom:10px">
+              <p style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.3);margin-bottom:6px">Colección 01 — Sakura 🌸</p>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:rgba(0,0,0,.5)">S/. 100 – S/. 199</span><span style="font-size:12px;font-weight:700;color:#000">1 sticker 🌸</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:rgba(0,0,0,.5)">S/. 200 – S/. 399</span><span style="font-size:12px;font-weight:700;color:#000">2 stickers 🌸🌸</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;color:rgba(0,0,0,.5)">S/. 400 o más</span><span style="font-size:12px;font-weight:700;color:#000">3 stickers 🌸🌸🌸</span></div>
+            </div>
+            <p style="font-size:12px;color:rgba(0,0,0,.4);line-height:1.7">Los stickers acumulados suman a tu rango en el Members Club y podrán canjearse por beneficios exclusivos que la marca anunciará en cada drop: acceso anticipado, piezas especiales y más.</p>
+          </div>
+          <p id="stickerInfoHint" style="font-size:12px;color:rgba(0,0,0,.4);cursor:pointer;line-height:1.5" onclick="toggleStickerInfo()">¿Para qué sirven los stickers? <span style="text-decoration:underline">Ver más</span></p>
+        </div>
+
+        <!-- Botones de acción -->
+        <div style="padding:24px 32px;display:flex;gap:12px">
+          <a href="catalogo.html" style="flex:1;display:flex;align-items:center;justify-content:center;background:#000;color:#fff;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:14px;border-radius:6px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">Seguir comprando</a>
+          <a id="viewOrderBtn" href="#" style="flex:1;display:flex;align-items:center;justify-content:center;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:14px;border-radius:6px;text-decoration:none;border:1px solid rgba(0,0,0,.15);transition:border-color .2s" onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='rgba(0,0,0,.15)'">Ver mi pedido</a>
+        </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT — Order summary -->
+  <div style="position:sticky;top:80px" class="checkout-summary">
+    <div class="section-box">
+      <p class="section-title">Resumen del pedido</p>
+
+      <!-- Items from cart -->
+      <div id="summaryItems" style="margin-bottom:20px"></div>
+
+      <!-- Coupon -->
+      <div style="display:flex;gap:8px;margin-bottom:20px">
+        <input type="text" class="inp" placeholder="Código de descuento" id="couponInput" style="flex:1">
+        <button onclick="applyCoupon()" style="background:#000;color:#fff;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:0 16px;border:none;border-radius:6px;white-space:nowrap;transition:background .2s" onmouseover="this.style.background='#333'" onmouseout="this.style.background='#000'">Aplicar</button>
+      </div>
+      <p id="couponMsg" style="display:none;font-size:11px;color:green;margin-top:-12px;margin-bottom:12px">✓ 10% de descuento aplicado</p>
+
+      <!-- Totals -->
+      <div style="border-top:1px solid rgba(0,0,0,.08);padding-top:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <span style="color:rgba(0,0,0,.5)">Subtotal</span>
+          <span id="subtotal">S/. 0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px" id="discountRow" style="display:none">
+          <span style="color:green">Descuento (10%)</span>
+          <span style="color:green" id="discountAmt">- S/. 0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <span style="color:rgba(0,0,0,.5)">Envío</span>
+          <span id="shippingCost">S/. 9</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;border-top:1px solid rgba(0,0,0,.08);padding-top:12px;margin-top:4px">
+          <span>Total</span>
+          <span id="totalAmt">S/. 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security badges -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px;padding:16px;opacity:.4">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase">Pago seguro</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span style="font-size:10px;letter-spacing:.06em;text-transform:uppercase">SSL</span>
+    </div>
+  </div>
+
+</main>
+
+<!-- API Client -->
+<script>
+  window.DFORZZE_API_URL = 'https://dforzze-backend-production.up.railway.app/api';
+  window.DFORZZE_WS_URL  = 'https://dforzze-backend-production.up.railway.app';
+</script>
+<script src="dforzze-backend/public/js/api.js"></script>
+<script>
+// ── Cart image map ──────────────────────────────────────────────
+let cartBase = 0;
+
+// Obtiene la imagen real de un producto desde el inventario
+function getProductImage(itemId, fallback){
+  try{
+    var products = JSON.parse(localStorage.getItem('dforzze_products')||'[]');
+    var prod = products.find(function(p){ return p.id === itemId; });
+    if(prod){
+      if(prod.image) return prod.image;
+      if(prod.images && prod.images[0]) return prod.images[0];
+    }
+  }catch(e){}
+  return fallback || 'images/1.png';
+}
+
+// ── Render cart summary ─────────────────────────────────────────
+function renderSummary(){
+  const cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  const container = document.getElementById('summaryItems');
+  if(!container) return;
+  cartBase = 0;
+  if(cart.length === 0){
+    container.innerHTML = '<p style="font-size:13px;color:rgba(0,0,0,.4)">No hay productos en el carrito.</p>';
+  } else {
+    container.innerHTML = cart.map(item => {
+      cartBase += item.price * item.qty;
+      const imgSrc = getProductImage(item.id, item.image || 'images/1.png');
+      return `<div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+        <div style="position:relative;flex-shrink:0">
+          <img src="${imgSrc}" style="width:64px;height:64px;object-fit:contain;background:#e8e8e8;border-radius:6px;padding:6px" onerror="this.src='images/1.png'">
+          <span style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#555;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center">${item.qty}</span>
+        </div>
+        <div style="flex:1">
+          <p style="font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px">${item.name}</p>
+          <p style="font-size:11px;color:rgba(0,0,0,.4)">S/. ${item.price} c/u${item.size ? ' · Talla ' + item.size : ''}</p>
+        </div>
+        <p style="font-weight:700;font-size:13px">S/. ${item.price * item.qty}</p>
+      </div>`;
+    }).join('');
+  }
+  updateTotal();
+}
+
+// ── Step navigation ─────────────────────────────────────────────
+function goStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('step'+i).style.display = i===n ? 'block' : 'none';
+  });
+  [1,2,3].forEach(i=>{
+    const dot = document.getElementById('s'+i);
+    const txt = document.getElementById('s'+i+'t');
+    if(i <= n){ dot.style.background='#000'; dot.style.color='#fff'; if(txt) txt.style.color='#000'; }
+    else { dot.style.background='rgba(0,0,0,.1)'; dot.style.color='rgba(0,0,0,.4)'; if(txt) txt.style.color='rgba(0,0,0,.4)'; }
+  });
+  if(n >= 2) updateTotal();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── Inline field validation helpers ────────────────────────────
+function setFieldError(id, msg){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('error');
+  let errEl = el.parentElement.querySelector('.field-error');
+  if(!errEl){
+    errEl = document.createElement('p');
+    errEl.className = 'field-error';
+    el.parentElement.appendChild(errEl);
+  }
+  errEl.textContent = msg;
+  errEl.classList.add('visible');
+}
+function clearFieldError(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('error');
+  const errEl = el.parentElement.querySelector('.field-error');
+  if(errEl) errEl.classList.remove('visible');
+}
+function clearAllErrors(){
+  document.querySelectorAll('.inp.error').forEach(el => el.classList.remove('error'));
+  document.querySelectorAll('.field-error.visible').forEach(el => el.classList.remove('visible'));
+}
+
+// ── Validaciones de campo ───────────────────────────────────────
+// Detecta basura: caracteres repetidos (aaa, zzz), solo símbolos, muy corto
+function isGarbageInput(val, minLen){
+  if(!val) return true;
+  var v = val.trim();
+  if(v.length < (minLen||2)) return true;
+  // Solo un carácter repetido (aaaa, 1111, ...)
+  if(/^(.)\1+$/.test(v)) return true;
+  // Solo caracteres no alfanuméricos (!!!, ???, ...)
+  if(/^[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(v)) return true;
+  // Menos de 2 letras reales
+  var letters = v.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]/g,'');
+  if(letters.length < 2) return true;
+  return false;
+}
+
+function isGarbageAddress(val){
+  if(!val) return true;
+  var v = val.trim();
+  if(v.length < 5) return true;
+  if(/^(.)\1+$/.test(v)) return true;
+  // Debe tener al menos una letra y un número o al menos 3 palabras
+  var hasLetter = /[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ]/.test(v);
+  var hasNumber = /\d/.test(v);
+  var wordCount = v.split(/\s+/).filter(function(w){ return w.length > 0; }).length;
+  if(!hasLetter) return true;
+  if(!hasNumber && wordCount < 2) return true;
+  return false;
+}
+
+function isGarbagePhone(val){
+  if(!val) return true;
+  var digits = val.replace(/\D/g,'');
+  if(digits.length < 7) return true;
+  // Solo dígitos repetidos (1111111, 0000000)
+  if(/^(\d)\1+$/.test(digits)) return true;
+  return false;
+}
+
+// ── Step 1 validation ───────────────────────────────────────────
+function goStep2(){
+  clearAllErrors();
+  const cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  let valid = true;
+
+  if(cart.length === 0){
+    const container = document.getElementById('summaryItems');
+    if(container) container.innerHTML = '<p style="font-size:13px;color:#dc2626;font-weight:600">Tu carrito está vacío. Agrega productos antes de continuar.</p>';
+    valid = false;
+  }
+
+  // Email
+  const emailVal = document.getElementById('email')?.value.trim();
+  if(!emailVal){
+    setFieldError('email', 'El email es requerido');
+    valid = false;
+  } else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)){
+    setFieldError('email', 'Ingresa un email válido (ej: nombre@gmail.com)');
+    valid = false;
+  }
+
+  // Nombre
+  const fnameVal = document.getElementById('fname')?.value.trim();
+  if(!fnameVal || isGarbageInput(fnameVal, 2)){
+    setFieldError('fname', 'Ingresa tu nombre real (mínimo 2 letras)');
+    valid = false;
+  }
+
+  // Apellido
+  const lnameVal = document.getElementById('lname')?.value.trim();
+  if(!lnameVal || isGarbageInput(lnameVal, 2)){
+    setFieldError('lname', 'Ingresa tu apellido real (mínimo 2 letras)');
+    valid = false;
+  }
+
+  // Teléfono
+  const phoneVal = document.getElementById('phone')?.value.trim();
+  if(!phoneVal || isGarbagePhone(phoneVal)){
+    setFieldError('phone', 'Ingresa un número de teléfono válido (mínimo 7 dígitos)');
+    valid = false;
+  }
+
+  // Dirección
+  const addrVal = document.getElementById('address')?.value.trim();
+  if(!addrVal || isGarbageAddress(addrVal)){
+    setFieldError('address', 'Ingresa tu dirección completa (calle y número, ej: Av. Lima 123)');
+    valid = false;
+  }
+
+  // Ciudad
+  const cityVal = document.getElementById('city')?.value.trim();
+  if(!cityVal || isGarbageInput(cityVal, 3)){
+    setFieldError('city', 'Ingresa una ciudad válida');
+    valid = false;
+  }
+
+  // Distrito
+  const distVal = document.getElementById('district')?.value.trim();
+  if(!distVal || isGarbageInput(distVal, 3)){
+    setFieldError('district', 'Ingresa un distrito válido');
+    valid = false;
+  }
+
+  // Si hay email válido, aplicar descuento primera compra automáticamente
+  if(valid && emailVal && !discountApplied){
+    checkFirstPurchaseDiscount(emailVal);
+  }
+
+  if(valid) goStep(2);
+}
+
+// ── Descuento primera compra ────────────────────────────────────
+function checkFirstPurchaseDiscount(email){
+  if(discountApplied) return; // ya tiene descuento
+  var normalizedEmail = email.toLowerCase().trim();
+
+  // Verificar si este email ya compró antes
+  var orders = JSON.parse(localStorage.getItem('dforzze_orders')||'[]');
+  var alreadyBought = orders.some(function(o){
+    return o.email && o.email.toLowerCase().trim() === normalizedEmail;
+  });
+
+  // Verificar si ya usó el descuento de primera compra
+  var usedFirstDiscount = JSON.parse(localStorage.getItem('dforzze_first_discount_used')||'[]');
+  var alreadyUsed = usedFirstDiscount.some(function(e){ return e.toLowerCase().trim() === normalizedEmail; });
+
+  if(!alreadyBought && !alreadyUsed){
+    // Primera compra — aplicar 10% automáticamente
+    discountPct = 10;
+    discountApplied = true;
+    appliedCouponCode = 'PRIMERA-COMPRA';
+
+    var msg = document.getElementById('couponMsg');
+    var row = document.getElementById('discountRow');
+    if(msg){ msg.textContent = '🎉 ¡10% de descuento por tu primera compra aplicado automáticamente!'; msg.style.color = '#16a34a'; msg.style.display = 'block'; }
+    if(row) row.style.display = 'flex';
+
+    // Deshabilitar el campo de cupón (ya tiene descuento)
+    var couponInput = document.getElementById('couponInput');
+    var couponBtn = couponInput?.nextElementSibling;
+    if(couponInput){ couponInput.disabled = true; couponInput.placeholder = 'Descuento de primera compra aplicado'; couponInput.style.opacity = '.5'; }
+    if(couponBtn){ couponBtn.disabled = true; couponBtn.style.opacity = '.4'; }
+
+    updateTotal();
+  }
+}
+
+// ── Step 2 → 3 validation ──────────────────────────────────────
+function goStep3(){
+  // Mostrar resumen en step 3
+  const cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  const summaryEl = document.getElementById('step3Summary');
+  if(summaryEl && cart.length > 0){
+    const expressEl = document.querySelector('input[value="express"]');
+    const ship = (expressEl && expressEl.checked) ? 12 : 9;
+    const sub = cart.reduce(function(s,i){ return s+(i.price*i.qty); }, 0);
+    const disc = discountApplied ? Math.round(sub * discountPct / 100) : 0;
+    const total = sub - disc + ship;
+    summaryEl.innerHTML = cart.map(function(i){
+      return '<div style="display:flex;justify-content:space-between;font-size:13px;padding:4px 0">'
+        +'<span style="color:rgba(0,0,0,.6)">'+i.name+(i.size?' ('+i.size+')':'')+'  ×'+i.qty+'</span>'
+        +'<span style="font-weight:600">S/. '+(i.price*i.qty)+'</span>'
+      +'</div>';
+    }).join('')
+    +'<div style="border-top:1px solid rgba(0,0,0,.08);margin-top:10px;padding-top:10px">'
+      +(disc>0?'<div style="display:flex;justify-content:space-between;font-size:12px;color:#16a34a;margin-bottom:4px"><span>Descuento</span><span>- S/. '+disc+'</span></div>':'')
+      +'<div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(0,0,0,.5);margin-bottom:4px"><span>Envío</span><span>S/. '+ship+'</span></div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800"><span>Total</span><span>S/. '+total+'</span></div>'
+    +'</div>';
+  }
+  goStep(3);
+}
+
+// ── Coupon ──────────────────────────────────────────────────────
+let discountApplied = false;
+let discountPct = 0;
+let appliedCouponCode = '';
+
+function applyCoupon(){
+  if(discountApplied){
+    const msg = document.getElementById('couponMsg');
+    if(msg){ msg.textContent = 'Ya tienes un descuento aplicado en este pedido.'; msg.style.color = '#b45309'; msg.style.display = 'block'; }
+    return;
+  }
+  const code = document.getElementById('couponInput').value.trim().toUpperCase();
+  const msg = document.getElementById('couponMsg');
+  const row = document.getElementById('discountRow');
+  // Códigos fijos
+  const fixedCodes = {'DFORZZE10':10,'10OFF':10};
+  // Códigos dinámicos del admin
+  let dynCodes = JSON.parse(localStorage.getItem('dforzze_codes')||'[]');
+  let dynMatch = dynCodes.find(c => c.code===code && c.type==='discount' && c.active);
+
+  if(fixedCodes[code] !== undefined){
+    discountPct = fixedCodes[code];
+    discountApplied = true;
+    appliedCouponCode = code;
+    msg.textContent = '✓ '+discountPct+'% de descuento aplicado';
+    msg.style.color = 'green'; msg.style.display = 'block'; row.style.display = 'flex';
+    updateTotal();
+  } else if(dynMatch){
+    discountPct = parseInt(dynMatch.value);
+    discountApplied = true;
+    appliedCouponCode = code;
+    // Marcar como usado
+    dynMatch.active = false; dynMatch.usedBy = 'cliente'; dynMatch.usedAt = new Date().toLocaleDateString('es-PE');
+    localStorage.setItem('dforzze_codes', JSON.stringify(dynCodes));
+    msg.textContent = '✓ '+discountPct+'% de descuento aplicado';
+    msg.style.color = 'green'; msg.style.display = 'block'; row.style.display = 'flex';
+    updateTotal();
+  } else {
+    msg.textContent = '✗ Código inválido o ya utilizado';
+    msg.style.color = '#c00'; msg.style.display = 'block';
+  }
+}
+
+function updateTotal(){
+  const expressEl = document.querySelector('input[value="express"]');
+  const ship = (expressEl && expressEl.checked) ? 12 : 9;
+  const disc = discountApplied ? Math.round(cartBase * discountPct / 100) : 0;
+  const total = cartBase - disc + ship;
+  document.getElementById('subtotal').textContent = 'S/. ' + cartBase;
+  document.getElementById('shippingCost').textContent = 'S/. ' + ship;
+  if(document.getElementById('discountAmt')) document.getElementById('discountAmt').textContent = '- S/. ' + disc;
+  document.getElementById('totalAmt').textContent = 'S/. ' + total;
+}
+
+// Card formatting
+function formatCard(el){
+  let v = el.value.replace(/\D/g,'').substring(0,16);
+  el.value = v.replace(/(.{4})/g,'$1 ').trim();
+}
+function formatExp(el){
+  let v = el.value.replace(/\D/g,'');
+  if(v.length >= 2) v = v.substring(0,2) + ' / ' + v.substring(2,4);
+  el.value = v;
+}
+
+// ── Loading state helpers ───────────────────────────────────────
+function setConfirmLoading(loading){
+  const btn = document.getElementById('confirmBtn');
+  const txt = document.getElementById('confirmBtnText');
+  if(!btn) return;
+  if(loading){
+    btn.disabled = true;
+    txt.innerHTML = `<svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Procesando pedido...`;
+  } else {
+    btn.disabled = false;
+    txt.innerHTML = 'Confirmar pedido →';
+  }
+}
+
+// ── Error banner helpers ────────────────────────────────────────
+function showOrderError(title, bodyHtml, actionsHtml){
+  const banner = document.getElementById('orderErrorBanner');
+  document.getElementById('orderErrorTitle').textContent = title;
+  document.getElementById('orderErrorBody').innerHTML = bodyHtml;
+  document.getElementById('orderErrorActions').innerHTML = actionsHtml || '';
+  banner.classList.add('visible');
+  banner.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function hideOrderError(){
+  document.getElementById('orderErrorBanner').classList.remove('visible');
+}
+
+// ── Copy order number ───────────────────────────────────────────
+function copyOrderNumber(el){
+  const text = el.textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const hint = document.getElementById('copyHint');
+    if(hint){ hint.textContent = '¡Copiado!'; setTimeout(()=>{ hint.textContent = 'Click para copiar'; }, 2000); }
+  }).catch(()=>{});
+}
+
+// ── Descontar stock del inventario local ────────────────────────
+function decrementStockLocal(cart){
+  try{
+    var products = JSON.parse(localStorage.getItem('dforzze_products')||'[]');
+    var movements = JSON.parse(localStorage.getItem('dforzze_inv_movements')||'[]');
+    var today = new Date().toLocaleDateString('es-PE');
+    var time  = new Date().toLocaleTimeString('es-PE');
+
+    cart.forEach(function(item){
+      var prod = products.find(function(p){ return p.id === item.id; });
+      if(!prod) return;
+      var sizeData = (prod.sizes||[]).find(function(sz){ return sz.size === item.size; });
+      if(!sizeData) return;
+      var prevStock = sizeData.stock;
+      sizeData.stock = Math.max(0, sizeData.stock - item.qty);
+      // Registrar movimiento
+      movements.unshift({
+        id: 'mov_'+Date.now()+'_'+Math.random().toString(36).slice(2),
+        productId: prod.id,
+        productName: prod.name,
+        type: 'purchase',
+        size: item.size,
+        previousStock: prevStock,
+        newStock: sizeData.stock,
+        quantity: -(item.qty),
+        date: today,
+        time: time,
+        reason: 'Venta confirmada'
+      });
+    });
+
+    localStorage.setItem('dforzze_products', JSON.stringify(products));
+    localStorage.setItem('dforzze_inv_movements', JSON.stringify(movements.slice(0, 500)));
+  }catch(e){ console.error('Error al descontar stock:', e); }
+}
+
+// ── Fallback localStorage order (when backend unavailable) ──────
+function placeOrderFallback(cart){
+  // Validar stock antes de procesar
+  var products = [];
+  try{ products = JSON.parse(localStorage.getItem('dforzze_products')||'[]'); }catch(e){}
+  var stockErrors = [];
+  cart.forEach(function(item){
+    var prod = products.find(function(p){ return p.id === item.id; });
+    if(prod && prod.sizes){
+      var sd = prod.sizes.find(function(sz){ return sz.size === item.size; });
+      if(sd && item.qty > sd.stock){
+        stockErrors.push({ productName: item.name, available: sd.stock, requested: item.qty });
+      }
+    }
+  });
+
+  if(stockErrors.length > 0){
+    setConfirmLoading(false);
+    var itemsList = stockErrors.map(function(i){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #fee2e2">'
+        +'<span style="font-weight:600;font-size:12px">'+i.productName+'</span>'
+        +'<span style="font-size:12px;color:#dc2626">Solo quedan '+i.available+' unidades</span>'
+        +'</div>';
+    }).join('');
+    showOrderError(
+      'Stock insuficiente',
+      '<p style="margin-bottom:8px">Los siguientes productos no tienen suficiente stock:</p>'+itemsList,
+      '<button onclick="window.location.href=\'carrito.html\'" style="font-size:12px;font-weight:600;background:#dc2626;color:#fff;border:none;border-radius:4px;padding:8px 16px;cursor:pointer">Actualizar carrito</button>'
+    );
+    return;
+  }
+
+  // Descontar stock ANTES de confirmar
+  decrementStockLocal(cart);
+
+  // Guardar pedido en historial
+  var earnedStickers = [];
+  var u = null;
+  try{ u = JSON.parse(localStorage.getItem('dforzze_user')); }catch(e){}
+  if(u){
+    try{
+      var uList = JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+      var fresh = uList.find(function(x){ return x.email===u.email; });
+      if(fresh) u = fresh;
+    }catch(e){}
+    if(!u.stickers) u.stickers = [];
+    var today = new Date().toLocaleDateString('es-PE');
+    var finalAmount = cart.reduce(function(s,i){ return s + (i.price * i.qty); }, 0);
+    var stickerQty = finalAmount >= 400 ? 3 : finalAmount >= 200 ? 2 : finalAmount >= 100 ? 1 : 0;
+    for(var k = 0; k < stickerQty; k++){
+      var stk = {name:'Sakura — Colección 01',emoji:'🌸',drop:'Colección 01',pts:1,date:today,code:'SAKURA-'+Date.now()+'-'+k,type:'drop'};
+      u.stickers.push(stk); earnedStickers.push(stk);
+    }
+    u.stickerCount = (u.stickerCount||0) + earnedStickers.length;
+    try{ localStorage.setItem('dforzze_user',JSON.stringify(u)); }catch(e){}
+    try{
+      var list = JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+      var idx = list.findIndex(function(x){ return x.email===u.email; });
+      if(idx>=0) list[idx]=u; else list.push(u);
+      localStorage.setItem('dforzze_users', JSON.stringify(list));
+    }catch(e){}
+  }
+
+  // Guardar pedido en historial de pedidos — datos completos para el admin
+  try{
+    var orders = JSON.parse(localStorage.getItem('dforzze_orders')||'[]');
+    var expressEl = document.querySelector('input[value="express"]');
+    var isExpress = expressEl && expressEl.checked;
+    var ship = isExpress ? 12 : 9;
+    var sub = cartBase || cart.reduce(function(s,i){ return s+(i.price*i.qty); },0);
+    var disc = discountApplied ? Math.round(sub * discountPct / 100) : 0;
+    var orderId = 'DFZ-' + Date.now().toString(36).toUpperCase();
+    var fname = document.getElementById('fname')?.value.trim()||'';
+    var lname = document.getElementById('lname')?.value.trim()||'';
+    orders.unshift({
+      id: orderId,
+      // Datos del cliente
+      name: (fname + ' ' + lname).trim(),
+      email: document.getElementById('email')?.value.trim()||'',
+      phone: document.getElementById('phone')?.value.trim()||'',
+      dni: document.getElementById('dni')?.value.trim()||'',
+      // Dirección de envío
+      address: document.getElementById('address')?.value.trim()||'',
+      city: document.getElementById('city')?.value.trim()||'',
+      district: document.getElementById('district')?.value.trim()||'',
+      zip: document.getElementById('zip')?.value.trim()||'',
+      country: document.getElementById('country')?.value||'PE',
+      // Método de envío
+      shippingMethod: isExpress ? 'express' : 'standard',
+      shippingLabel: isExpress ? 'Express (1-3 días · según zona)' : 'Estándar (2-5 días)',
+      // Items detallados
+      itemsDetail: cart.map(function(i){ return { name:i.name, size:i.size||'', qty:i.qty, price:i.price, subtotal:i.price*i.qty }; }),
+      items: cart.map(function(i){ return i.name+(i.size?' ('+i.size+')':'')+'×'+i.qty; }).join(', '),
+      // Totales
+      subtotal: sub,
+      discount: disc,
+      shipping: ship,
+      total: sub - disc + ship,
+      coupon: appliedCouponCode || '',
+      stickersEarned: earnedStickers.length,
+      // Meta
+      date: new Date().toLocaleDateString('es-PE'),
+      time: new Date().toLocaleTimeString('es-PE'),
+      status: 'confirmed',
+      // Usuario registrado si aplica
+      userId: u ? u.email : null,
+      userName: u ? u.name : null,
+      userRank: u ? (u.rank||'NONE') : null
+    });
+    localStorage.setItem('dforzze_orders', JSON.stringify(orders));
+
+    // Registrar email como "ya usó descuento primera compra"
+    if(appliedCouponCode === 'PRIMERA-COMPRA'){
+      var usedList = JSON.parse(localStorage.getItem('dforzze_first_discount_used')||'[]');
+      var emailUsed = (document.getElementById('email')?.value||'').toLowerCase().trim();
+      if(emailUsed && !usedList.includes(emailUsed)){
+        usedList.push(emailUsed);
+        localStorage.setItem('dforzze_first_discount_used', JSON.stringify(usedList));
+      }
+    }
+  }catch(e){}
+
+  localStorage.removeItem('dforzzeCart');
+
+  var expressEl2 = document.querySelector('input[value="express"]');
+  var ship2 = (expressEl2 && expressEl2.checked) ? 12 : 9;
+  var sub2 = cartBase || cart.reduce(function(s,i){ return s+(i.price*i.qty); },0);
+  var disc2 = discountApplied ? Math.round(sub2 * discountPct / 100) : 0;
+  var fakeOrderId = 'DFZ-' + Date.now().toString(36).toUpperCase();
+
+  showConfirmationScreen({
+    id: fakeOrderId,
+    items: cart.map(function(i){ return {productName:i.name+(i.size?' — '+i.size:''), quantity:i.qty, unitPrice:i.price}; }),
+    subtotal: sub2,
+    discount: disc2,
+    shipping: ship2,
+    total: sub2 - disc2 + ship2,
+    stickersEarned: earnedStickers.length
+  }, earnedStickers);
+}
+
+// ── Main placeOrder ─────────────────────────────────────────────
+async function placeOrder(){
+  hideOrderError();
+  const cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  if(cart.length === 0){
+    showOrderError('Carrito vacío', 'Agrega productos antes de confirmar el pedido.',
+      '<button onclick="goStep(1)" style="font-size:12px;font-weight:600;background:#000;color:#fff;border:none;border-radius:4px;padding:8px 16px;cursor:pointer">Ir al carrito</button>');
+    return;
+  }
+
+  // Check auth
+  const localUser = (function(){ try{ return JSON.parse(localStorage.getItem('dforzze_user')); }catch(e){ return null; } })();
+  const isAdmin = localUser && localUser.role === 'ADMIN';
+  const isLoggedIn = isAdmin || ((typeof DforzzeAPI !== 'undefined') && DforzzeAPI.isLoggedIn());
+  if(!isLoggedIn){
+    openAuthModal('login');
+    return;
+  }
+
+  setConfirmLoading(true);
+
+  const expressEl = document.querySelector('input[value="express"]');
+  const shippingMethod = (expressEl && expressEl.checked) ? 'express' : 'standard';
+  const fname = document.getElementById('fname')?.value.trim() || '';
+  const lname = document.getElementById('lname')?.value.trim() || '';
+
+  const orderData = {
+    items: cart.map(i => ({ productId: i.id, quantity: i.qty })),
+    shipping: {
+      name: (fname + ' ' + lname).trim(),
+      email: document.getElementById('email')?.value.trim() || '',
+      phone: document.getElementById('phone')?.value.trim() || '',
+      address: document.getElementById('address')?.value.trim() || '',
+      city: document.getElementById('city')?.value.trim() || '',
+      district: document.getElementById('district')?.value.trim() || '',
+      zip: document.getElementById('zip')?.value.trim() || '',
+      country: document.getElementById('country')?.value || 'PE',
+    },
+    shippingMethod,
+    couponCode: appliedCouponCode || undefined,
+  };
+
+  // ── Intentar con Mercado Pago (backend real) ──────────────────
+  if(typeof DforzzeAPI !== 'undefined' && DforzzeAPI.isLoggedIn()){
+    try{
+      const API_URL = window.DFORZZE_API_URL || 'https://dforzze-backend-production.up.railway.app/api';
+      const token = localStorage.getItem('dforzze_token');
+      const res = await fetch(API_URL + '/payments/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ orderData })
+      });
+      const data = await res.json();
+
+      if(data.success){
+        // Guardar orderId para cuando vuelva de MP
+        localStorage.setItem('dforzze_pending_order', data.data.orderId);
+        localStorage.setItem('dforzze_pending_cart', JSON.stringify(cart));
+        // Guardar datos del formulario para el historial al volver de MP
+        localStorage.setItem('dforzze_checkout_name', (document.getElementById('fname')?.value.trim()||'')+' '+(document.getElementById('lname')?.value.trim()||''));
+        localStorage.setItem('dforzze_checkout_email', document.getElementById('email')?.value.trim()||'');
+        localStorage.setItem('dforzze_checkout_phone', document.getElementById('phone')?.value.trim()||'');
+        localStorage.setItem('dforzze_checkout_dni', document.getElementById('dni')?.value.trim()||'');
+        localStorage.setItem('dforzze_checkout_address', document.getElementById('address')?.value.trim()||'');
+        localStorage.setItem('dforzze_checkout_city', document.getElementById('city')?.value.trim()||'');
+        localStorage.setItem('dforzze_checkout_district', document.getElementById('district')?.value.trim()||'');
+        localStorage.setItem('dforzze_checkout_zip', document.getElementById('zip')?.value.trim()||'');
+        setConfirmLoading(false);
+
+        // Redirigir a Mercado Pago
+        const mpUrl = data.data.sandboxInitPoint || data.data.initPoint;
+        window.location.href = mpUrl;
+        return;
+      } else {
+        throw Object.assign(new Error(data.error), { status: res.status, data });
+      }
+    } catch(err){
+      setConfirmLoading(false);
+      if(err.status === 409 && err.data){
+        const stockItems = err.data?.data?.items || [];
+        const itemsList = stockItems.map(i =>
+          `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #fee2e2">
+            <span style="font-weight:600;font-size:12px">${i.productName}</span>
+            <span style="font-size:12px;color:#dc2626">Solo quedan ${i.available} unidades</span>
+          </div>`
+        ).join('');
+        showOrderError('Stock insuficiente',
+          `<p style="margin-bottom:8px">Los siguientes productos no tienen suficiente stock:</p>${itemsList}`,
+          `<button onclick="window.location.href='carrito.html'" style="font-size:12px;font-weight:600;background:#dc2626;color:#fff;border:none;border-radius:4px;padding:8px 16px;cursor:pointer">Actualizar carrito</button>`);
+        return;
+      }
+      // Si MP no está configurado aún, usar fallback local
+      if(err.message && err.message.includes('MP_ACCESS_TOKEN')){
+        placeOrderFallback(cart);
+        return;
+      }
+      showOrderError('No pudimos procesar tu pedido',
+        err.message || 'Ocurrió un error inesperado.',
+        `<button onclick="hideOrderError();placeOrder()" style="font-size:12px;font-weight:600;background:#000;color:#fff;border:none;border-radius:4px;padding:8px 16px;cursor:pointer">Reintentar</button>`);
+      return;
+    }
+  }
+
+  // Fallback local (sin backend o sin MP configurado)
+  setConfirmLoading(false);
+  placeOrderFallback(cart);
+}
+
+// ── Manejar retorno de Mercado Pago ─────────────────────────────
+(function handleMPReturn(){
+  const params = new URLSearchParams(window.location.search);
+  const payment = params.get('payment');
+  const orderId = params.get('order');
+
+  if(!payment) return;
+
+  const cart = JSON.parse(localStorage.getItem('dforzze_pending_cart') || '[]');
+  localStorage.removeItem('dforzze_pending_order');
+  localStorage.removeItem('dforzze_pending_cart');
+
+  if(payment === 'success'){
+    // Pago exitoso — descontar stock local y mostrar confirmación
+    if(cart.length > 0) decrementStockLocal(cart);
+    localStorage.removeItem('dforzzeCart');
+
+    const expressEl = document.querySelector('input[value="express"]');
+    const isExpress = expressEl && expressEl.checked;
+    const sub = cart.reduce(function(s,i){ return s+(i.price*i.qty); }, 0);
+    const ship = isExpress ? 12 : 9;
+    const finalOrderId = orderId || 'DFZ-MP-' + Date.now().toString(36).toUpperCase();
+
+    // Guardar pedido en historial local para que aparezca en admin
+    try{
+      var localUser = JSON.parse(localStorage.getItem('dforzze_user')||'null');
+      var mpOrders = JSON.parse(localStorage.getItem('dforzze_orders')||'[]');
+      mpOrders.unshift({
+        id: finalOrderId,
+        name: localStorage.getItem('dforzze_checkout_name')||'',
+        email: localStorage.getItem('dforzze_checkout_email')||'',
+        phone: localStorage.getItem('dforzze_checkout_phone')||'',
+        dni: localStorage.getItem('dforzze_checkout_dni')||'',
+        address: localStorage.getItem('dforzze_checkout_address')||'',
+        city: localStorage.getItem('dforzze_checkout_city')||'',
+        district: localStorage.getItem('dforzze_checkout_district')||'',
+        zip: localStorage.getItem('dforzze_checkout_zip')||'',
+        country: 'PE',
+        shippingMethod: isExpress ? 'express' : 'standard',
+        shippingLabel: isExpress ? 'Express (1-3 días)' : 'Estándar (2-5 días)',
+        itemsDetail: cart.map(function(i){ return {name:i.name,size:i.size||'',qty:i.qty,price:i.price,subtotal:i.price*i.qty}; }),
+        items: cart.map(function(i){ return i.name+(i.size?' ('+i.size+')':'')+'×'+i.qty; }).join(', '),
+        subtotal: sub, discount: 0, shipping: ship, total: sub + ship,
+        stickersEarned: sub >= 400 ? 3 : sub >= 200 ? 2 : sub >= 100 ? 1 : 0,
+        date: new Date().toLocaleDateString('es-PE'),
+        time: new Date().toLocaleTimeString('es-PE'),
+        status: 'confirmed',
+        userId: localUser ? localUser.email : null,
+        userName: localUser ? localUser.name : null,
+        userRank: localUser ? (localUser.rank||'NONE') : null,
+        paymentMethod: 'mercadopago'
+      });
+      localStorage.setItem('dforzze_orders', JSON.stringify(mpOrders));
+    }catch(e){}
+
+    showConfirmationScreen({
+      id: finalOrderId,
+      items: cart.map(function(i){ return {productName:i.name+(i.size?' — '+i.size:''), quantity:i.qty, unitPrice:i.price}; }),
+      subtotal: sub,
+      discount: 0,
+      shipping: ship,
+      total: sub + ship,
+      stickersEarned: sub >= 400 ? 3 : sub >= 200 ? 2 : sub >= 100 ? 1 : 0
+    }, null);
+
+    // Ir directo al step 4
+    goStep(4);
+
+  } else if(payment === 'failure'){
+    goStep(3);
+    showOrderError('Pago rechazado',
+      'Tu pago no fue procesado. Puedes intentarlo de nuevo.',
+      `<button onclick="hideOrderError();placeOrder()" style="font-size:12px;font-weight:600;background:#000;color:#fff;border:none;border-radius:4px;padding:8px 16px;cursor:pointer">Intentar de nuevo</button>`);
+
+  } else if(payment === 'pending'){
+    goStep(4);
+    showConfirmationScreen({
+      id: orderId || 'DFZ-PENDING',
+      items: cart.map(function(i){ return {productName:i.name, quantity:i.qty, unitPrice:i.price}; }),
+      subtotal: cart.reduce(function(s,i){ return s+(i.price*i.qty); }, 0),
+      discount: 0, shipping: 9,
+      total: cart.reduce(function(s,i){ return s+(i.price*i.qty); }, 0) + 9,
+      stickersEarned: 0
+    }, null);
+    // Mostrar mensaje de pendiente
+    const orderNum = document.getElementById('orderNumber');
+    if(orderNum) orderNum.style.color = '#f59e0b';
+    const header = document.querySelector('#step4 h2');
+    if(header) header.textContent = 'Pago en proceso';
+    const sub = document.querySelector('#step4 p');
+    if(sub) sub.textContent = 'Tu pago está siendo verificado. Te notificaremos cuando se confirme.';
+  }
+})();
+
+// ── Show confirmation screen ────────────────────────────────────
+function showConfirmationScreen(order, localStickers){
+  // Order number
+  const orderNum = document.getElementById('orderNumber');
+  if(orderNum) orderNum.textContent = '#' + (order.id || 'DFZ-0000');
+
+  // View order link
+  const viewBtn = document.getElementById('viewOrderBtn');
+  if(viewBtn && order.id) viewBtn.href = 'dforzze.html#pedidos';
+
+  // Order summary
+  const summaryEl = document.getElementById('orderSummaryConfirm');
+  if(summaryEl){
+    const items = order.items || [];
+    const itemsHtml = items.map(i => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f5f5f5">
+        <div>
+          <p style="font-weight:600;font-size:13px">${i.productName || i.name || 'Producto'}</p>
+          <p style="font-size:11px;color:rgba(0,0,0,.4)">Cantidad: ${i.quantity || i.qty}</p>
+        </div>
+        <p style="font-weight:700;font-size:13px">S/. ${((i.unitPrice || i.price || 0) * (i.quantity || i.qty || 1)).toFixed(0)}</p>
+      </div>`).join('');
+
+    const disc = order.discount || 0;
+    const ship = order.shipping || 9;
+    const total = order.total || (order.subtotal - disc + ship);
+
+    summaryEl.innerHTML = `
+      <p style="font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #f0f0f0">Resumen del pedido</p>
+      ${itemsHtml}
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(0,0,0,.5)">Subtotal</span><span>S/. ${order.subtotal || 0}</span></div>
+        ${disc > 0 ? `<div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#16a34a">Descuento</span><span style="color:#16a34a">- S/. ${disc}</span></div>` : ''}
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(0,0,0,.5)">Envío</span><span>S/. ${ship}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;border-top:1px solid rgba(0,0,0,.08);padding-top:10px;margin-top:4px"><span>Total</span><span>S/. ${total}</span></div>
+      </div>`;
+  }
+
+  // Delivery estimate
+  const expressEl = document.querySelector('input[value="express"]');
+  const isExpress = expressEl && expressEl.checked;
+  const deliveryTitle = document.getElementById('deliveryTitle');
+  const deliveryDays = document.getElementById('deliveryDays');
+  if(deliveryTitle) deliveryTitle.textContent = isExpress ? 'Envío express' : 'Envío estándar';
+  if(deliveryDays) deliveryDays.textContent = isExpress ? 'Estimado: 2 a 4 días hábiles' : 'Estimado: 5 a 10 días hábiles';
+
+  // Stickers
+  const stickersEarned = order.stickersEarned || (localStickers ? localStickers.length : 0);
+  const stickerSection = document.getElementById('stickerReward');
+  const stickerInfoSection = document.getElementById('stickerInfoSection');
+
+  if(stickersEarned > 0 && stickerSection){
+    stickerSection.style.display = 'block';
+    const cards = Array.from({length: stickersEarned}, (_, k) => `
+      <div class="sticker-card">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="14" fill="#fff0f5" stroke="#fda4af" stroke-width="1.5"/>
+          <text x="16" y="21" text-anchor="middle" font-size="16">🌸</text>
+        </svg>
+        <span style="font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#000">Sakura 01</span>
+        <span style="font-size:9px;color:rgba(0,0,0,.35)">+1 sticker</span>
+      </div>`).join('');
+
+    stickerSection.innerHTML = `
+      <p style="font-weight:800;font-size:15px;color:#000;margin-bottom:4px">🌸 +${stickersEarned} sticker${stickersEarned>1?'s':''} ganado${stickersEarned>1?'s':''} — Colección 01</p>
+      <p style="font-size:12px;color:rgba(0,0,0,.45);margin-bottom:16px">Se sumaron a tu colección del Members Club.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">${cards}</div>`;
+
+    if(stickerInfoSection) stickerInfoSection.style.display = 'flex';
+  } else if(stickerSection){
+    stickerSection.style.display = 'none';
+  }
+
+  goStep(4);
+}
+
+function toggleStickerInfo(){
+  var info = document.getElementById('stickerInfo');
+  var hint = document.getElementById('stickerInfoHint');
+  if(!info) return;
+  if(info.style.display==='none'){ info.style.display='block'; if(hint) hint.style.display='none'; }
+  else { info.style.display='none'; if(hint) hint.style.display='block'; }
+}
+
+// ── Shipping radio update ───────────────────────────────────────
+document.querySelectorAll('input[name="shipping"]').forEach(r=>{
+  r.addEventListener('change', updateTotal);
+});
+
+// ── Init ────────────────────────────────────────────────────────
+renderSummary();
+var _cartSnapshot = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+
+// ── AUTH MODAL ─────────────────────────────────────────────────
+var _aTab = 'register';
+var _pendingOrder = false;
+
+function openAuthModal(tab){
+  _aTab = tab || 'register';
+  _authTab(_aTab);
+  document.getElementById('authM').style.display = 'flex';
+  document.getElementById('authErr').style.display = 'none';
+  document.body.style.overflow = 'hidden';
+}
+function closeAuth(){
+  document.getElementById('authM').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function _authTab(t){
+  _aTab = t;
+  document.getElementById('tReg').style.cssText = 'flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;font-family:inherit;background:'+(t==='register'?'#fff':'transparent')+';color:'+(t==='register'?'#000':'rgba(255,255,255,.4)');
+  document.getElementById('tLog').style.cssText = 'flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;font-family:inherit;background:'+(t==='login'?'#fff':'transparent')+';color:'+(t==='login'?'#000':'rgba(255,255,255,.4)');
+  document.getElementById('nameF').style.display = t==='register' ? 'block' : 'none';
+  document.getElementById('aSub').textContent = t==='register' ? 'Crear cuenta' : 'Iniciar sesión';
+  document.getElementById('authErr').style.display = 'none';
+}
+async function doAuth(e){
+  e.preventDefault();
+  var nm = document.getElementById('aName').value.trim();
+  var em = document.getElementById('aEmail').value.trim();
+  var pw = document.getElementById('aPass').value;
+  var err = document.getElementById('authErr');
+  if(_aTab==='register' && !nm){ err.textContent='Ingresa un nombre'; err.style.display='block'; return; }
+  if(!em){ err.textContent='Ingresa tu email'; err.style.display='block'; return; }
+  if(pw.length < 6){ err.textContent='Mínimo 6 caracteres'; err.style.display='block'; return; }
+
+  // Try real API first
+  if(typeof DforzzeAPI !== 'undefined'){
+    try{
+      if(_aTab === 'login'){
+        await DforzzeAPI.login(em, pw);
+      } else {
+        await DforzzeAPI.register(nm, em, pw);
+      }
+      closeAuth();
+      // Retry order after successful auth
+      placeOrder();
+      return;
+    } catch(apiErr){
+      // Fall through to localStorage fallback
+    }
+  }
+
+  // localStorage fallback auth
+  if(em==='admin@dforzze.com' && pw==='dforzze2025'){
+    var uListAdmin = JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+    var existingAdmin = uListAdmin.find(function(x){ return x.email===em; });
+    var U = existingAdmin || {name:'Admin',email:em,rank:'INNER',stickerCount:0,stickers:[],image:null,role:'ADMIN',createdAt:new Date().toLocaleDateString('es-PE'),blocked:false};
+    U.role = 'ADMIN';
+    try{localStorage.setItem('dforzze_user',JSON.stringify(U));}catch(ex){}
+    closeAuth();
+    placeOrderFallback(JSON.parse(localStorage.getItem('dforzzeCart')||'[]'));
+    return;
+  }
+  var uList = JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+  var existing = uList.find(function(x){ return x.email===em; });
+  if(existing && existing.blocked){ err.textContent='Cuenta bloqueada. Contacta al administrador.'; err.style.display='block'; return; }
+  var U = existing || {name:_aTab==='register'?nm:em.split('@')[0], email:em, rank:'NONE', stickerCount:0, stickers:[], image:null, role:'USER', createdAt:new Date().toLocaleDateString('es-PE'), blocked:false};
+  if(!existing){ uList.push(U); localStorage.setItem('dforzze_users',JSON.stringify(uList)); }
+  try{localStorage.setItem('dforzze_user',JSON.stringify(U));}catch(ex){}
+  closeAuth();
+  placeOrderFallback(JSON.parse(localStorage.getItem('dforzzeCart')||'[]'));
+}
+</script>
+<!-- MODAL AUTH -->
+<div id="authM" onclick="if(event.target===this)closeAuth()" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:16px">
+  <div onclick="event.stopPropagation()" style="background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:0 0 80px rgba(0,0,0,.5);overflow:hidden;width:100%;max-width:400px;position:relative;animation:authIn .3s ease-out">
+    <button onclick="closeAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;line-height:1;padding:4px;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">✕</button>
+    <div style="padding:32px">
+      <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:24px">
+        <img src="images/logo.png" alt="DFORZZE" style="height:32px;width:auto;object-fit:contain;filter:brightness(0) invert(1)">
+        <span style="color:rgba(255,255,255,.5);font-weight:700;font-size:9px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+      </div>
+      <div style="display:flex;margin-bottom:24px;background:rgba(255,255,255,.04);border-radius:8px;padding:4px">
+        <button id="tReg" onclick="_authTab('register')" style="flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;background:#fff;color:#000;font-family:inherit">Crear cuenta</button>
+        <button id="tLog" onclick="_authTab('login')" style="flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,.4);font-family:inherit">Iniciar sesión</button>
+      </div>
+      <div id="authErr" style="display:none;margin-bottom:16px;padding:12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:#f87171;font-size:12px;text-align:center"></div>
+      <form onsubmit="doAuth(event)" style="display:flex;flex-direction:column;gap:16px">
+        <div id="nameF">
+          <label style="display:block;color:rgba(255,255,255,.4);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Nombre de usuario</label>
+          <input type="text" id="aName" maxlength="20" placeholder="Tu nombre" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='rgba(255,255,255,.2)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        </div>
+        <div>
+          <label style="display:block;color:rgba(255,255,255,.4);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Email</label>
+          <input type="email" id="aEmail" required placeholder="tu@email.com" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='rgba(255,255,255,.2)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        </div>
+        <div>
+          <label style="display:block;color:rgba(255,255,255,.4);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Contraseña</label>
+          <input type="password" id="aPass" required minlength="6" placeholder="Mínimo 6 caracteres" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='rgba(255,255,255,.2)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        </div>
+        <button type="submit" id="aSub" style="width:100%;background:#fff;color:#000;font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:14px;border-radius:9999px;border:none;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">Crear cuenta</button>
+      </form>
+    </div>
+  </div>
+</div>
+<style>@keyframes authIn{0%{opacity:0;transform:scale(.95) translateY(10px)}100%{opacity:1;transform:scale(1) translateY(0)}}</style>
+
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proceso & Progreso — DFORZZE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:100px}
+a{text-decoration:none;color:inherit}
+
+@keyframes fadeInUp{0%{opacity:0;transform:translateY(32px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+@keyframes nebulaDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(30px)}}
+@keyframes nebulaDriftR{0%,100%{transform:translateX(0)}50%{transform:translateX(-25px)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,.05)}50%{box-shadow:0 0 40px 8px rgba(255,255,255,.08)}}
+
+.fade-up{opacity:0;animation:fadeInUp .9s cubic-bezier(.16,1,.3,1) forwards}
+.fade-in{opacity:0;animation:fadeIn 1s ease forwards}
+.nebula{animation:nebulaDrift 20s ease-in-out infinite}
+.nebula-r{animation:nebulaDriftR 25s ease-in-out infinite}
+
+.level-card{border-radius:16px;padding:32px;transition:all .4s;position:relative;overflow:hidden}
+.level-card:hover{transform:translateY(-6px)}
+.level-badge{display:inline-flex;align-items:center;padding:5px 14px;border-radius:9999px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px}
+.action-item{display:flex;align-items:flex-start;gap:16px;padding:20px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.action-item:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header style="position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(16px);background:rgba(0,0,0,.6);border-bottom:1px solid rgba(255,255,255,.06)">
+<div style="max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px">
+  <a href="dforzze.html" style="display:flex;align-items:center;gap:8px">
+    <img src="images/logo.png" alt="DFORZZE" style="height:36px;width:auto;filter:brightness(0) invert(1)">
+    <span style="color:rgba(255,255,255,.5);font-weight:700;font-size:10px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px">
+    <a href="exclusividad.html" style="display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.4);font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.8)'" onmouseout="this.style.color='rgba(255,255,255,.4)'">← Exclusividad</a>
+    <span style="color:rgba(255,255,255,.15);font-size:12px">/</span>
+    <a href="dforzze.html" style="display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.4);font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.8)'" onmouseout="this.style.color='rgba(255,255,255,.4)'">Inicio →</a>
+  </div>
+</div>
+</header>
+
+<!-- HERO -->
+<section style="position:relative;min-height:100vh;display:flex;align-items:flex-end;overflow:hidden">
+  <div style="position:absolute;inset:0">
+    <img src="images/benefit-progreso.jpg" alt="Progreso" style="width:100%;height:100%;object-fit:cover;transform:scale(1.05)">
+    <div style="position:absolute;inset:0;background:linear-gradient(to top,#000 30%,rgba(0,0,0,.6) 60%,rgba(0,0,0,.3))"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(0,0,0,.4),transparent)"></div>
+  </div>
+  <div style="position:relative;z-index:10;max-width:1280px;margin:0 auto;padding:0 24px 80px;width:100%">
+    <p class="fade-up" style="color:rgba(255,255,255,.4);font-weight:500;font-size:12px;letter-spacing:.3em;text-transform:uppercase;margin-bottom:16px;animation-delay:.2s">03 — Member Benefits</p>
+    <h1 class="fade-up" style="font-weight:800;font-size:clamp(48px,9vw,96px);letter-spacing:-.03em;line-height:1;margin-bottom:24px;animation-delay:.35s">Proceso<br><span style="color:rgba(255,255,255,.4)">&</span> Progreso</h1>
+    <div class="fade-up" style="width:48px;height:2px;background:#fff;margin-bottom:28px;animation-delay:.5s"></div>
+    <p class="fade-up" style="color:rgba(255,255,255,.7);font-size:18px;line-height:1.7;max-width:560px;animation-delay:.6s">Convertirse es la verdadera recompensa.</p>
+  </div>
+</section>
+
+<!-- CONTENT -->
+<section style="background:#000;padding:100px 0;position:relative;overflow:hidden">
+  <div style="pointer-events:none;position:absolute;inset:0">
+    <div class="nebula" style="position:absolute;top:10%;left:10%;width:600px;height:600px;border-radius:50%;background:rgba(88,28,135,.08);filter:blur(120px)"></div>
+    <div class="nebula-r" style="position:absolute;bottom:5%;right:10%;width:500px;height:500px;border-radius:50%;background:rgba(30,58,138,.06);filter:blur(100px)"></div>
+  </div>
+  <div style="max-width:900px;margin:0 auto;padding:0 24px;position:relative;z-index:10">
+
+    <!-- Intro -->
+    <div class="fade-in" style="animation-delay:.1s;margin-bottom:80px">
+      <p style="color:rgba(255,255,255,.65);font-size:18px;line-height:1.85">
+        Todo gira alrededor del progreso. Dentro de DFORZZE existe un sistema donde <strong style="color:#fff">cada acción suma</strong>. No se trata de consumir, se trata de avanzar y demostrar en qué te estás convirtiendo.
+      </p>
+    </div>
+
+    <!-- How you earn -->
+    <div style="margin-bottom:80px">
+      <p style="color:rgba(255,255,255,.25);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;margin-bottom:32px">Cómo sumas dentro del sistema</p>
+      <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:8px 28px">
+        <div class="action-item fade-up" style="animation-delay:.1s">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          </div>
+          <div>
+            <h4 style="color:#fff;font-weight:600;font-size:16px;margin-bottom:6px">Comprar</h4>
+            <p style="color:rgba(255,255,255,.45);font-size:14px;line-height:1.6">Cada compra dentro de DFORZZE suma stickers a tu cuenta. No es solo una transacción, es una acción dentro del sistema.</p>
+            <!-- Bloque de stickers por drop -->
+            <div style="margin-top:16px;padding:20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px">
+              <p style="color:rgba(255,255,255,.25);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;margin-bottom:14px">Stickers de Colección — Drop Activo</p>
+              <p style="color:rgba(255,255,255,.5);font-size:13px;line-height:1.7;margin-bottom:16px">Cada drop tiene su propio sticker exclusivo. No se vende, no se repite. Solo se obtiene comprando en el drop activo — y el monto define cuántos acumulas.</p>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,.04);border-radius:6px">
+                  <span style="color:rgba(255,255,255,.4);font-size:13px">S/. 100 – S/. 199</span>
+                  <span style="color:#fff;font-size:13px;font-weight:600">1 sticker</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,.04);border-radius:6px">
+                  <span style="color:rgba(255,255,255,.4);font-size:13px">S/. 200 – S/. 399</span>
+                  <span style="color:#fff;font-size:13px;font-weight:600">2 stickers</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,.05);border-radius:6px;border:1px solid rgba(255,255,255,.08)">
+                  <span style="color:rgba(255,255,255,.5);font-size:13px">S/. 400 o más</span>
+                  <span style="color:#fff;font-size:13px;font-weight:600">3 stickers</span>
+                </div>
+              </div>
+              <p style="color:rgba(255,255,255,.25);font-size:11px;line-height:1.6;margin-top:12px">Los stickers acumulados suman a tu status en el Members Club y podrán canjearse por beneficios que la marca anunciará en cada drop.</p>
+            </div>
+          </div>
+        </div>
+        <div class="action-item fade-up" style="animation-delay:.2s">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <h4 style="color:#fff;font-weight:600;font-size:16px;margin-bottom:6px">Participar</h4>
+            <p style="color:rgba(255,255,255,.45);font-size:14px;line-height:1.6">Estar presente, moverse con la marca, aparecer en los momentos que importan. La participación activa tiene peso.</p>
+          </div>
+        </div>
+        <div class="action-item fade-up" style="animation-delay:.3s">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div>
+            <h4 style="color:#fff;font-weight:600;font-size:16px;margin-bottom:6px">Interactuar</h4>
+            <p style="color:rgba(255,255,255,.45);font-size:14px;line-height:1.6">Conectar con la comunidad, con el contenido y con el proceso. Cada interacción real cuenta dentro del sistema.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Golden Ticket -->
+    <div style="margin-bottom:80px">
+      <p style="color:rgba(255,255,255,.25);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;margin-bottom:32px">Recurso especial</p>
+      <div class="fade-up" style="animation-delay:.1s;background:linear-gradient(135deg,rgba(234,179,8,.08),rgba(234,179,8,.03));border:1px solid rgba(234,179,8,.2);border-radius:16px;padding:36px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(234,179,8,.05);filter:blur(60px)"></div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div style="width:52px;height:52px;border-radius:12px;background:rgba(234,179,8,.1);border:1px solid rgba(234,179,8,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          </div>
+          <div>
+            <h3 style="color:#fbbf24;font-weight:800;font-size:24px;letter-spacing:-.01em">Golden Ticket</h3>
+            <p style="color:rgba(251,191,36,.5);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase">Recurso escaso</p>
+          </div>
+        </div>
+        <p style="color:rgba(255,255,255,.6);font-size:15px;line-height:1.8">En momentos específicos, puedes acceder al Golden Ticket. Es más escaso que los stickers y desbloquea beneficios mayores dentro del sistema. No siempre está disponible y no todos lo obtienen.</p>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div style="height:1px;background:rgba(255,255,255,.06);margin-bottom:80px"></div>
+
+    <!-- Levels -->
+    <div style="margin-bottom:80px">
+      <p style="color:rgba(255,255,255,.25);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px">Members Club</p>
+      <h2 style="color:#fff;font-weight:700;font-size:clamp(28px,4vw,42px);letter-spacing:-.02em;line-height:1.2;margin-bottom:48px">Los tres niveles</h2>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Initiated -->
+        <div class="level-card fade-up" style="animation-delay:.1s;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08)">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px">
+            <div style="flex:1;min-width:200px">
+              <span class="level-badge" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)">Nivel 01</span>
+              <h3 style="color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;margin-bottom:12px">Initiated</h3>
+              <p style="color:rgba(255,255,255,.5);font-size:15px;line-height:1.75">Recién entras al sistema. Estás dentro, pero el camino acaba de comenzar. Tienes acceso al canal de difusión y empiezas a acumular stickers con cada acción.</p>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Builder -->
+        <div class="level-card fade-up" style="animation-delay:.2s;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12)">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px">
+            <div style="flex:1;min-width:200px">
+              <span class="level-badge" style="background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.25)">Nivel 02</span>
+              <h3 style="color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;margin-bottom:12px">Builder</h3>
+              <p style="color:rgba(255,255,255,.55);font-size:15px;line-height:1.75">Ya participas activamente y estás en el proceso. Accedes a Close Friends, ves el proceso real de la marca y empiezas a tener acceso a drops antes que el resto.</p>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="width:48px;height:48px;border-radius:12px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);display:flex;align-items:center;justify-content:center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inner -->
+        <div class="level-card fade-up" style="animation-delay:.3s;background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.18)">
+          <div style="position:absolute;top:0;right:0;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.03);filter:blur(60px)"></div>
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;position:relative">
+            <div style="flex:1;min-width:200px">
+              <span class="level-badge" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.3)">Nivel 03 — Máximo</span>
+              <h3 style="color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;margin-bottom:12px">Inner</h3>
+              <p style="color:rgba(255,255,255,.65);font-size:15px;line-height:1.75">El núcleo. El nivel más alto con acceso a lo más exclusivo, comunicación más directa y oportunidades que no están disponibles para el resto. No se compra. Se construye con el tiempo.</p>
+              <div style="margin-top:20px;padding:16px;background:rgba(255,255,255,.04);border-radius:10px;border:1px solid rgba(255,255,255,.08)">
+                <p style="color:rgba(255,255,255,.4);font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase">Acceso Inner incluye</p>
+                <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:10px"><span style="color:rgba(255,255,255,.3);font-size:12px">—</span><span style="color:rgba(255,255,255,.6);font-size:13px">WhatsApp directo con la marca</span></div>
+                  <div style="display:flex;align-items:center;gap:10px"><span style="color:rgba(255,255,255,.3);font-size:12px">—</span><span style="color:rgba(255,255,255,.6);font-size:13px">Drops exclusivos solo para Inner</span></div>
+                  <div style="display:flex;align-items:center;gap:10px"><span style="color:rgba(255,255,255,.3);font-size:12px">—</span><span style="color:rgba(255,255,255,.6);font-size:13px">Oportunidades que no existen para el resto</span></div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:center">
+      <a href="dforzze.html" style="display:inline-flex;align-items:center;background:#fff;color:#000;font-weight:600;font-size:13px;letter-spacing:.05em;text-transform:uppercase;padding:14px 32px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">Entrar al proceso →</a>
+      <a href="comunidad.html" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);color:#fff;font-weight:500;font-size:13px;letter-spacing:.05em;text-transform:uppercase;padding:14px 28px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">← Volver a Comunidad</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#000;border-top:1px solid rgba(255,255,255,.04);padding:32px 0">
+<div style="max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+  <div style="display:flex;align-items:center;gap:4px">
+    <img src="images/logo.png" alt="DFORZZE" style="height:18px;width:auto;filter:brightness(0) invert(1);opacity:.25">
+    <span style="color:rgba(255,255,255,.2);font-weight:700;font-size:8px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+  </div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap">
+    <a href="terminos.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Términos</a>
+    <a href="envios.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Envíos</a>
+    <a href="privacidad.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Privacidad</a>
+  </div>
+  <p style="color:rgba(255,255,255,.12);font-size:10px;letter-spacing:.05em">© 2025 DFORZZE.</p>
+</div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.style.animationPlayState='running';
+      obs.unobserve(e.target);
+    }
+  });
+},{threshold:.15});
+document.querySelectorAll('.fade-up,.fade-in').forEach(el=>{
+  el.style.animationPlayState='paused';
+  obs.observe(el);
+});
+</script>
+
+<!-- NAV FLOTANTE ENTRE BLOQUES -->
+<div style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:4px;background:rgba(10,10,10,.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:9999px;padding:6px 8px">
+  <span style="color:rgba(255,255,255,.25);font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:0 10px">Benefits</span>
+  <div style="width:1px;height:16px;background:rgba(255,255,255,.1)"></div>
+  <a href="comunidad.html" style="padding:8px 16px;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;transition:all .25s;color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.color='rgba(255,255,255,.45)';this.style.background='transparent'">01 Comunidad</a>
+  <a href="exclusividad.html" style="padding:8px 16px;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;transition:all .25s;color:rgba(255,255,255,.45)" onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.color='rgba(255,255,255,.45)';this.style.background='transparent'">02 Exclusividad</a>
+  <a href="progreso.html" style="padding:8px 16px;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;transition:all .25s;background:#fff;color:#000">03 Progreso</a>
+</div>
+
+</body>
+</html>

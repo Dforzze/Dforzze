@@ -1,0 +1,199 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Rank {
+  NONE
+  INITIATED
+  BUILDER
+  INNER
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum MovementType {
+  PURCHASE
+  ADJUSTMENT
+  RETURN
+  RESTOCK
+  DAMAGE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  name         String
+  email        String    @unique
+  password     String
+  role         Role      @default(USER)
+  rank         Rank      @default(NONE)
+  stickerCount Int       @default(0)
+  blocked      Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  orders       Order[]
+  stickers     Sticker[]
+  rankRequests RankRequest[]
+  movements    InventoryMovement[]
+  @@index([email])
+  @@index([rank])
+}
+
+model Product {
+  id                String    @id @default(uuid())
+  name              String    @unique
+  description       String?
+  price             Decimal   @db.Decimal(10, 2)
+  category          String
+  stock             Int       @default(0)
+  lowStockThreshold Int       @default(5)
+  images            String[]
+  active            Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  orderItems        OrderItem[]
+  movements         InventoryMovement[]
+  alerts            Alert[]
+  @@index([category])
+  @@index([stock])
+  @@index([active])
+}
+
+model Order {
+  id               String      @id @default(uuid())
+  userId           String
+  status           OrderStatus @default(PENDING)
+  subtotal         Decimal     @db.Decimal(10, 2)
+  discount         Decimal     @default(0) @db.Decimal(10, 2)
+  shippingCost     Decimal     @db.Decimal(10, 2)
+  total            Decimal     @db.Decimal(10, 2)
+  shippingMethod   String
+  couponCode       String?
+  stickersEarned   Int         @default(0)
+  shippingName     String
+  shippingEmail    String
+  shippingPhone    String?
+  shippingAddress  String
+  shippingCity     String
+  shippingDistrict String?
+  shippingZip      String?
+  shippingCountry  String      @default("PE")
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  user             User        @relation(fields: [userId], references: [id])
+  items            OrderItem[]
+  movements        InventoryMovement[]
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Decimal @db.Decimal(10, 2)
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+  @@index([orderId])
+  @@index([productId])
+}
+
+model InventoryMovement {
+  id            String       @id @default(uuid())
+  productId     String
+  type          MovementType
+  quantity      Int
+  previousStock Int
+  newStock      Int
+  orderId       String?
+  userId        String?
+  reason        String?
+  createdAt     DateTime     @default(now())
+  product       Product      @relation(fields: [productId], references: [id])
+  order         Order?       @relation(fields: [orderId], references: [id])
+  user          User?        @relation(fields: [userId], references: [id])
+  @@index([productId])
+  @@index([orderId])
+  @@index([createdAt])
+  @@index([type])
+}
+
+model Sticker {
+  id         String   @id @default(uuid())
+  userId     String
+  name       String
+  emoji      String
+  drop       String
+  pts        Int      @default(1)
+  type       String   @default("drop")
+  code       String?  @unique
+  orderId    String?
+  redeemedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+  @@index([userId])
+  @@index([code])
+}
+
+model Coupon {
+  id        String    @id @default(uuid())
+  code      String    @unique
+  type      String
+  value     Int
+  active    Boolean   @default(true)
+  usedBy    String?
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  @@index([code])
+  @@index([active])
+}
+
+model Alert {
+  id           String   @id @default(uuid())
+  productId    String
+  type         String
+  message      String
+  metadata     Json?
+  acknowledged Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  product      Product  @relation(fields: [productId], references: [id])
+  @@index([productId])
+  @@index([acknowledged])
+  @@index([createdAt])
+}
+
+model RankRequest {
+  id        String        @id @default(uuid())
+  userId    String
+  fromRank  Rank
+  toRank    Rank
+  stickers  Int
+  status    RequestStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  user      User          @relation(fields: [userId], references: [id])
+  @@index([userId])
+  @@index([status])
+}

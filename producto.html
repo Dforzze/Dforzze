@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Producto — DFORZZE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#f0f0f0;color:#000;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+
+.nav-link{color:rgba(0,0,0,.5);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;transition:color .25s}
+.nav-link:hover{color:#000}
+
+.size-btn{width:52px;height:52px;border:1px solid rgba(0,0,0,.2);background:#fff;font-size:12px;font-weight:600;letter-spacing:.04em;cursor:pointer;transition:all .2s;border-radius:4px}
+.size-btn:hover{border-color:#000}
+.size-btn.active{background:#000;color:#fff;border-color:#000}
+.size-btn.sold{background:#f0f0f0;color:rgba(0,0,0,.25);cursor:not-allowed;text-decoration:line-through}
+
+.thumb{width:80px;height:80px;object-fit:cover;cursor:pointer;border:2px solid transparent;transition:border-color .2s}
+.thumb.active{border-color:#000}
+.thumb:hover{border-color:rgba(0,0,0,.4)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header style="background:#f0f0f0;border-bottom:1px solid rgba(0,0,0,.08);position:sticky;top:0;z-index:50">
+  <div style="max-width:1400px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px">
+    <a href="tienda.html" style="display:flex;align-items:center;gap:6px">
+      <img src="images/logo.png" alt="DFORZZE" style="height:32px;width:auto">
+      <span style="font-weight:800;font-size:11px;letter-spacing:.2em;text-transform:uppercase">DFORZZE</span>
+    </a>
+    <nav style="display:flex;align-items:center;gap:28px">
+      <a href="about.html" class="nav-link">About</a>
+      <a href="dforzze.html" class="nav-link">Membership</a>
+      <a href="tienda.html" class="nav-link">Tienda</a>
+    </nav>
+    <a href="catalogo.html" style="color:rgba(0,0,0,.5);font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:color .3s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.5)'">← Volver</a>
+  </div>
+</header>
+
+<!-- BREADCRUMB -->
+<div style="max-width:1400px;margin:0 auto;padding:16px 32px">
+  <p style="font-size:11px;color:rgba(0,0,0,.4);letter-spacing:.04em">
+    <a href="tienda.html" style="transition:color .2s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.4)'">Tienda</a>
+    <span style="margin:0 8px">/</span>
+    <a href="catalogo.html" style="transition:color .2s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.4)'">Pantalones</a>
+    <span style="margin:0 8px">/</span>
+    <span id="breadName" style="color:#000">Short Sakura</span>
+  </p>
+</div>
+
+<!-- PRODUCT -->
+<main style="max-width:1400px;margin:0 auto;padding:0 32px 80px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start">
+
+    <!-- LEFT — Images -->
+    <div>
+      <!-- Main image -->
+      <div style="background:#e8e8e8;aspect-ratio:1/1;overflow:hidden;margin-bottom:12px">
+        <img id="mainImg" src="images/1.png" alt="DFORZZE Short" style="width:100%;height:100%;object-fit:contain;padding:32px;transition:opacity .3s">
+      </div>
+      <!-- Thumbnails -->
+      <div style="display:flex;gap:8px">
+        <img src="images/1.png" class="thumb active" id="t1" onclick="switchImg('images/1.png','t1')" alt="Short 01">
+        <img src="images/2.png" class="thumb" id="t2" onclick="switchImg('images/2.png','t2')" alt="Short 02">
+      </div>
+    </div>
+
+    <!-- RIGHT — Info -->
+    <div style="padding-top:8px">
+
+      <!-- Badge -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:green;background:rgba(0,150,0,.08);padding:4px 12px;border-radius:9999px">Disponible</span>
+        <span style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,0,0,.4)">Colección 01</span>
+      </div>
+
+      <!-- Name -->
+      <h1 id="prodName" style="font-weight:800;font-size:clamp(24px,3vw,36px);letter-spacing:-.02em;line-height:1.1;margin-bottom:16px">DFORZZE SHORT SAKURA</h1>
+
+      <!-- Price -->
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:24px">
+        <p style="font-size:28px;font-weight:800;letter-spacing:-.02em">S/. 80</p>
+        <p style="font-size:13px;color:rgba(0,0,0,.4)">o S/. 72 con 10% off primera compra</p>
+      </div>
+
+      <!-- Divider -->
+      <div style="height:1px;background:rgba(0,0,0,.1);margin-bottom:24px"></div>
+
+      <!-- Description -->
+      <div style="margin-bottom:28px">
+        <p style="font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(0,0,0,.4);margin-bottom:10px">Descripción</p>
+        <p id="prodDesc" style="font-size:14px;line-height:1.8;color:rgba(0,0,0,.7)">Short en tela French Terry de 3 hilos con doble pretina, diseño Sakura full bordado. Corte moderno y acabados de excelente calidad, brindando comodidad, ajuste y estilo.</p>
+      </div>
+
+      <!-- Size selector -->
+      <div style="margin-bottom:28px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <p style="font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(0,0,0,.4)">Talla</p>
+          <button onclick="toggleGuia()" style="font-size:11px;color:rgba(0,0,0,.5);background:none;border:none;text-decoration:underline;cursor:pointer;letter-spacing:.04em">Guía de tallas</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="size-btn" onclick="selectSize(this,'S')">S</button>
+          <button class="size-btn" onclick="selectSize(this,'M')">M</button>
+          <button class="size-btn" onclick="selectSize(this,'L')">L</button>
+          <button class="size-btn" onclick="selectSize(this,'XL')">XL</button>
+        </div>
+        <p id="sizeError" style="display:none;color:#c00;font-size:11px;margin-top:8px;letter-spacing:.04em">Selecciona una talla para continuar</p>
+      </div>
+
+      <!-- Guía de tallas (oculta) -->
+      <div id="guiaTallas" style="display:none;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:8px;padding:20px;margin-bottom:24px">
+        <p style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px">Guía de tallas</p>
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <tr style="border-bottom:1px solid rgba(0,0,0,.08)">
+            <th style="text-align:left;padding:8px 0;color:rgba(0,0,0,.5);font-weight:600;letter-spacing:.05em">TALLA</th>
+            <th style="text-align:center;padding:8px 0;color:rgba(0,0,0,.5);font-weight:600;letter-spacing:.05em">CINTURA</th>
+            <th style="text-align:center;padding:8px 0;color:rgba(0,0,0,.5);font-weight:600;letter-spacing:.05em">LARGO</th>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(0,0,0,.05)"><td style="padding:8px 0;font-weight:600">S</td><td style="text-align:center;padding:8px 0">70-74 cm</td><td style="text-align:center;padding:8px 0">48 cm</td></tr>
+          <tr style="border-bottom:1px solid rgba(0,0,0,.05)"><td style="padding:8px 0;font-weight:600">M</td><td style="text-align:center;padding:8px 0">75-80 cm</td><td style="text-align:center;padding:8px 0">50 cm</td></tr>
+          <tr style="border-bottom:1px solid rgba(0,0,0,.05)"><td style="padding:8px 0;font-weight:600">L</td><td style="text-align:center;padding:8px 0">81-86 cm</td><td style="text-align:center;padding:8px 0">52 cm</td></tr>
+          <tr><td style="padding:8px 0;font-weight:600">XL</td><td style="text-align:center;padding:8px 0">87-92 cm</td><td style="text-align:center;padding:8px 0">54 cm</td></tr>
+        </table>
+      </div>
+
+      <!-- CTA buttons -->
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+        <button onclick="addToCartAndGo()" style="width:100%;background:#000;color:#fff;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:16px;border:none;border-radius:4px;transition:background .2s" onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">Agregar al carrito</button>
+      </div>
+
+      <!-- Info pills -->
+      <div style="display:flex;flex-direction:column;gap:10px;padding:20px;background:#fff;border-radius:8px;border:1px solid rgba(0,0,0,.08)">
+        <div style="display:flex;align-items:center;gap:12px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          <p style="font-size:12px;color:rgba(0,0,0,.6)">Envío nacional disponible</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          <p style="font-size:12px;color:rgba(0,0,0,.6)">Unidades limitadas — sin restock</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <p style="font-size:12px;color:rgba(0,0,0,.6)">Preparación: 1 a 3 días hábiles</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer style="background:#000;padding:28px 0">
+<div style="max-width:1400px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+  <div style="display:flex;align-items:center;gap:4px">
+    <img src="images/logo.png" alt="DFORZZE" style="height:18px;width:auto;filter:brightness(0) invert(1);opacity:.3">
+    <span style="color:rgba(255,255,255,.2);font-weight:700;font-size:8px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+  </div>
+  <div style="display:flex;gap:20px">
+    <a href="terminos.html" style="color:rgba(255,255,255,.2);font-size:11px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Términos</a>
+    <a href="envios.html" style="color:rgba(255,255,255,.2);font-size:11px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Envíos</a>
+    <a href="privacidad.html" style="color:rgba(255,255,255,.2);font-size:11px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Privacidad</a>
+  </div>
+  <p style="color:rgba(255,255,255,.12);font-size:10px">© 2025 DFORZZE.</p>
+</div>
+</footer>
+
+<script>
+let selectedSize = null;
+
+function switchImg(src, thumbId){
+  const main = document.getElementById('mainImg');
+  main.style.opacity = '0';
+  setTimeout(()=>{ main.src = src; main.style.opacity = '1'; }, 200);
+  document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+  document.getElementById(thumbId).classList.add('active');
+}
+
+function selectSize(btn, size){
+  document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedSize = size;
+  document.getElementById('sizeError').style.display = 'none';
+}
+
+function toggleGuia(){
+  const g = document.getElementById('guiaTallas');
+  g.style.display = g.style.display === 'none' ? 'block' : 'none';
+}
+
+function addToCart(){
+  if(!selectedSize){
+    document.getElementById('sizeError').style.display = 'block';
+    return;
+  }
+  try{ var u = JSON.parse(localStorage.getItem('dforzze_user')); if(!u){ openAuthModal(); return; } }catch(e){ openAuthModal(); return; }
+  const p = params.get('p') || '1';
+  const name = document.getElementById('prodName').textContent;
+  const key = p + '-' + selectedSize;
+  let cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  const existing = cart.find(i => i.key === key);
+  if(existing){ existing.qty++; } else { cart.push({key, id: p, name, price: 80, qty: 1, size: selectedSize}); }
+  localStorage.setItem('dforzzeCart', JSON.stringify(cart));
+}
+
+function addToCartAndGo(){
+  if(!selectedSize){
+    document.getElementById('sizeError').style.display = 'block';
+    return;
+  }
+  try{ var u = JSON.parse(localStorage.getItem('dforzze_user')); if(!u){ openAuthModal(); return; } }catch(e){ openAuthModal(); return; }
+  addToCart();
+  window.location.href = 'carrito.html';
+}
+
+function buyNow(){
+  if(!selectedSize){
+    document.getElementById('sizeError').style.display = 'block';
+    return;
+  }
+  try{ var u = JSON.parse(localStorage.getItem('dforzze_user')); if(!u){ openAuthModal(); return; } }catch(e){ openAuthModal(); return; }
+  addToCart();
+  window.location.href = 'carrito.html';
+}
+
+// Load product from URL params
+const params = new URLSearchParams(window.location.search);
+const prod = params.get('p');
+if(prod === '2'){
+  document.getElementById('mainImg').src = 'images/2.png';
+  document.getElementById('t1').src = 'images/2.png';
+  document.getElementById('t2').src = 'images/1.png';
+  document.getElementById('prodName').textContent = 'DFORZZE SHORT SAKURA 02';
+  document.getElementById('breadName').textContent = 'Short Sakura 02';
+}
+
+// ── AUTH MODAL ─────────────────────────────────────────────────
+var _aTab = 'register';
+function openAuthModal(tab){
+  _aTab = tab || 'register';
+  _authTab(_aTab);
+  document.getElementById('authM').style.display = 'flex';
+  document.getElementById('authErr').style.display = 'none';
+  document.body.style.overflow = 'hidden';
+}
+function closeAuth(){
+  document.getElementById('authM').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function _authTab(t){
+  _aTab = t;
+  document.getElementById('tReg').style.cssText = 'flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;font-family:inherit;background:'+(t==='register'?'#fff':'transparent')+';color:'+(t==='register'?'#000':'rgba(255,255,255,.4)');
+  document.getElementById('tLog').style.cssText = 'flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;font-family:inherit;background:'+(t==='login'?'#fff':'transparent')+';color:'+(t==='login'?'#000':'rgba(255,255,255,.4)');
+  document.getElementById('nameF').style.display = t==='register' ? 'block' : 'none';
+  document.getElementById('aSub').textContent = t==='register' ? 'Crear cuenta' : 'Iniciar sesión';
+  document.getElementById('authErr').style.display = 'none';
+}
+function doAuth(e){
+  e.preventDefault();
+  var nm = document.getElementById('aName').value.trim();
+  var em = document.getElementById('aEmail').value.trim();
+  var pw = document.getElementById('aPass').value;
+  var err = document.getElementById('authErr');
+  if(_aTab==='register' && !nm){ err.textContent='Ingresa un nombre'; err.style.display='block'; return; }
+  if(!em){ err.textContent='Ingresa tu email'; err.style.display='block'; return; }
+  if(pw.length < 6){ err.textContent='Mínimo 6 caracteres'; err.style.display='block'; return; }
+  var U = {name: _aTab==='register' ? nm : em.split('@')[0], email: em, rank:'NONE', stickerCount:2, image:null, role:'USER'};
+  try{ localStorage.setItem('dforzze_user', JSON.stringify(U)); }catch(ex){}
+  closeAuth();
+  // Reintentar después de login
+  addToCartAndGo();
+}
+</script>
+
+<!-- MODAL AUTH -->
+<div id="authM" onclick="if(event.target===this)closeAuth()" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:16px">
+  <div onclick="event.stopPropagation()" style="background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:0 0 80px rgba(0,0,0,.5);overflow:hidden;width:100%;max-width:400px;position:relative;animation:authIn .3s ease-out">
+    <button onclick="closeAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;line-height:1;padding:4px;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">✕</button>
+    <div style="padding:32px">
+      <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:24px">
+        <img src="images/logo.png" alt="DFORZZE" style="height:32px;width:auto;object-fit:contain;filter:brightness(0) invert(1)">
+        <span style="color:rgba(255,255,255,.5);font-weight:700;font-size:9px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+      </div>
+      <div style="display:flex;margin-bottom:24px;background:rgba(255,255,255,.04);border-radius:8px;padding:4px">
+        <button id="tReg" onclick="_authTab('register')" style="flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;background:#fff;color:#000;font-family:inherit">Crear cuenta</button>
+        <button id="tLog" onclick="_authTab('login')" style="flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,.4);font-family:inherit">Iniciar sesión</button>
+      </div>
+      <div id="authErr" style="display:none;margin-bottom:16px;padding:12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:#f87171;font-size:12px;text-align:center"></div>
+      <form onsubmit="doAuth(event)" style="display:flex;flex-direction:column;gap:16px">
+        <div id="nameF">
+          <label style="display:block;color:rgba(255,255,255,.4);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Nombre de usuario</label>
+          <input type="text" id="aName" maxlength="20" placeholder="Tu nombre" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='rgba(255,255,255,.2)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        </div>
+        <div>
+          <label style="display:block;color:rgba(255,255,255,.4);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Email</label>
+          <input type="email" id="aEmail" required placeholder="tu@email.com" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='rgba(255,255,255,.2)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        </div>
+        <div>
+          <label style="display:block;color:rgba(255,255,255,.4);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Contraseña</label>
+          <input type="password" id="aPass" required minlength="6" placeholder="Mínimo 6 caracteres" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='rgba(255,255,255,.2)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        </div>
+        <button type="submit" id="aSub" style="width:100%;background:#fff;color:#000;font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:14px;border-radius:9999px;border:none;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">Crear cuenta</button>
+      </form>
+    </div>
+  </div>
+</div>
+<style>@keyframes authIn{0%{opacity:0;transform:scale(.95) translateY(10px)}100%{opacity:1;transform:scale(1) translateY(0)}}</style>
+
+</body>
+</html>

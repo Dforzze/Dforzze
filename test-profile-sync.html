@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test - Sincronización de Perfil</title>
+<style>
+body { font-family: system-ui; padding: 20px; background: #f5f5f5; }
+.test-section { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #000; }
+.test-result { padding: 10px; margin: 10px 0; border-radius: 4px; }
+.pass { background: #d4edda; color: #155724; }
+.fail { background: #f8d7da; color: #721c24; }
+.info { background: #d1ecf1; color: #0c5460; }
+button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #000; color: white; border: none; border-radius: 4px; }
+button:hover { background: #333; }
+pre { background: #f0f0f0; padding: 10px; border-radius: 4px; overflow-x: auto; }
+</style>
+</head>
+<body>
+
+<h1>🧪 Test de Sincronización de Perfil - DFORZZE</h1>
+
+<div class="test-section">
+  <h2>1. Crear Usuario de Prueba</h2>
+  <button onclick="createTestUser()">Crear Usuario</button>
+  <div id="result1" class="test-result"></div>
+</div>
+
+<div class="test-section">
+  <h2>2. Verificar localStorage en dforzze_user</h2>
+  <button onclick="checkDforzzeUser()">Verificar</button>
+  <div id="result2" class="test-result"></div>
+</div>
+
+<div class="test-section">
+  <h2>3. Verificar localStorage en dforzze_users</h2>
+  <button onclick="checkDforzzeUsers()">Verificar</button>
+  <div id="result3" class="test-result"></div>
+</div>
+
+<div class="test-section">
+  <h2>4. Simular getFreshUser()</h2>
+  <button onclick="testGetFreshUser()">Probar</button>
+  <div id="result4" class="test-result"></div>
+</div>
+
+<div class="test-section">
+  <h2>5. Simular openProfileModal()</h2>
+  <button onclick="testOpenProfileModal()">Probar</button>
+  <div id="result5" class="test-result"></div>
+</div>
+
+<div class="test-section">
+  <h2>6. Limpiar localStorage</h2>
+  <button onclick="clearStorage()">Limpiar</button>
+  <div id="result6" class="test-result"></div>
+</div>
+
+<script>
+function log(elementId, message, type = 'info') {
+  const el = document.getElementById(elementId);
+  const div = document.createElement('div');
+  div.className = `test-result ${type}`;
+  div.textContent = message;
+  el.appendChild(div);
+}
+
+function logCode(elementId, code) {
+  const el = document.getElementById(elementId);
+  const pre = document.createElement('pre');
+  pre.textContent = JSON.stringify(code, null, 2);
+  el.appendChild(pre);
+}
+
+function createTestUser() {
+  const testUser = {
+    name: 'Test User',
+    email: 'test@example.com',
+    rank: 'BUILDER',
+    stickerCount: 8,
+    image: null,
+    role: 'USER',
+    preferences: { animationsEnabled: true },
+    achievements: [],
+    lastActivity: new Date().toISOString()
+  };
+  
+  localStorage.setItem('dforzze_user', JSON.stringify(testUser));
+  
+  // También agregar a la lista global
+  let list = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+  const idx = list.findIndex(u => u.email === testUser.email);
+  if (idx >= 0) {
+    list[idx] = testUser;
+  } else {
+    list.push(testUser);
+  }
+  localStorage.setItem('dforzze_users', JSON.stringify(list));
+  
+  log('result1', '✓ Usuario de prueba creado correctamente', 'pass');
+  logCode('result1', testUser);
+}
+
+function checkDforzzeUser() {
+  const user = JSON.parse(localStorage.getItem('dforzze_user') || 'null');
+  if (user) {
+    log('result2', '✓ dforzze_user encontrado', 'pass');
+    logCode('result2', user);
+  } else {
+    log('result2', '✗ dforzze_user no encontrado', 'fail');
+  }
+}
+
+function checkDforzzeUsers() {
+  const users = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+  if (users.length > 0) {
+    log('result3', `✓ dforzze_users encontrado con ${users.length} usuario(s)`, 'pass');
+    logCode('result3', users);
+  } else {
+    log('result3', '✗ dforzze_users vacío o no encontrado', 'fail');
+  }
+}
+
+function testGetFreshUser() {
+  try {
+    var u = JSON.parse(localStorage.getItem('dforzze_user'));
+    if (!u) {
+      log('result4', '✗ No hay usuario en sesión', 'fail');
+      return;
+    }
+    var uList = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+    var fresh = uList.find(function(x) { return x.email === u.email; });
+    if (fresh) {
+      log('result4', '✓ getFreshUser() funcionó correctamente', 'pass');
+      logCode('result4', fresh);
+    } else {
+      log('result4', '✗ Usuario no encontrado en lista global', 'fail');
+    }
+  } catch (e) {
+    log('result4', `✗ Error: ${e.message}`, 'fail');
+  }
+}
+
+function testOpenProfileModal() {
+  try {
+    const u = JSON.parse(localStorage.getItem('dforzze_user'));
+    if (!u) {
+      log('result5', '✗ No hay usuario en sesión', 'fail');
+      return;
+    }
+    
+    const RANKS = {
+      NONE: { l: 'Sin Rango', c: 'rgba(255,255,255,.5)', bg: 'rgba(255,255,255,.08)' },
+      INITIATED: { l: 'Initiated', c: '#34d399', bg: 'rgba(52,211,153,.15)' },
+      BUILDER: { l: 'Builder', c: '#fbbf24', bg: 'rgba(251,191,36,.15)' },
+      INNER: { l: 'Inner', c: '#c084fc', bg: 'rgba(192,132,252,.15)' }
+    };
+    const RANK_ORDER = ['NONE', 'INITIATED', 'BUILDER', 'INNER'];
+    const RANK_STK = { NONE: 0, INITIATED: 3, BUILDER: 7, INNER: 15 };
+    
+    const cnt = u.stickerCount || 0;
+    const curIdx = RANK_ORDER.indexOf(u.rank || 'NONE');
+    const nextRank = RANK_ORDER[Math.min(curIdx + 1, 3)];
+    const needed = RANK_STK[nextRank];
+    const pct = Math.min(cnt / needed * 100, 100);
+    
+    const result = {
+      usuario: u.name,
+      email: u.email,
+      rango: RANKS[u.rank || 'NONE'].l,
+      stickersActuales: cnt,
+      stickersNecesarios: needed,
+      porcentajeProgreso: Math.round(pct) + '%',
+      proximoRango: RANKS[nextRank].l
+    };
+    
+    log('result5', '✓ openProfileModal() lógica funcionó correctamente', 'pass');
+    logCode('result5', result);
+  } catch (e) {
+    log('result5', `✗ Error: ${e.message}`, 'fail');
+  }
+}
+
+function clearStorage() {
+  localStorage.removeItem('dforzze_user');
+  localStorage.removeItem('dforzze_users');
+  log('result6', '✓ localStorage limpiado', 'pass');
+}
+</script>
+
+</body>
+</html>

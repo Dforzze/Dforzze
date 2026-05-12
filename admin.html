@@ -1,0 +1,1751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Admin — DFORZZE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0a0a0a;color:#fff;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:220px;background:#111;border-right:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;z-index:10}
+.main{margin-left:220px;padding:32px;min-height:100vh}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;cursor:pointer;transition:all .2s;color:rgba(255,255,255,.4);font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.8)}
+.nav-item.active{background:rgba(168,85,247,.12);color:#a855f7}
+.nav-item svg{flex-shrink:0}
+
+.card{background:#161616;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:24px}
+.stat-card{background:#161616;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:9999px;font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:6px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border:none;cursor:pointer;transition:all .2s}
+.btn-primary{background:#a855f7;color:#fff}
+.btn-primary:hover{background:#9333ea}
+.btn-ghost{background:rgba(255,255,255,.05);color:rgba(255,255,255,.6)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);color:#fff}
+.btn-danger{background:rgba(239,68,68,.1);color:rgba(239,68,68,.8)}
+.btn-danger:hover{background:rgba(239,68,68,.2)}
+
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 12px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);border-bottom:1px solid rgba(255,255,255,.06)}
+td{padding:12px;font-size:13px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+.section{display:none}
+.section.active{display:block}
+
+@keyframes fadeIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+.section.active{animation:fadeIn .25s ease-out}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);transition:transform .3s ease;z-index:100}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:16px}
+  .mob-toggle{display:flex!important}
+  .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+  .mob-overlay.open{display:block}
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .analytics-grid{grid-template-columns:1fr 1fr!important}
+  .rank-bars{font-size:11px}
+}
+@media(max-width:480px){
+  .analytics-grid{grid-template-columns:1fr!important}
+  .main{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="mob-overlay" id="mobOverlay" onclick="closeSidebar()"></div>
+<button class="mob-toggle" onclick="openSidebar()" style="display:none;position:fixed;top:12px;left:12px;z-index:101;background:#111;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px;cursor:pointer;color:#fff;align-items:center;justify-content:center">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+<div class="sidebar">
+  <div style="padding:20px 16px 16px;border-bottom:1px solid rgba(255,255,255,.06)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+      <img src="images/logo.png" alt="DFORZZE" style="height:24px;filter:brightness(0) invert(1);opacity:.7">
+      <span style="font-weight:800;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5)">DFORZZE</span>
+    </div>
+    <span style="font-size:10px;color:rgba(168,85,247,.6);font-weight:600;letter-spacing:.08em;text-transform:uppercase">Panel Admin</span>
+  </div>
+
+  <nav style="padding:12px 8px;flex:1;display:flex;flex-direction:column;gap:2px">
+    <button class="nav-item active" onclick="showSection('dashboard',this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </button>
+    <button class="nav-item" onclick="showSection('pedidos',this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Pedidos
+    </button>
+    <button class="nav-item" onclick="showSection('usuarios',this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Usuarios
+    </button>
+    <button class="nav-item" onclick="showSection('inventario',this)" id="navInventario">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      Inventario
+      <span id="alertBadge" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#f59e0b;color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:9999px"></span>
+    </button>
+    <button class="nav-item" onclick="showSection('codigos',this)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+      Códigos
+    </button>
+    <button class="nav-item" onclick="showSection('peticiones',this)" style="position:relative">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      Peticiones
+      <span id="reqBadge" style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#ef4444;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:9999px"></span>
+    </button>
+  </nav>
+
+  <div style="padding:12px 8px;border-top:1px solid rgba(255,255,255,.06)">
+    <div id="railwayStatus" style="font-size:10px;color:rgba(255,255,255,.2);padding:6px 8px;letter-spacing:.04em">● Conectando...</div>    <button class="nav-item" onclick="history.back()" style="color:rgba(255,255,255,.5)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      Volver
+    </button>
+    <button class="nav-item" onclick="window.location.href='dforzze.html'">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div id="sec-dashboard" class="section active">
+    <div style="margin-bottom:28px">
+      <h1 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Dashboard</h1>
+      <p style="color:rgba(255,255,255,.3);font-size:13px">Resumen general de DFORZZE</p>
+    </div>
+
+    <!-- Analytics Mejorado -->
+    <div class="admin-analytics" style="margin-bottom:28px">
+      <div class="analytics-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px">
+        <div class="metric-card stat-card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <div class="metric-icon" style="font-size:20px">👥</div>
+            <p style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3)">Usuarios</p>
+          </div>
+          <div class="metric-value" id="totalUsers" style="font-size:28px;font-weight:800">0</div>
+          <div class="metric-label" style="font-size:11px;color:rgba(255,255,255,.2)">registrados</div>
+        </div>
+        
+        <div class="metric-card stat-card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <div class="metric-icon" style="font-size:20px">🎴</div>
+            <p style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3)">Stickers</p>
+          </div>
+          <div class="metric-value" id="totalStickers" style="font-size:28px;font-weight:800">0</div>
+          <div class="metric-label" style="font-size:11px;color:rgba(255,255,255,.2)">canjeados</div>
+        </div>
+        
+        <div class="metric-card stat-card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <div class="metric-icon" style="font-size:20px">📊</div>
+            <p style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3)">Promedio</p>
+          </div>
+          <div class="metric-value" id="avgStickers" style="font-size:28px;font-weight:800">0</div>
+          <div class="metric-label" style="font-size:11px;color:rgba(255,255,255,.2)">por usuario</div>
+        </div>
+
+        <div class="metric-card stat-card">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <div class="metric-icon" style="font-size:20px">🏆</div>
+            <p style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3)">Inner</p>
+          </div>
+          <div class="metric-value" id="innerUsers" style="font-size:28px;font-weight:800">0</div>
+          <div class="metric-label" style="font-size:11px;color:rgba(255,255,255,.2)">usuarios</div>
+        </div>
+      </div>
+      
+      <!-- Distribución por Rangos -->
+      <div class="card" style="margin-bottom:24px">
+        <h4 style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px">Distribución por Rangos</h4>
+        <div class="rank-bars" id="rankBars">
+          <!-- Barras generadas dinámicamente -->
+        </div>
+      </div>
+
+      <!-- Actividad Reciente -->
+      <div class="card">
+        <h4 style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px">Actividad Reciente</h4>
+        <div id="recentActivity">
+          <!-- Actividad generada dinámicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Carrito Activo (mantener funcionalidad existente) -->
+    <div class="card">
+      <p style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:16px">Carrito activo</p>
+      <div id="dashCart"></div>
+    </div>
+  </div>
+
+  <!-- PEDIDOS -->
+  <div id="sec-pedidos" class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
+      <div>
+        <h1 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Pedidos</h1>
+        <p style="color:rgba(255,255,255,.3);font-size:13px">Historial de órdenes</p>
+      </div>
+      <button class="btn btn-ghost" onclick="clearOrders()">Limpiar todo</button>
+    </div>
+    <div class="card">
+      <div id="ordersTable"></div>
+    </div>
+  </div>
+
+  <!-- USUARIOS -->
+  <div id="sec-usuarios" class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
+      <div>
+        <h1 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Usuarios</h1>
+        <p style="color:rgba(255,255,255,.3);font-size:13px">Todos los usuarios registrados</p>
+      </div>
+      <button class="btn btn-ghost" onclick="renderUsers()">↻ Actualizar</button>
+    </div>
+    <div class="card">
+      <div id="usersTable"></div>
+    </div>
+  </div>
+
+  <!-- MODAL AGREGAR / EDITAR PRENDA -->
+  <div id="productModal" onclick="if(event.target===this)closeProductModal()" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:16px;overflow-y:auto">
+    <div onclick="event.stopPropagation()" style="background:#161616;border:1px solid rgba(255,255,255,.08);border-radius:14px;width:100%;max-width:560px;padding:32px;position:relative;margin:auto">
+      <button onclick="closeProductModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:20px;line-height:1;padding:4px;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">✕</button>
+
+      <h3 id="productModalTitle" style="font-size:17px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px">Agregar prenda</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:28px">Completa los datos de la prenda</p>
+
+      <div style="display:flex;flex-direction:column;gap:18px">
+
+        <!-- Nombre -->
+        <div>
+          <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">Nombre de la prenda *</label>
+          <input id="pName" type="text" placeholder="Ej: DFORZZE SHORT 01" maxlength="80"
+            style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;transition:border-color .2s"
+            onfocus="this.style.borderColor='rgba(168,85,247,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'">
+        </div>
+
+        <!-- Categoría + Precio -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">Categoría *</label>
+            <select id="pCategory" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;cursor:pointer"
+              onfocus="this.style.borderColor='rgba(168,85,247,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'">
+              <option value="Camisetas">Camisetas</option>
+              <option value="Pantalones">Pantalones</option>
+              <option value="Hoodies">Hoodies</option>
+              <option value="Accesorios">Accesorios</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">Precio (S/.) *</label>
+            <input id="pPrice" type="number" min="1" step="0.01" placeholder="80"
+              style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;transition:border-color .2s"
+              onfocus="this.style.borderColor='rgba(168,85,247,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'">
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">Descripción</label>
+          <textarea id="pDesc" rows="2" placeholder="Descripción opcional de la prenda..."
+            style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 14px;color:#fff;font-size:13px;outline:none;font-family:inherit;resize:vertical;transition:border-color .2s"
+            onfocus="this.style.borderColor='rgba(168,85,247,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'"></textarea>
+        </div>
+
+        <!-- Imagen -->
+        <div>
+          <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">Imagen (URL o ruta)</label>
+          <div style="display:flex;gap:10px;align-items:center">
+            <input id="pImage" type="text" placeholder="images/1.png o URL completa"
+              style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px 14px;color:#fff;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s"
+              onfocus="this.style.borderColor='rgba(168,85,247,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'"
+              oninput="previewImg(this.value)">
+            <div id="imgPreview" style="width:52px;height:52px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+          </div>
+          <!-- Imágenes rápidas del proyecto -->
+          <div style="margin-top:10px">
+            <p style="font-size:10px;color:rgba(255,255,255,.25);margin-bottom:6px;letter-spacing:.04em">Imágenes disponibles:</p>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <button type="button" onclick="selectImg('images/1.png')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:3px 8px;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(168,85,247,.4)';this.style.color='#a855f7'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.4)'">1.png</button>
+              <button type="button" onclick="selectImg('images/2.png')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:3px 8px;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(168,85,247,.4)';this.style.color='#a855f7'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.4)'">2.png</button>
+              <button type="button" onclick="selectImg('images/polosakura.png')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:3px 8px;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(168,85,247,.4)';this.style.color='#a855f7'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.4)'">polosakura.png</button>
+              <button type="button" onclick="selectImg('images/polosakura2.png')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:3px 8px;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(168,85,247,.4)';this.style.color='#a855f7'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.4)'">polosakura2.png</button>
+              <button type="button" onclick="selectImg('images/ziphodie.png')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:3px 8px;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(168,85,247,.4)';this.style.color='#a855f7'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.4)'">ziphodie.png</button>
+              <button type="button" onclick="selectImg('images/bici.jpg')" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:3px 8px;color:rgba(255,255,255,.4);font-size:10px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='rgba(168,85,247,.4)';this.style.color='#a855f7'" onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.4)'">bici.jpg</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tallas y stock -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <label style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35)">Tallas y stock *</label>
+            <button type="button" onclick="addSizeRow()" style="background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.2);color:#a855f7;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:5px 12px;border-radius:4px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(168,85,247,.2)'" onmouseout="this.style.background='rgba(168,85,247,.12)'">+ Agregar talla</button>
+          </div>
+          <div id="sizesContainer" style="display:flex;flex-direction:column;gap:8px">
+            <!-- Filas de talla generadas por JS -->
+          </div>
+          <p style="font-size:10px;color:rgba(255,255,255,.2);margin-top:8px">Agrega una fila por cada talla disponible. Stock 0 = agotado.</p>
+        </div>
+
+        <!-- Umbral de stock bajo -->
+        <div>
+          <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">Umbral de stock bajo (alerta)</label>
+          <input id="pThreshold" type="number" min="1" value="5" placeholder="5"
+            style="width:120px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:10px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;transition:border-color .2s"
+            onfocus="this.style.borderColor='rgba(168,85,247,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.1)'">
+          <span style="font-size:11px;color:rgba(255,255,255,.25);margin-left:10px">unidades totales</span>
+        </div>
+
+        <!-- Error -->
+        <div id="productModalError" style="display:none;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:6px;padding:10px 14px;font-size:12px;color:#f87171"></div>
+
+        <!-- Botones -->
+        <div style="display:flex;gap:10px;padding-top:4px">
+          <button type="button" onclick="closeProductModal()" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:13px;border-radius:6px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">Cancelar</button>
+          <button type="button" id="productModalSaveBtn" onclick="saveProduct()" style="flex:2;background:#a855f7;color:#fff;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px;border:none;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#9333ea'" onmouseout="this.style.background='#a855f7'">Guardar prenda</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR STOCK RÁPIDO -->
+  <div id="stockModal" onclick="if(event.target===this)closeStockModal()" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:16px">
+    <div onclick="event.stopPropagation()" style="background:#161616;border:1px solid rgba(255,255,255,.08);border-radius:14px;width:100%;max-width:420px;padding:28px;position:relative">
+      <button onclick="closeStockModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:20px;line-height:1;padding:4px" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">✕</button>
+      <h3 id="stockModalTitle" style="font-size:16px;font-weight:800;margin-bottom:4px">Editar stock</h3>
+      <p id="stockModalSub" style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:24px"></p>
+
+      <div id="stockSizesEdit" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+      <div style="margin-bottom:20px">
+        <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:8px">Motivo del ajuste</label>
+        <select id="stockReason" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:11px 14px;color:#fff;font-size:13px;outline:none;font-family:inherit;cursor:pointer">
+          <option value="restock">Reabastecimiento</option>
+          <option value="adjustment">Ajuste manual</option>
+          <option value="return">Devolución</option>
+          <option value="damage">Daño / pérdida</option>
+        </select>
+      </div>
+
+      <button onclick="saveStockEdit()" style="width:100%;background:#a855f7;color:#fff;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px;border:none;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#9333ea'" onmouseout="this.style.background='#a855f7'">Guardar stock</button>
+    </div>
+  </div>
+  <div id="editUserModal" onclick="if(event.target===this)closeEditUser()" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px">
+    <div onclick="event.stopPropagation()" style="background:#1a1a1a;border:1px solid rgba(255,255,255,.08);border-radius:12px;width:100%;max-width:420px;padding:28px;position:relative">
+      <button onclick="closeEditUser()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">✕</button>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <div id="euAvatar" style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;overflow:hidden;flex-shrink:0"></div>
+        <div>
+          <p id="euName" style="font-weight:700;font-size:15px"></p>
+          <p id="euEmail" style="font-size:12px;color:rgba(255,255,255,.35)"></p>
+        </div>
+      </div>
+
+      <!-- Rango -->
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px">Rango</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="setUserRank('NONE')" id="rb-NONE" class="rank-btn" style="padding:6px 14px;border-radius:4px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s">Sin Rango</button>
+          <button onclick="setUserRank('INITIATED')" id="rb-INITIATED" class="rank-btn" style="padding:6px 14px;border-radius:4px;border:1px solid rgba(52,211,153,.2);background:rgba(52,211,153,.06);color:#34d399;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s">Initiated</button>
+          <button onclick="setUserRank('BUILDER')" id="rb-BUILDER" class="rank-btn" style="padding:6px 14px;border-radius:4px;border:1px solid rgba(251,191,36,.2);background:rgba(251,191,36,.06);color:#fbbf24;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s">Builder</button>
+          <button onclick="setUserRank('INNER')" id="rb-INNER" class="rank-btn" style="padding:6px 14px;border-radius:4px;border:1px solid rgba(192,132,252,.2);background:rgba(192,132,252,.06);color:#c084fc;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s">Inner</button>
+        </div>
+      </div>
+
+      <!-- Stickers -->
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px">Stickers</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button onclick="adjustStickers(-1)" style="width:36px;height:36px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);border-radius:6px;color:#fff;font-size:18px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">−</button>
+          <span id="euStickers" style="font-weight:800;font-size:22px;min-width:40px;text-align:center">0</span>
+          <button onclick="adjustStickers(1)" style="width:36px;height:36px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);border-radius:6px;color:#fff;font-size:18px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">+</button>
+          <button onclick="adjustStickers(-999)" style="padding:6px 12px;border:1px solid rgba(239,68,68,.2);background:rgba(239,68,68,.06);border-radius:4px;color:rgba(239,68,68,.7);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(239,68,68,.12)'" onmouseout="this.style.background='rgba(239,68,68,.06)'">Quitar todos</button>
+        </div>
+      </div>
+
+      <!-- Estado cuenta -->
+      <div style="margin-bottom:24px">
+        <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px">Estado de cuenta</label>
+        <div style="display:flex;gap:8px">
+          <button onclick="setUserStatus('active')" id="sb-active" style="flex:1;padding:8px;border-radius:4px;border:1px solid rgba(74,222,128,.2);background:rgba(74,222,128,.08);color:#4ade80;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s">✓ Activa</button>
+          <button onclick="setUserStatus('blocked')" id="sb-blocked" style="flex:1;padding:8px;border-radius:4px;border:1px solid rgba(239,68,68,.2);background:rgba(239,68,68,.06);color:rgba(239,68,68,.6);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s">⊘ Bloqueada</button>
+        </div>
+      </div>
+
+      <button onclick="saveUserEdit()" style="width:100%;background:#a855f7;color:#fff;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px;border:none;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#9333ea'" onmouseout="this.style.background='#a855f7'">Guardar cambios</button>
+    </div>
+  </div>
+
+  <!-- INVENTARIO (reemplaza Productos) -->
+  <div id="sec-inventario" class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+      <div>
+        <h1 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Inventario</h1>
+        <p style="color:rgba(255,255,255,.3);font-size:13px">Gestiona prendas, precios, tallas y stock</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <!-- Filtro de estado -->
+        <select id="invFilter" onchange="renderInventario()" style="background:#1a1a1a;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);font-size:12px;padding:8px 12px;border-radius:6px;outline:none;cursor:pointer">
+          <option value="all">Todos</option>
+          <option value="available">Disponible</option>
+          <option value="low">Stock bajo</option>
+          <option value="out">Agotado</option>
+        </select>
+        <button onclick="openAddProduct()" class="btn btn-primary" style="gap:6px">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Agregar prenda
+        </button>
+      </div>
+    </div>
+
+    <!-- Alertas de stock bajo -->
+    <div id="invAlerts" style="margin-bottom:20px"></div>
+
+    <!-- Stats rápidas -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px">
+      <div class="stat-card">
+        <p style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3)">Total prendas</p>
+        <p id="invStatTotal" style="font-size:26px;font-weight:800">0</p>
+      </div>
+      <div class="stat-card">
+        <p style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(74,222,128,.5)">Disponibles</p>
+        <p id="invStatAvail" style="font-size:26px;font-weight:800;color:#4ade80">0</p>
+      </div>
+      <div class="stat-card">
+        <p style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(251,191,36,.5)">Stock bajo</p>
+        <p id="invStatLow" style="font-size:26px;font-weight:800;color:#fbbf24">0</p>
+      </div>
+      <div class="stat-card">
+        <p style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(239,68,68,.5)">Agotados</p>
+        <p id="invStatOut" style="font-size:26px;font-weight:800;color:#ef4444">0</p>
+      </div>
+    </div>
+
+    <!-- Tabla de inventario -->
+    <div class="card" style="padding:0;overflow:hidden">
+      <div id="invTable"></div>
+    </div>
+  </div>
+
+  <!-- PETICIONES DE RANGO -->
+  <div id="sec-peticiones" class="section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
+      <div>
+        <h1 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Peticiones de Rango</h1>
+        <p style="color:rgba(255,255,255,.3);font-size:13px">Usuarios que alcanzaron Builder o Inner y esperan aprobación</p>
+      </div>
+      <button class="btn btn-ghost" onclick="renderRequests()">↻ Actualizar</button>
+    </div>
+    <div class="card">
+      <div id="requestsTable"></div>
+    </div>
+  </div>
+  <div id="sec-codigos" class="section">
+    <div style="margin-bottom:28px">
+      <h1 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin-bottom:4px">Códigos</h1>
+      <p style="color:rgba(255,255,255,.3);font-size:13px">Genera y gestiona códigos de descuento y stickers</p>
+    </div>
+
+    <!-- Generadores -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px">
+      <div class="card" style="text-align:center">
+        <p style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px">Descuento 10%</p>
+        <button onclick="genCode('discount','10')" class="btn btn-primary" style="width:100%">Generar código</button>
+      </div>
+      <div class="card" style="text-align:center">
+        <p style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px">Descuento 20%</p>
+        <button onclick="genCode('discount','20')" class="btn btn-primary" style="width:100%">Generar código</button>
+      </div>
+      <div class="card" style="text-align:center">
+        <p style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px">Descuento 30%</p>
+        <button onclick="genCode('discount','30')" class="btn btn-primary" style="width:100%">Generar código</button>
+      </div>
+      <div class="card" style="text-align:center;border-color:rgba(255,182,193,.3)">
+        <p style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,182,193,.7);margin-bottom:4px">Código de Sticker</p>
+        <p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:12px">🌸 Colección 01 — Sakura</p>
+        <button onclick="genCode('sticker','1')" class="btn" style="width:100%;background:rgba(255,182,193,.12);color:#ffb6c1">Generar código 🌸</button>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <p style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3)">Historial de códigos</p>
+        <button class="btn btn-ghost" onclick="clearAllCodes()">Limpiar todo</button>
+      </div>
+      <div id="codesTable"></div>
+    </div>
+  </div>
+
+</div>
+
+  <!-- MODAL SIMULACIÓN DE COMPRA -->
+  <div id="simModal" onclick="if(event.target===this)closeSimModal()" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:16px">
+    <div onclick="event.stopPropagation()" style="background:#161616;border:1px solid rgba(168,85,247,.2);border-radius:14px;width:100%;max-width:480px;padding:32px;position:relative">
+      <button onclick="closeSimModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:20px;line-height:1;padding:4px;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">✕</button>
+
+      <!-- Header -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <div style="width:8px;height:8px;border-radius:50%;background:#a855f7;animation:pulse 1.5s infinite"></div>
+        <span style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#a855f7">Simulación de compra</span>
+      </div>
+      <h3 id="simProdName" style="font-size:17px;font-weight:800;letter-spacing:-.01em;margin-bottom:4px;text-transform:uppercase"></h3>
+      <p id="simProdPrice" style="font-size:13px;color:rgba(255,255,255,.35);margin-bottom:24px"></p>
+
+      <!-- Estado inicial -->
+      <div id="simForm">
+        <!-- Talla -->
+        <div style="margin-bottom:20px">
+          <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px">Talla</label>
+          <div id="simSizeBtns" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+          <p id="simSizeErr" style="display:none;color:#f87171;font-size:11px;margin-top:6px">Selecciona una talla</p>
+        </div>
+
+        <!-- Cantidad -->
+        <div style="margin-bottom:24px">
+          <label style="display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:10px">Cantidad</label>
+          <div style="display:flex;align-items:center;gap:12px">
+            <button onclick="simChangeQty(-1)" style="width:40px;height:40px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);border-radius:8px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">−</button>
+            <span id="simQtyVal" style="font-weight:800;font-size:26px;min-width:36px;text-align:center">1</span>
+            <button onclick="simChangeQty(1)" style="width:40px;height:40px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);border-radius:8px;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.04)'">+</button>
+            <span id="simStockAvail" style="font-size:11px;color:rgba(255,255,255,.3);margin-left:4px"></span>
+          </div>
+        </div>
+
+        <!-- Resumen antes de confirmar -->
+        <div id="simPreview" style="display:none;background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.15);border-radius:8px;padding:14px 16px;margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:rgba(255,255,255,.4)">Talla</span>
+            <span id="simPreviewSize" style="font-weight:700"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:rgba(255,255,255,.4)">Cantidad</span>
+            <span id="simPreviewQty" style="font-weight:700"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:rgba(255,255,255,.4)">Stock actual</span>
+            <span id="simPreviewBefore" style="font-weight:700;color:#fbbf24"></span>
+          </div>
+          <div style="height:1px;background:rgba(255,255,255,.06);margin:8px 0"></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+            <span style="color:rgba(255,255,255,.4)">Stock después</span>
+            <span id="simPreviewAfter" style="font-weight:800;color:#4ade80"></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800">
+            <span style="color:rgba(255,255,255,.5)">Total simulado</span>
+            <span id="simPreviewTotal" style="color:#a855f7"></span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px">
+          <button onclick="simPreview()" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.6);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:12px;border-radius:6px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">Ver resumen</button>
+          <button onclick="simConfirm()" style="flex:2;background:#a855f7;color:#fff;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:12px;border:none;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#9333ea'" onmouseout="this.style.background='#a855f7'">Confirmar simulación</button>
+        </div>
+      </div>
+
+      <!-- Resultado de la simulación -->
+      <div id="simResult" style="display:none;text-align:center">
+        <div id="simResultIcon" style="font-size:48px;margin-bottom:16px"></div>
+        <h4 id="simResultTitle" style="font-size:18px;font-weight:800;margin-bottom:8px"></h4>
+        <p id="simResultMsg" style="font-size:13px;color:rgba(255,255,255,.4);line-height:1.6;margin-bottom:24px"></p>
+        <!-- Detalle del movimiento -->
+        <div id="simResultDetail" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:16px;margin-bottom:20px;text-align:left"></div>
+        <div style="display:flex;gap:10px">
+          <button onclick="simReset()" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.6);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:12px;border-radius:6px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">Otra simulación</button>
+          <button onclick="closeSimModal()" style="flex:1;background:#a855f7;color:#fff;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:12px;border:none;border-radius:6px;cursor:pointer;transition:background .2s" onmouseover="this.style.background='#9333ea'" onmouseout="this.style.background='#a855f7'">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
+<script>
+// ── PROTECCIÓN ADMIN ───────────────────────────────────────────
+(function(){
+  try{
+    var u = JSON.parse(localStorage.getItem('dforzze_user'));
+    if(!u || u.role !== 'ADMIN'){
+      document.body.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:16px;text-align:center;padding:24px"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><p style="font-size:16px;font-weight:700;color:rgba(255,255,255,.6)">Acceso denegado</p><p style="font-size:13px;color:rgba(255,255,255,.3)">Solo administradores pueden ver esta página.</p><a href="dforzze.html" style="margin-top:8px;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:12px 24px;border-radius:6px">Volver</a></div>';
+    }
+  }catch(e){ window.location.href='dforzze.html'; }
+})();
+
+// ── NAVEGACIÓN ─────────────────────────────────────────────────
+function showSection(id, btn){
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='dashboard') renderDashboard();
+  if(id==='pedidos') renderOrders();
+  if(id==='usuarios') renderUsers();
+  if(id==='codigos') renderCodes();
+  if(id==='peticiones') renderRequests();
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────
+function renderDashboard(){
+  var cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  var orders = JSON.parse(localStorage.getItem('dforzze_orders') || '[]');
+  var users = getAllUsers().filter(function(u){ return u.role !== 'ADMIN'; });
+
+  // Stats del dashboard nuevo (IDs: totalUsers, totalStickers, avgStickers, innerUsers)
+  var totalStk = users.reduce(function(s,u){ return s+(u.stickerCount||0); },0);
+  var innerCount = users.filter(function(u){ return u.rank==='INNER'; }).length;
+  var el = function(id){ return document.getElementById(id); };
+  if(el('totalUsers')) el('totalUsers').textContent = users.length;
+  if(el('totalStickers')) el('totalStickers').textContent = totalStk;
+  if(el('avgStickers')) el('avgStickers').textContent = users.length ? (totalStk/users.length).toFixed(1) : '0';
+  if(el('innerUsers')) el('innerUsers').textContent = innerCount;
+
+  // Distribución por rangos
+  var rankBars = el('rankBars');
+  if(rankBars){
+    var rankCounts = {NONE:0,INITIATED:0,BUILDER:0,INNER:0};
+    users.forEach(function(u){ rankCounts[u.rank||'NONE']++; });
+    var rankColors = {NONE:'rgba(255,255,255,.2)',INITIATED:'#34d399',BUILDER:'#fbbf24',INNER:'#c084fc'};
+    var rankLabels = {NONE:'Sin Rango',INITIATED:'Initiated',BUILDER:'Builder',INNER:'Inner'};
+    rankBars.innerHTML = Object.keys(rankCounts).map(function(r){
+      var pct = users.length ? Math.round(rankCounts[r]/users.length*100) : 0;
+      return '<div style="margin-bottom:10px">'
+        +'<div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">'
+          +'<span style="color:'+rankColors[r]+';font-weight:600">'+rankLabels[r]+'</span>'
+          +'<span style="color:rgba(255,255,255,.3)">'+rankCounts[r]+' ('+pct+'%)</span>'
+        +'</div>'
+        +'<div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden">'
+          +'<div style="height:100%;width:'+pct+'%;background:'+rankColors[r]+';border-radius:2px;transition:width .5s"></div>'
+        +'</div>'
+      +'</div>';
+    }).join('');
+  }
+
+  // Actividad reciente — últimos pedidos
+  var recentActivity = el('recentActivity');
+  if(recentActivity){
+    if(orders.length === 0){
+      recentActivity.innerHTML = '<p style="color:rgba(255,255,255,.2);font-size:13px;text-align:center;padding:16px 0">Sin actividad reciente</p>';
+    } else {
+      recentActivity.innerHTML = orders.slice(0,5).map(function(o){
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
+          +'<div><p style="font-size:13px;font-weight:600;margin-bottom:2px">'+(o.name||'Cliente')+'</p>'
+          +'<p style="font-size:11px;color:rgba(255,255,255,.3)">'+(o.date||'')+'</p></div>'
+          +'<span style="font-weight:700;color:#a855f7">S/. '+(o.total||0)+'</span>'
+        +'</div>';
+      }).join('');
+    }
+  }
+
+  // Carrito activo
+  var invProds = [];
+  try{ invProds = JSON.parse(localStorage.getItem('dforzze_products')||'[]'); }catch(e){}
+  function getImg(id){ var p=invProds.find(function(x){return x.id===id;}); return p&&p.image?p.image:({'1':'images/1.png','2':'images/2.png'}[id]||'images/1.png'); }
+  if(cart.length === 0){
+    document.getElementById('dashCart').innerHTML = '<p style="color:rgba(255,255,255,.2);font-size:13px;text-align:center;padding:24px 0">Carrito vacío</p>';
+  } else {
+    document.getElementById('dashCart').innerHTML = '<table><thead><tr><th>Producto</th><th>Qty</th><th>Precio unit.</th><th>Subtotal</th></tr></thead><tbody>'
+      + cart.map(function(i){
+          return '<tr><td><div style="display:flex;align-items:center;gap:10px"><img src="'+getImg(i.id)+'" style="width:36px;height:36px;object-fit:contain;background:#222;border-radius:4px;padding:3px"><span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em">'+i.name+(i.size?' ('+i.size+')':'')+'</span></div></td><td style="font-weight:700">'+i.qty+'</td><td style="color:rgba(255,255,255,.5)">S/. '+i.price+'</td><td style="font-weight:700;color:#a855f7">S/. '+(i.price*i.qty)+'</td></tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+}
+
+// ── PEDIDOS ────────────────────────────────────────────────────
+function renderOrders(){
+  var orders = JSON.parse(localStorage.getItem('dforzze_orders') || '[]');
+  var el = document.getElementById('ordersTable');
+  if(orders.length === 0){
+    el.innerHTML = '<p style="color:rgba(255,255,255,.2);font-size:13px;text-align:center;padding:32px 0">No hay pedidos registrados aún.</p>';
+    return;
+  }
+  el.innerHTML = '<table><thead><tr>'
+    +'<th>#</th><th>Cliente</th><th>Contacto</th><th>Productos</th><th>Total</th><th>Envío</th><th>Fecha</th><th>Estado</th><th></th>'
+    +'</tr></thead><tbody>'
+    + orders.map(function(o, i){
+        var statusColors = {
+          confirmed: 'background:rgba(74,222,128,.1);color:#4ade80',
+          pending:   'background:rgba(251,191,36,.1);color:#fbbf24',
+          shipped:   'background:rgba(96,165,250,.1);color:#60a5fa',
+          delivered: 'background:rgba(168,85,247,.1);color:#a855f7',
+          cancelled: 'background:rgba(239,68,68,.1);color:#ef4444'
+        };
+        var statusLabels = {confirmed:'Confirmado',pending:'Pendiente',shipped:'Enviado',delivered:'Entregado',cancelled:'Cancelado'};
+        var sc = statusColors[o.status||'confirmed'] || statusColors.confirmed;
+        var sl = statusLabels[o.status||'confirmed'] || 'Confirmado';
+        return '<tr>'
+          +'<td style="color:rgba(255,255,255,.4);font-size:11px;font-family:monospace">'+(o.id||('#'+String(i+1).padStart(3,'0')))+'</td>'
+          +'<td style="font-weight:600">'+(o.name||'—')+'</td>'
+          +'<td style="font-size:11px;color:rgba(255,255,255,.4)">'+(o.email||'—')+'<br>'+(o.phone?'📞 '+o.phone:'')+(o.dni?'<br>DNI: '+o.dni:'')+'</td>'
+          +'<td style="font-size:11px;color:rgba(255,255,255,.5);max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(o.items||'—')+'</td>'
+          +'<td style="font-weight:700;color:#a855f7">S/. '+(o.total||0)+'</td>'
+          +'<td style="font-size:11px;color:rgba(255,255,255,.4)">'+(o.shippingLabel||'Estándar')+'</td>'
+          +'<td style="font-size:11px;color:rgba(255,255,255,.3)">'+(o.date||'—')+'</td>'
+          +'<td><span class="badge" style="'+sc+'">'+sl+'</span></td>'
+          +'<td><button class="btn btn-ghost" onclick="openOrderDetail('+i+')" style="padding:5px 12px;font-size:10px">Ver detalle</button></td>'
+        +'</tr>';
+      }).join('')
+    + '</tbody></table>';
+}
+
+function openOrderDetail(idx){
+  var orders = JSON.parse(localStorage.getItem('dforzze_orders') || '[]');
+  var o = orders[idx];
+  if(!o) return;
+
+  var statusColors = {confirmed:'#4ade80',pending:'#fbbf24',shipped:'#60a5fa',delivered:'#a855f7',cancelled:'#ef4444'};
+  var statusLabels = {confirmed:'Confirmado',pending:'Pendiente',shipped:'Enviado',delivered:'Entregado',cancelled:'Cancelado'};
+  var sc = statusColors[o.status||'confirmed'] || '#4ade80';
+  var sl = statusLabels[o.status||'confirmed'] || 'Confirmado';
+
+  // Items detallados
+  var itemsHtml = '';
+  if(o.itemsDetail && o.itemsDetail.length > 0){
+    itemsHtml = o.itemsDetail.map(function(it){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
+        +'<div><p style="font-size:13px;font-weight:600">'+it.name+(it.size?' <span style="font-size:10px;background:rgba(255,255,255,.08);padding:1px 6px;border-radius:3px">'+it.size+'</span>':'')+'</p>'
+        +'<p style="font-size:11px;color:rgba(255,255,255,.3)">S/. '+it.price+' × '+it.qty+'</p></div>'
+        +'<p style="font-weight:700;color:#a855f7">S/. '+it.subtotal+'</p>'
+      +'</div>';
+    }).join('');
+  } else {
+    itemsHtml = '<p style="font-size:12px;color:rgba(255,255,255,.4)">'+(o.items||'Sin detalle')+'</p>';
+  }
+
+  var modal = document.getElementById('orderDetailModal');
+  if(!modal){
+    // Crear modal si no existe
+    modal = document.createElement('div');
+    modal.id = 'orderDetailModal';
+    modal.onclick = function(e){ if(e.target===this) this.style.display='none'; };
+    modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto';
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = '<div onclick="event.stopPropagation()" style="background:#161616;border:1px solid rgba(255,255,255,.08);border-radius:14px;width:100%;max-width:600px;margin:auto;overflow:hidden">'
+    // Header
+    +'<div style="background:#1a1a1a;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06)">'
+      +'<div>'
+        +'<p style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:4px">Pedido</p>'
+        +'<p style="font-size:18px;font-weight:800;font-family:monospace;letter-spacing:.04em">'+(o.id||'—')+'</p>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:12px">'
+        +'<span class="badge" style="background:rgba(74,222,128,.1);color:'+sc+'">'+sl+'</span>'
+        +'<button onclick="document.getElementById(\'orderDetailModal\').style.display=\'none\'" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:20px;padding:4px" onmouseover="this.style.color=\'#fff\'" onmouseout="this.style.color=\'rgba(255,255,255,.3)\'">✕</button>'
+      +'</div>'
+    +'</div>'
+    // Datos del cliente
+    +'<div style="padding:24px 28px;border-bottom:1px solid rgba(255,255,255,.06)">'
+      +'<p style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:14px">Datos del cliente</p>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+        +'<div><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">Nombre</p><p style="font-weight:600">'+(o.name||'—')+'</p></div>'
+        +'<div><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">Email</p><p style="font-weight:600;font-size:13px">'+(o.email||'—')+'</p></div>'
+        +'<div><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">Teléfono</p><p style="font-weight:600">'+(o.phone||'—')+'</p></div>'
+        +'<div><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">DNI</p><p style="font-weight:600;font-family:monospace;letter-spacing:.06em">'+(o.dni||'—')+'</p></div>'
+        +'<div><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">Rango Members</p><p style="font-weight:600;color:'+(o.userRank==='INNER'?'#c084fc':o.userRank==='BUILDER'?'#fbbf24':o.userRank==='INITIATED'?'#34d399':'rgba(255,255,255,.4)')+'">'+({INNER:'Inner',BUILDER:'Builder',INITIATED:'Initiated',NONE:'Sin rango'}[o.userRank||'NONE']||'—')+'</p></div>'
+      +'</div>'
+    +'</div>'
+    // Dirección de envío
+    +'<div style="padding:24px 28px;border-bottom:1px solid rgba(255,255,255,.06)">'
+      +'<p style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:14px">Dirección de envío</p>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'
+        +'<div style="grid-column:1/-1"><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">Dirección</p><p style="font-weight:600">'+(o.address||'—')+'</p></div>'
+        +'<div><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">Ciudad</p><p style="font-weight:600">'+(o.city||'—')+'</p></div>'
+        +'<div><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">Distrito</p><p style="font-weight:600">'+(o.district||'—')+'</p></div>'
+        +'<div><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">Código postal</p><p style="font-weight:600">'+(o.zip||'—')+'</p></div>'
+        +'<div><p style="font-size:10px;color:rgba(255,255,255,.3);margin-bottom:3px">País</p><p style="font-weight:600">'+(o.country||'PE')+'</p></div>'
+      +'</div>'
+      +'<div style="margin-top:12px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:6px;display:flex;align-items:center;gap:8px">'
+        +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>'
+        +'<p style="font-size:12px;color:rgba(255,255,255,.5)">'+(o.shippingLabel||'Envío estándar')+'</p>'
+      +'</div>'
+    +'</div>'
+    // Items
+    +'<div style="padding:24px 28px;border-bottom:1px solid rgba(255,255,255,.06)">'
+      +'<p style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:14px">Productos</p>'
+      +itemsHtml
+    +'</div>'
+    // Totales
+    +'<div style="padding:24px 28px;border-bottom:1px solid rgba(255,255,255,.06)">'
+      +'<div style="display:flex;flex-direction:column;gap:8px">'
+        +'<div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(255,255,255,.4)">Subtotal</span><span>S/. '+(o.subtotal||o.total||0)+'</span></div>'
+        +(o.discount>0?'<div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#4ade80">Descuento'+(o.coupon?' ('+o.coupon+')':'')+'</span><span style="color:#4ade80">- S/. '+o.discount+'</span></div>':'')
+        +'<div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(255,255,255,.4)">Envío</span><span>S/. '+(o.shipping||9)+'</span></div>'
+        +'<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;border-top:1px solid rgba(255,255,255,.06);padding-top:10px;margin-top:4px"><span>Total</span><span style="color:#a855f7">S/. '+(o.total||0)+'</span></div>'
+        +(o.stickersEarned>0?'<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:rgba(255,255,255,.3)">Stickers ganados</span><span style="color:#fbbf24">🌸 ×'+o.stickersEarned+'</span></div>':'')
+      +'</div>'
+    +'</div>'
+    // Footer — cambiar estado + fecha
+    +'<div style="padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:12px">'
+      +'<div style="font-size:11px;color:rgba(255,255,255,.3)">'+(o.date||'')+(o.time?' · '+o.time:'')+'</div>'
+      +'<div style="display:flex;gap:8px">'
+        +'<select onchange="updateOrderStatus('+idx+',this.value)" style="background:#1a1a1a;border:1px solid rgba(255,255,255,.1);color:#fff;font-size:11px;padding:7px 10px;border-radius:6px;outline:none;cursor:pointer">'
+          +['confirmed','pending','shipped','delivered','cancelled'].map(function(s){
+            return '<option value="'+s+'"'+(s===(o.status||'confirmed')?' selected':'')+'>'+({confirmed:'Confirmado',pending:'Pendiente',shipped:'Enviado',delivered:'Entregado',cancelled:'Cancelado'}[s])+'</option>';
+          }).join('')
+        +'</select>'
+        +'<button onclick="document.getElementById(\'orderDetailModal\').style.display=\'none\'" class="btn btn-ghost" style="padding:7px 16px;font-size:11px">Cerrar</button>'
+      +'</div>'
+    +'</div>'
+  +'</div>';
+
+  modal.style.display = 'flex';
+}
+
+function updateOrderStatus(idx, newStatus){
+  var orders = JSON.parse(localStorage.getItem('dforzze_orders') || '[]');
+  if(orders[idx]){ orders[idx].status = newStatus; localStorage.setItem('dforzze_orders', JSON.stringify(orders)); renderOrders(); }
+}
+
+function clearOrders(){
+  if(confirm('¿Eliminar todos los pedidos?')){
+    localStorage.removeItem('dforzze_orders');
+    renderOrders();
+  }
+}
+
+// ── USUARIOS ───────────────────────────────────────────────────
+var _editEmail = null;
+var _editUser  = null;
+
+function getAllUsers(){
+  var list = JSON.parse(localStorage.getItem('dforzze_users') || '[]');
+  // Incluir usuario activo si no está en la lista
+  try{
+    var cur = JSON.parse(localStorage.getItem('dforzze_user'));
+    if(cur){
+      var exists = list.find(function(u){ return u.email === cur.email; });
+      if(!exists){ list.push(cur); localStorage.setItem('dforzze_users', JSON.stringify(list)); }
+    }
+  }catch(e){}
+  return list;
+}
+
+function renderUsers(){
+  var users = getAllUsers();
+  var el = document.getElementById('usersTable');
+  if(users.length === 0){
+    el.innerHTML = '<p style="color:rgba(255,255,255,.2);font-size:13px;text-align:center;padding:40px 0">No hay usuarios registrados aún.</p>';
+    return;
+  }
+  var rankColors = {INNER:'#c084fc',BUILDER:'#fbbf24',INITIATED:'#34d399',NONE:'rgba(255,255,255,.3)'};
+  el.innerHTML = '<table><thead><tr><th>Usuario</th><th>Email</th><th>Rango</th><th>Stickers</th><th>Estado</th><th>Registro</th><th></th></tr></thead><tbody>' +
+    users.map(function(u){
+      var blocked = u.blocked;
+      var statusBadge = blocked
+        ? '<span class="badge" style="background:rgba(239,68,68,.1);color:rgba(239,68,68,.8)">Bloqueado</span>'
+        : '<span class="badge" style="background:rgba(74,222,128,.1);color:#4ade80">Activo</span>';
+      var rankLabel = {NONE:'Sin Rango',INITIATED:'Initiated',BUILDER:'Builder',INNER:'Inner'}[u.rank||'NONE'];
+      return '<tr style="'+(blocked?'opacity:.5':'')+'">'+
+        '<td><div style="display:flex;align-items:center;gap:10px">'+
+          '<div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;overflow:hidden;flex-shrink:0">'+(u.image?'<img src="'+u.image+'" style="width:100%;height:100%;object-fit:cover">':u.name.charAt(0).toUpperCase())+'</div>'+
+          '<span style="font-weight:600">'+u.name+'</span></div></td>'+
+        '<td style="color:rgba(255,255,255,.4);font-size:12px">'+u.email+'</td>'+
+        '<td><span style="font-size:11px;font-weight:700;color:'+(rankColors[u.rank||'NONE']||'rgba(255,255,255,.3)')+'">'+rankLabel+'</span></td>'+
+        '<td style="font-weight:700">'+(u.stickerCount||0)+'</td>'+
+        '<td>'+statusBadge+'</td>'+
+        '<td style="font-size:11px;color:rgba(255,255,255,.3)">'+(u.createdAt||'—')+'</td>'+
+        '<td><button class="btn btn-ghost" onclick="openEditUser(\''+u.email+'\')" style="padding:5px 12px;font-size:11px">Editar</button></td>'+
+      '</tr>';
+    }).join('') + '</tbody></table>';
+}
+
+function openEditUser(email){
+  var users = getAllUsers();
+  var u = users.find(function(x){ return x.email === email; });
+  if(!u) return;
+  _editEmail = email;
+  _editUser  = JSON.parse(JSON.stringify(u)); // copia
+
+  // Llenar modal
+  var av = document.getElementById('euAvatar');
+  av.innerHTML = u.image ? '<img src="'+u.image+'" style="width:100%;height:100%;object-fit:cover">' : u.name.charAt(0).toUpperCase();
+  document.getElementById('euName').textContent = u.name;
+  document.getElementById('euEmail').textContent = u.email;
+  document.getElementById('euStickers').textContent = u.stickerCount || 0;
+
+  // Resaltar rango activo
+  ['NONE','INITIATED','BUILDER','INNER'].forEach(function(r){
+    var btn = document.getElementById('rb-'+r);
+    if(btn) btn.style.opacity = (u.rank||'NONE') === r ? '1' : '0.45';
+    if(btn) btn.style.transform = (u.rank||'NONE') === r ? 'scale(1.05)' : 'scale(1)';
+  });
+
+  // Estado
+  document.getElementById('sb-active').style.opacity  = !u.blocked ? '1' : '0.4';
+  document.getElementById('sb-blocked').style.opacity = u.blocked  ? '1' : '0.4';
+
+  document.getElementById('editUserModal').style.display = 'flex';
+}
+
+function closeEditUser(){
+  document.getElementById('editUserModal').style.display = 'none';
+  _editEmail = null; _editUser = null;
+}
+
+function setUserRank(rank){
+  if(!_editUser) return;
+  _editUser.rank = rank;
+  // Recalcular stickers mínimos para el rango
+  var minStk = {NONE:0,INITIATED:3,BUILDER:7,INNER:15};
+  if((_editUser.stickerCount||0) < minStk[rank]) _editUser.stickerCount = minStk[rank];
+  document.getElementById('euStickers').textContent = _editUser.stickerCount;
+  ['NONE','INITIATED','BUILDER','INNER'].forEach(function(r){
+    var btn = document.getElementById('rb-'+r);
+    if(btn){ btn.style.opacity = r===rank?'1':'0.45'; btn.style.transform = r===rank?'scale(1.05)':'scale(1)'; }
+  });
+}
+
+function adjustStickers(delta){
+  if(!_editUser) return;
+  var cur = _editUser.stickerCount || 0;
+  _editUser.stickerCount = Math.max(0, cur + delta);
+  document.getElementById('euStickers').textContent = _editUser.stickerCount;
+}
+
+function setUserStatus(status){
+  if(!_editUser) return;
+  _editUser.blocked = status === 'blocked';
+  document.getElementById('sb-active').style.opacity  = !_editUser.blocked ? '1' : '0.4';
+  document.getElementById('sb-blocked').style.opacity = _editUser.blocked  ? '1' : '0.4';
+}
+
+function saveUserEdit(){
+  if(!_editEmail || !_editUser) return;
+  var users = getAllUsers();
+  var idx = users.findIndex(function(u){ return u.email === _editEmail; });
+  if(idx === -1) return;
+  users[idx] = _editUser;
+  localStorage.setItem('dforzze_users', JSON.stringify(users));
+  // Si es el usuario activo, actualizar también dforzze_user
+  try{
+    var cur = JSON.parse(localStorage.getItem('dforzze_user'));
+    if(cur && cur.email === _editEmail){
+      localStorage.setItem('dforzze_user', JSON.stringify(_editUser));
+    }
+  }catch(e){}
+  closeEditUser();
+  renderUsers();
+  // Feedback
+  var btn = document.querySelector('#editUserModal button:last-child');
+  if(btn){ var o=btn.textContent; btn.textContent='✓ Guardado'; setTimeout(function(){btn.textContent=o;},1500); }
+}
+
+// ── INVENTARIO ─────────────────────────────────────────────────
+
+// ── CONFIG API ────────────────────────────────────────────────
+var DFORZZE_API = 'https://dforzze-backend-production.up.railway.app/api';
+var _adminToken = null; // se llena al hacer login admin con el backend
+
+// Intentar recuperar token de admin desde localStorage al cargar
+(function initAdminToken(){
+  var token = localStorage.getItem('dforzze_token');
+  if(!token) return;
+  _adminToken = token; // optimista
+  // Verificar que sea admin válido
+  fetch(DFORZZE_API + '/products?limit=1', {
+    headers: { 'Authorization': 'Bearer ' + token }
+  })
+  .then(function(r){
+    if(r.ok){
+      _adminToken = token;
+      // Mostrar indicador de Railway conectado
+      var ind = document.getElementById('railwayStatus');
+      if(ind){ ind.textContent = '● Railway conectado'; ind.style.color = '#4ade80'; }
+    } else {
+      _adminToken = null;
+      var ind = document.getElementById('railwayStatus');
+      if(ind){ ind.textContent = '● Sin Railway (local)'; ind.style.color = '#fbbf24'; }
+    }
+  })
+  .catch(function(){
+    var ind = document.getElementById('railwayStatus');
+    if(ind){ ind.textContent = '● Sin Railway (local)'; ind.style.color = '#fbbf24'; }
+  });
+})();
+
+// Productos por defecto (fallback sin backend)
+var DEFAULT_PRODUCTS = [
+  { id:'prod_1', name:'DFORZZE SHORT 01', category:'Pantalones', price:80, description:'Short deportivo DFORZZE Colección 01', image:'images/1.png', sizes:[{size:'S',stock:10},{size:'M',stock:8},{size:'L',stock:5},{size:'XL',stock:3}], lowStockThreshold:5, createdAt: new Date().toLocaleDateString('es-PE') },
+  { id:'prod_2', name:'DFORZZE SHORT 02', category:'Pantalones', price:80, description:'Short deportivo DFORZZE Colección 01 variante 2', image:'images/2.png', sizes:[{size:'S',stock:6},{size:'M',stock:4},{size:'L',stock:2},{size:'XL',stock:0}], lowStockThreshold:5, createdAt: new Date().toLocaleDateString('es-PE') },
+  { id:'prod_3', name:'DFORZZE TEE SAKURA', category:'Camisetas', price:70, description:'Polo Sakura — Colección 01', image:'images/polosakura.png', sizes:[{size:'S',stock:0},{size:'M',stock:0},{size:'L',stock:0}], lowStockThreshold:5, createdAt: new Date().toLocaleDateString('es-PE') },
+  { id:'prod_4', name:'DFORZZE TEE SAKURA 02', category:'Camisetas', price:70, description:'Polo Sakura 02 — Colección 01', image:'images/polosakura2.png', sizes:[{size:'S',stock:0},{size:'M',stock:0},{size:'L',stock:0}], lowStockThreshold:5, createdAt: new Date().toLocaleDateString('es-PE') },
+  { id:'prod_5', name:'DFORZZE ZIP HOODIE', category:'Hoodies', price:110, description:'Zip Hoodie DFORZZE Colección 01', image:'images/ziphodie.png', sizes:[{size:'S',stock:0},{size:'M',stock:0},{size:'L',stock:0},{size:'XL',stock:0}], lowStockThreshold:5, createdAt: new Date().toLocaleDateString('es-PE') }
+];
+
+// Normaliza producto del backend al formato del admin
+function normalizeAdminProduct(p){
+  var stockPerSize = Math.floor((p.stock||0) / 4);
+  var remainder = (p.stock||0) % 4;
+  var sizes = ['S','M','L','XL'].map(function(s, i){
+    return { size: s, stock: stockPerSize + (i === 0 ? remainder : 0) };
+  });
+  return {
+    id: p.id,
+    name: p.name,
+    category: p.category,
+    price: parseFloat(p.price),
+    description: p.description || '',
+    image: (p.images && p.images[0]) ? p.images[0] : '',
+    sizes: sizes,
+    lowStockThreshold: p.lowStockThreshold || 5,
+    createdAt: p.createdAt ? new Date(p.createdAt).toLocaleDateString('es-PE') : new Date().toLocaleDateString('es-PE'),
+    _fromBackend: true
+  };
+}
+
+// Carga productos: backend primero, localStorage como fallback
+function loadAdminProducts(callback){
+  fetch(DFORZZE_API + '/products?limit=100')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data.success && data.data && data.data.products){
+        var backendProducts = data.data.products.map(normalizeAdminProduct);
+
+        // El localStorage tiene prioridad — preservar tallas y stock editados por admin
+        var stored = localStorage.getItem('dforzze_products');
+        var localProducts = stored ? JSON.parse(stored) : [];
+
+        var merged = backendProducts.map(function(bp){
+          var local = localProducts.find(function(lp){ return lp.id === bp.id; });
+          if(local && local.sizes && local.sizes.length > 0){
+            bp.sizes = local.sizes; // conservar tallas detalladas del admin
+          }
+          return bp;
+        });
+
+        // Agregar productos locales nuevos que aún no están en Railway
+        var localOnly = localProducts.filter(function(lp){
+          return !merged.find(function(bp){ return bp.id === lp.id; });
+        });
+
+        var final = merged.concat(localOnly);
+        localStorage.setItem('dforzze_products', JSON.stringify(final));
+        if(callback) callback(final);
+      } else { throw new Error('invalid'); }
+    })
+    .catch(function(){
+      if(callback) callback(getProducts());
+    });
+}
+
+function getProducts(){
+  var stored = localStorage.getItem('dforzze_products');
+  if(!stored){
+    localStorage.setItem('dforzze_products', JSON.stringify(DEFAULT_PRODUCTS));
+    return DEFAULT_PRODUCTS;
+  }
+  return JSON.parse(stored);
+}
+
+function saveProducts(products){
+  localStorage.setItem('dforzze_products', JSON.stringify(products));
+  localStorage.setItem('dforzze_products_updated', Date.now()); // invalidar cache del catálogo
+}
+
+function getTotalStock(product){
+  return (product.sizes||[]).reduce(function(s,sz){ return s + (sz.stock||0); }, 0);
+}
+
+function getProductStatus(product){
+  var total = getTotalStock(product);
+  if(total === 0) return 'out';
+  if(total <= (product.lowStockThreshold||5)) return 'low';
+  return 'available';
+}
+
+function renderInventario(){
+  var products = getProducts();
+  var filter = document.getElementById('invFilter') ? document.getElementById('invFilter').value : 'all';
+
+  // Stats
+  var total = products.length;
+  var avail = products.filter(function(p){ return getProductStatus(p)==='available'; }).length;
+  var low   = products.filter(function(p){ return getProductStatus(p)==='low'; }).length;
+  var out   = products.filter(function(p){ return getProductStatus(p)==='out'; }).length;
+
+  var el = function(id){ return document.getElementById(id); };
+  if(el('invStatTotal')) el('invStatTotal').textContent = total;
+  if(el('invStatAvail')) el('invStatAvail').textContent = avail;
+  if(el('invStatLow'))   el('invStatLow').textContent   = low;
+  if(el('invStatOut'))   el('invStatOut').textContent   = out;
+
+  // Badge en sidebar
+  var badge = document.getElementById('alertBadge');
+  if(badge){ badge.style.display = (low+out)>0?'inline':'none'; badge.textContent = low+out; }
+
+  // Alertas
+  var alertsEl = el('invAlerts');
+  if(alertsEl){
+    var lowProds = products.filter(function(p){ return getProductStatus(p)==='low' || getProductStatus(p)==='out'; });
+    if(lowProds.length > 0){
+      alertsEl.innerHTML = '<div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px">'
+        +'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+        +'<div><p style="font-weight:700;font-size:12px;color:#fbbf24;margin-bottom:4px">'+lowProds.length+' prenda'+(lowProds.length>1?'s':'')+' con stock bajo o agotado</p>'
+        +'<p style="font-size:11px;color:rgba(255,255,255,.4)">'+lowProds.map(function(p){ return p.name + ' (' + getTotalStock(p) + ' uds)'; }).join(' · ')+'</p></div></div>';
+    } else {
+      alertsEl.innerHTML = '';
+    }
+  }
+
+  // Filtrar
+  var filtered = products.filter(function(p){
+    if(filter === 'all') return true;
+    return getProductStatus(p) === filter;
+  });
+
+  var tableEl = el('invTable');
+  if(!tableEl) return;
+
+  if(filtered.length === 0){
+    tableEl.innerHTML = '<div style="padding:48px;text-align:center"><p style="color:rgba(255,255,255,.2);font-size:14px">No hay prendas en esta categoría.</p><button onclick="openAddProduct()" class="btn btn-primary" style="margin-top:16px">+ Agregar primera prenda</button></div>';
+    return;
+  }
+
+  var statusConfig = {
+    available: { label:'Disponible', bg:'rgba(74,222,128,.1)', color:'#4ade80' },
+    low:       { label:'Stock bajo', bg:'rgba(251,191,36,.1)', color:'#fbbf24' },
+    out:       { label:'Agotado',    bg:'rgba(239,68,68,.1)',  color:'#ef4444' }
+  };
+
+  tableEl.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    +'<thead><tr>'
+    +'<th style="text-align:left;padding:14px 16px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);border-bottom:1px solid rgba(255,255,255,.06)">Prenda</th>'
+    +'<th style="text-align:left;padding:14px 12px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);border-bottom:1px solid rgba(255,255,255,.06)">Precio</th>'
+    +'<th style="text-align:left;padding:14px 12px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);border-bottom:1px solid rgba(255,255,255,.06)">Tallas / Stock</th>'
+    +'<th style="text-align:left;padding:14px 12px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);border-bottom:1px solid rgba(255,255,255,.06)">Estado</th>'
+    +'<th style="text-align:left;padding:14px 12px;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.25);border-bottom:1px solid rgba(255,255,255,.06)">Total</th>'
+    +'<th style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06)"></th>'
+    +'</tr></thead><tbody>'
+    + filtered.map(function(p){
+        var status = getProductStatus(p);
+        var sc = statusConfig[status];
+        var totalStock = getTotalStock(p);
+        var sizesHtml = (p.sizes||[]).map(function(sz){
+          var sColor = sz.stock === 0 ? 'rgba(239,68,68,.6)' : sz.stock <= 3 ? '#fbbf24' : 'rgba(255,255,255,.5)';
+          return '<span style="display:inline-flex;align-items:center;gap:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:2px 7px;font-size:10px;font-weight:600">'
+            +'<span style="color:rgba(255,255,255,.6)">' + sz.size + '</span>'
+            +'<span style="color:' + sColor + '">' + sz.stock + '</span>'
+            +'</span>';
+        }).join(' ');
+        return '<tr style="transition:background .15s" onmouseover="this.style.background=\'rgba(255,255,255,.02)\'" onmouseout="this.style.background=\'transparent\'">'
+          +'<td style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04)">'
+            +'<div style="display:flex;align-items:center;gap:12px">'
+              +'<div style="width:48px;height:48px;border-radius:8px;background:#1e1e1e;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center">'
+                +(p.image ? '<img src="'+p.image+'" style="width:100%;height:100%;object-fit:contain;padding:4px">' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>')
+              +'</div>'
+              +'<div>'
+                +'<p style="font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase;margin-bottom:2px">'+p.name+'</p>'
+                +'<p style="font-size:11px;color:rgba(255,255,255,.3)">'+p.category+'</p>'
+              +'</div>'
+            +'</div>'
+          +'</td>'
+          +'<td style="padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:800;font-size:14px'+(status==='out'?';color:rgba(255,255,255,.3);text-decoration:line-through':'')+'">S/. '+p.price+'</td>'
+          +'<td style="padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.04)"><div style="display:flex;flex-wrap:wrap;gap:4px">'+sizesHtml+'</div></td>'
+          +'<td style="padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.04)"><span style="display:inline-flex;align-items:center;padding:4px 10px;border-radius:9999px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:'+sc.bg+';color:'+sc.color+'">'+sc.label+'</span></td>'
+          +'<td style="padding:14px 12px;border-bottom:1px solid rgba(255,255,255,.04);font-weight:800;font-size:15px;color:'+(totalStock===0?'rgba(239,68,68,.6)':totalStock<=5?'#fbbf24':'rgba(255,255,255,.9)')+'">'+totalStock+'</td>'
+          +'<td style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.04)">'
+            +'<div style="display:flex;gap:6px;justify-content:flex-end">'
+              +'<button onclick="openStockModal(\''+p.id+'\')" class="btn btn-ghost" style="padding:6px 12px;font-size:10px;white-space:nowrap">Editar stock</button>'
+              +'<button onclick="openSimModal(\''+p.id+'\')" class="btn" style="padding:6px 12px;font-size:10px;background:rgba(168,85,247,.12);color:#a855f7;border:1px solid rgba(168,85,247,.2);white-space:nowrap" onmouseover="this.style.background=\'rgba(168,85,247,.2)\'" onmouseout="this.style.background=\'rgba(168,85,247,.12)\'">▶ Simular</button>'
+              +'<button onclick="openEditProduct(\''+p.id+'\')" class="btn btn-ghost" style="padding:6px 12px;font-size:10px">Editar</button>'
+              +'<button onclick="deleteProduct(\''+p.id+'\')" class="btn btn-danger" style="padding:6px 10px;font-size:10px">✕</button>'
+            +'</div>'
+          +'</td>'
+        +'</tr>';
+      }).join('')
+    +'</tbody></table>';
+}
+
+// ── MODAL AGREGAR / EDITAR PRENDA ───────────────────────────────
+var _editProductId = null;
+
+function openAddProduct(){
+  _editProductId = null;
+  document.getElementById('productModalTitle').textContent = 'Agregar prenda';
+  document.getElementById('productModalSaveBtn').textContent = 'Guardar prenda';
+  document.getElementById('pName').value = '';
+  document.getElementById('pCategory').value = 'Camisetas';
+  document.getElementById('pPrice').value = '';
+  document.getElementById('pDesc').value = '';
+  document.getElementById('pImage').value = '';
+  document.getElementById('pThreshold').value = '5';
+  document.getElementById('productModalError').style.display = 'none';
+  previewImg('');
+  // Tallas por defecto
+  document.getElementById('sizesContainer').innerHTML = '';
+  ['S','M','L','XL'].forEach(function(s){ addSizeRow(s, 0); });
+  document.getElementById('productModal').style.display = 'flex';
+}
+
+function openEditProduct(id){
+  var products = getProducts();
+  var p = products.find(function(x){ return x.id === id; });
+  if(!p) return;
+  _editProductId = id;
+  document.getElementById('productModalTitle').textContent = 'Editar prenda';
+  document.getElementById('productModalSaveBtn').textContent = 'Guardar cambios';
+  document.getElementById('pName').value = p.name;
+  document.getElementById('pCategory').value = p.category;
+  document.getElementById('pPrice').value = p.price;
+  document.getElementById('pDesc').value = p.description || '';
+  document.getElementById('pImage').value = p.image || '';
+  document.getElementById('pThreshold').value = p.lowStockThreshold || 5;
+  document.getElementById('productModalError').style.display = 'none';
+  previewImg(p.image || '');
+  // Cargar tallas
+  document.getElementById('sizesContainer').innerHTML = '';
+  (p.sizes||[]).forEach(function(sz){ addSizeRow(sz.size, sz.stock); });
+  document.getElementById('productModal').style.display = 'flex';
+}
+
+function closeProductModal(){
+  document.getElementById('productModal').style.display = 'none';
+  _editProductId = null;
+}
+
+function addSizeRow(sizeVal, stockVal){
+  var container = document.getElementById('sizesContainer');
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:10px;align-items:center';
+  row.innerHTML = '<select style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:9px 12px;color:#fff;font-size:13px;outline:none;font-family:inherit;cursor:pointer;min-width:80px">'
+    +['XS','S','M','L','XL','XXL','Único'].map(function(s){ return '<option value="'+s+'"'+(s===(sizeVal||'S')?' selected':'')+'>'+s+'</option>'; }).join('')
+    +'</select>'
+    +'<input type="number" min="0" value="'+(stockVal||0)+'" placeholder="0" style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:9px 12px;color:#fff;font-size:13px;outline:none;font-family:inherit;transition:border-color .2s" onfocus="this.style.borderColor=\'rgba(168,85,247,.5)\'" onblur="this.style.borderColor=\'rgba(255,255,255,.1)\'">'
+    +'<span style="font-size:11px;color:rgba(255,255,255,.3);white-space:nowrap">uds</span>'
+    +'<button type="button" onclick="this.parentElement.remove()" style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.15);color:rgba(239,68,68,.6);border-radius:4px;padding:6px 10px;cursor:pointer;font-size:12px;transition:all .2s" onmouseover="this.style.background=\'rgba(239,68,68,.15)\'" onmouseout="this.style.background=\'rgba(239,68,68,.08)\'">✕</button>';
+  container.appendChild(row);
+}
+
+function previewImg(url){
+  var preview = document.getElementById('imgPreview');
+  if(!preview) return;
+  if(url){
+    preview.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:contain;padding:4px" onerror="this.parentElement.innerHTML=\'<svg width=18 height=18 viewBox=\\\"0 0 24 24\\\" fill=none stroke=\\\"rgba(255,255,255,.2)\\\" stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><polyline points=\\\"21 15 16 10 5 21\\\"/></svg>\'">';
+  } else {
+    preview.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+  }
+}
+
+function selectImg(path){
+  document.getElementById('pImage').value = path;
+  previewImg(path);
+}
+
+function saveProduct(){
+  var name = document.getElementById('pName').value.trim();
+  var price = parseFloat(document.getElementById('pPrice').value);
+  var category = document.getElementById('pCategory').value;
+  var desc = document.getElementById('pDesc').value.trim();
+  var image = document.getElementById('pImage').value.trim();
+  var threshold = parseInt(document.getElementById('pThreshold').value) || 5;
+  var errEl = document.getElementById('productModalError');
+
+  if(!name){ errEl.textContent='El nombre es requerido'; errEl.style.display='block'; return; }
+  if(!price || price <= 0){ errEl.textContent='El precio debe ser mayor a 0'; errEl.style.display='block'; return; }
+
+  // Leer tallas
+  var rows = document.getElementById('sizesContainer').children;
+  var sizes = [];
+  for(var i=0; i<rows.length; i++){
+    var sel = rows[i].querySelector('select');
+    var inp = rows[i].querySelector('input[type="number"]');
+    if(sel && inp) sizes.push({ size: sel.value, stock: Math.max(0, parseInt(inp.value)||0) });
+  }
+  if(sizes.length === 0){ errEl.textContent='Agrega al menos una talla'; errEl.style.display='block'; return; }
+
+  errEl.style.display = 'none';
+
+  var totalStock = sizes.reduce(function(s, sz){ return s + sz.stock; }, 0);
+  var btn = document.getElementById('productModalSaveBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Guardando...'; }
+
+  function finishSave(label){
+    closeProductModal();
+    renderInventario();
+    if(btn){ btn.disabled=false; btn.textContent='✓ '+label; setTimeout(function(){ btn.textContent=_editProductId?'Guardar cambios':'Guardar prenda'; },1800); }
+  }
+
+  function saveLocal(){
+    var products = getProducts();
+    if(_editProductId){
+      var idx = products.findIndex(function(p){ return p.id === _editProductId; });
+      if(idx >= 0){
+        products[idx].name = name; products[idx].price = price;
+        products[idx].category = category; products[idx].description = desc;
+        products[idx].image = image; products[idx].sizes = sizes;
+        products[idx].lowStockThreshold = threshold;
+      }
+    } else {
+      products.push({ id:'prod_'+Date.now(), name:name, price:price, category:category,
+        description:desc, image:image, sizes:sizes, lowStockThreshold:threshold,
+        createdAt:new Date().toLocaleDateString('es-PE') });
+    }
+    saveProducts(products);
+  }
+
+  if(_adminToken){
+    if(_editProductId){
+      // Editar: actualizar local + stock en backend si viene del backend
+      var products = getProducts();
+      var idx = products.findIndex(function(p){ return p.id === _editProductId; });
+      var isBackend = idx >= 0 && products[idx]._fromBackend;
+      saveLocal();
+      if(isBackend){
+        fetch(DFORZZE_API + '/products/' + _editProductId + '/stock', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _adminToken },
+          body: JSON.stringify({ stock: totalStock, reason: 'Edición desde admin' })
+        }).catch(function(){});
+      }
+      finishSave('Guardado');
+    } else {
+      // Crear nuevo en Railway
+      fetch(DFORZZE_API + '/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _adminToken },
+        body: JSON.stringify({ name:name, price:price, category:category, description:desc,
+          images: image ? [image] : [], stock:totalStock, lowStockThreshold:threshold })
+      })
+      .then(function(r){ return r.json().then(function(d){ return { ok:r.ok, data:d }; }); })
+      .then(function(result){
+        var products = getProducts();
+        if(result.ok && result.data && result.data.data && result.data.data.product){
+          var np = normalizeAdminProduct(result.data.data.product);
+          np.sizes = sizes;
+          np._fromBackend = true;
+          products.push(np);
+        } else {
+          products.push({ id:'prod_'+Date.now(), name:name, price:price, category:category,
+            description:desc, image:image, sizes:sizes, lowStockThreshold:threshold,
+            createdAt:new Date().toLocaleDateString('es-PE') });
+        }
+        saveProducts(products);
+        finishSave('Guardado en Railway');      })
+      .catch(function(){
+        saveLocal();
+        finishSave('Guardado local');
+      });
+    }
+  } else {
+    saveLocal();
+    finishSave('Guardado');
+  }
+}
+
+function deleteProduct(id){
+  if(!confirm('¿Eliminar esta prenda del inventario?')) return;
+  var products = getProducts();
+  var p = products.find(function(x){ return x.id === id; });
+  // Eliminar local
+  saveProducts(products.filter(function(x){ return x.id !== id; }));
+  renderInventario();
+  // Eliminar en Railway si viene del backend
+  if(p && p._fromBackend && _adminToken){
+    fetch(DFORZZE_API + '/products/' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + _adminToken }
+    }).catch(function(){});
+  }
+}
+
+// ── MODAL EDITAR STOCK RÁPIDO ───────────────────────────────────
+var _stockEditId = null;
+
+function openStockModal(id){
+  var products = getProducts();
+  var p = products.find(function(x){ return x.id === id; });
+  if(!p) return;
+  _stockEditId = id;
+  document.getElementById('stockModalTitle').textContent = p.name;
+  document.getElementById('stockModalSub').textContent = 'Ajusta el stock por talla';
+
+  var container = document.getElementById('stockSizesEdit');
+  container.innerHTML = (p.sizes||[]).map(function(sz, i){
+    var sColor = sz.stock === 0 ? '#ef4444' : sz.stock <= 3 ? '#fbbf24' : '#4ade80';
+    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid rgba(255,255,255,.06)">'
+      +'<span style="font-weight:800;font-size:14px;min-width:36px;color:rgba(255,255,255,.7)">'+sz.size+'</span>'
+      +'<div style="flex:1;display:flex;align-items:center;gap:8px">'
+        +'<button onclick="adjustStockSize('+i+',-1)" style="width:32px;height:32px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);border-radius:6px;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background=\'rgba(255,255,255,.08)\'" onmouseout="this.style.background=\'rgba(255,255,255,.04)\'">−</button>'
+        +'<input type="number" min="0" value="'+sz.stock+'" id="stockInput_'+i+'" style="width:64px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:7px 10px;color:#fff;font-size:15px;font-weight:700;text-align:center;outline:none;font-family:inherit" onfocus="this.style.borderColor=\'rgba(168,85,247,.5)\'" onblur="this.style.borderColor=\'rgba(255,255,255,.1)\'">'
+        +'<button onclick="adjustStockSize('+i+',1)" style="width:32px;height:32px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);border-radius:6px;color:#fff;font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background=\'rgba(255,255,255,.08)\'" onmouseout="this.style.background=\'rgba(255,255,255,.04)\'">+</button>'
+      +'</div>'
+      +'<span style="font-size:11px;font-weight:600;color:'+sColor+'">'+(sz.stock===0?'Agotado':sz.stock<=3?'Bajo':'OK')+'</span>'
+    +'</div>';
+  }).join('');
+
+  document.getElementById('stockModal').style.display = 'flex';
+}
+
+function adjustStockSize(idx, delta){
+  var inp = document.getElementById('stockInput_'+idx);
+  if(!inp) return;
+  var cur = parseInt(inp.value)||0;
+  inp.value = Math.max(0, cur + delta);
+}
+
+function closeStockModal(){
+  document.getElementById('stockModal').style.display = 'none';
+  _stockEditId = null;
+}
+
+function saveStockEdit(){
+  if(!_stockEditId) return;
+  var products = getProducts();
+  var idx = products.findIndex(function(p){ return p.id === _stockEditId; });
+  if(idx < 0) return;
+
+  var p = products[idx];
+  var reason = document.getElementById('stockReason').value;
+  var prevTotal = getTotalStock(p);
+
+  // Leer nuevos valores
+  (p.sizes||[]).forEach(function(sz, i){
+    var inp = document.getElementById('stockInput_'+i);
+    if(inp) sz.stock = Math.max(0, parseInt(inp.value)||0);
+  });
+
+  var newTotal = getTotalStock(p);
+
+  // Registrar movimiento en historial
+  var movements = JSON.parse(localStorage.getItem('dforzze_inv_movements')||'[]');
+  movements.unshift({
+    id: 'mov_'+Date.now(),
+    productId: p.id,
+    productName: p.name,
+    type: reason,
+    previousStock: prevTotal,
+    newStock: newTotal,
+    quantity: newTotal - prevTotal,
+    date: new Date().toLocaleDateString('es-PE'),
+    time: new Date().toLocaleTimeString('es-PE')
+  });
+  localStorage.setItem('dforzze_inv_movements', JSON.stringify(movements.slice(0,200)));
+
+  saveProducts(products);
+  closeStockModal();
+  renderInventario();
+
+  // Sincronizar stock con Railway si viene del backend
+  if(p._fromBackend && _adminToken){
+    fetch(DFORZZE_API + '/products/' + p.id + '/stock', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + _adminToken },
+      body: JSON.stringify({ stock: newTotal, reason: reason })
+    }).catch(function(){});
+  }
+}
+
+// Actualizar showSection para incluir inventario
+var _origShowSection = showSection;
+showSection = function(id, btn){
+  _origShowSection(id, btn);
+  if(id==='inventario'){
+    // Cargar del backend y luego renderizar
+    loadAdminProducts(function(){ renderInventario(); });
+  }
+};
+
+// Init badge — cargar del backend al iniciar
+loadAdminProducts(function(products){
+  var lowOut = products.filter(function(p){ return getProductStatus(p)==='low'||getProductStatus(p)==='out'; }).length;
+  var badge = document.getElementById('alertBadge');
+  if(badge && lowOut>0){ badge.style.display='inline'; badge.textContent=lowOut; }
+});
+
+// ── PETICIONES DE RANGO ────────────────────────────────────────
+function updateReqBadge(){
+  var reqs = JSON.parse(localStorage.getItem('dforzze_rank_requests')||'[]');
+  var pending = reqs.filter(function(r){ return r.status==='pending'; }).length;
+  var badge = document.getElementById('reqBadge');
+  if(badge){ badge.style.display = pending>0?'inline':'none'; badge.textContent = pending; }
+}
+
+function renderRequests(){
+  var reqs = JSON.parse(localStorage.getItem('dforzze_rank_requests')||'[]');
+  var el = document.getElementById('requestsTable');
+  if(!el) return;
+  updateReqBadge();
+  if(reqs.length===0){
+    el.innerHTML='<p style="color:rgba(255,255,255,.2);font-size:13px;text-align:center;padding:40px 0">No hay peticiones pendientes.</p>';
+    return;
+  }
+  var rankColors={NONE:'rgba(255,255,255,.3)',INITIATED:'#34d399',BUILDER:'#fbbf24',INNER:'#c084fc'};
+  el.innerHTML='<table><thead><tr><th>Usuario</th><th>De</th><th>A</th><th>Stickers</th><th>Fecha</th><th>Estado</th><th></th></tr></thead><tbody>'+
+    reqs.map(function(r,i){
+      var statusBadge = r.status==='pending'
+        ? '<span class="badge" style="background:rgba(251,191,36,.1);color:#fbbf24">Pendiente</span>'
+        : r.status==='approved'
+        ? '<span class="badge" style="background:rgba(74,222,128,.1);color:#4ade80">Aprobado</span>'
+        : '<span class="badge" style="background:rgba(239,68,68,.1);color:rgba(239,68,68,.8)">Rechazado</span>';
+      var actions = r.status==='pending'
+        ? '<div style="display:flex;gap:6px">'+
+            '<button class="btn" onclick="approveRank('+i+')" style="background:rgba(74,222,128,.15);color:#4ade80;padding:5px 12px;font-size:10px">✓ Aprobar</button>'+
+            '<button class="btn btn-danger" onclick="rejectRank('+i+')" style="padding:5px 12px;font-size:10px">✕ Rechazar</button>'+
+          '</div>'
+        : '<span style="font-size:11px;color:rgba(255,255,255,.2)">'+( r.resolvedAt||'—')+'</span>';
+      return '<tr>'+
+        '<td><span style="font-weight:600">'+r.name+'</span><br><span style="font-size:11px;color:rgba(255,255,255,.3)">'+r.email+'</span></td>'+
+        '<td><span style="color:'+(rankColors[r.fromRank]||'rgba(255,255,255,.3)')+';font-weight:600;font-size:12px">'+r.fromRank+'</span></td>'+
+        '<td><span style="color:'+(rankColors[r.toRank]||'rgba(255,255,255,.3)')+';font-weight:700;font-size:12px">'+r.toRank+'</span></td>'+
+        '<td style="font-weight:700">'+r.stickers+'</td>'+
+        '<td style="font-size:11px;color:rgba(255,255,255,.3)">'+r.date+'</td>'+
+        '<td>'+statusBadge+'</td>'+
+        '<td>'+actions+'</td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
+}
+
+function approveRank(i){
+  var reqs = JSON.parse(localStorage.getItem('dforzze_rank_requests')||'[]');
+  if(!reqs[i]) return;
+  reqs[i].status = 'approved';
+  reqs[i].resolvedAt = new Date().toLocaleDateString('es-PE');
+  localStorage.setItem('dforzze_rank_requests', JSON.stringify(reqs));
+  // Actualizar usuario en la lista global
+  var users = JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+  var idx = users.findIndex(function(u){ return u.email===reqs[i].email; });
+  if(idx>=0){ users[idx].rank = reqs[i].toRank; localStorage.setItem('dforzze_users', JSON.stringify(users)); }
+  // Si es el usuario activo, actualizar también
+  try{
+    var cur = JSON.parse(localStorage.getItem('dforzze_user'));
+    if(cur && cur.email===reqs[i].email){ cur.rank=reqs[i].toRank; localStorage.setItem('dforzze_user',JSON.stringify(cur)); }
+  }catch(e){}
+  renderRequests();
+}
+
+function rejectRank(i){
+  var reqs = JSON.parse(localStorage.getItem('dforzze_rank_requests')||'[]');
+  if(!reqs[i]) return;
+  reqs[i].status = 'rejected';
+  reqs[i].resolvedAt = new Date().toLocaleDateString('es-PE');
+  localStorage.setItem('dforzze_rank_requests', JSON.stringify(reqs));
+  renderRequests();
+}
+
+// ── CÓDIGOS ────────────────────────────────────────────────────
+function genCode(type, value){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code='DFZ-';
+  for(var i=0;i<6;i++) code+=chars[Math.floor(Math.random()*chars.length)];
+  var codes=JSON.parse(localStorage.getItem('dforzze_codes')||'[]');
+  var entry = {
+    code: code,
+    type: type,
+    value: value,
+    active: true,
+    createdAt: new Date().toLocaleDateString('es-PE'),
+    usedBy: null,
+    usedAt: null
+  };
+  // Stickers de drop llevan emoji sakura y nombre de colección
+  if(type === 'sticker'){
+    entry.emoji = '🌸';
+    entry.drop = 'Colección 01 — Sakura';
+    entry.stickerName = 'Sakura — Colección 01';
+  }
+  codes.unshift(entry);
+  localStorage.setItem('dforzze_codes', JSON.stringify(codes));
+  renderCodes();
+  // Copiar al portapapeles
+  try{ navigator.clipboard.writeText(code); }catch(e){}
+  // Feedback visual
+  var btn = event.target;
+  var orig = btn.textContent;
+  btn.textContent = (type==='sticker' ? '🌸 Copiado: ' : '✓ Copiado: ') + code;
+  btn.style.background = type==='sticker' ? 'rgba(255,182,193,.2)' : 'rgba(74,222,128,.2)';
+  btn.style.color = type==='sticker' ? '#ff69b4' : '#4ade80';
+  setTimeout(function(){ btn.textContent=orig; btn.style.background=''; btn.style.color=''; }, 2500);
+}
+
+function renderCodes(){
+  var codes=JSON.parse(localStorage.getItem('dforzze_codes')||'[]');
+  var el=document.getElementById('codesTable');
+  if(!el) return;
+  if(codes.length===0){
+    el.innerHTML='<p style="color:rgba(255,255,255,.2);font-size:13px;text-align:center;padding:32px 0">No hay códigos generados aún.</p>';
+    return;
+  }
+  el.innerHTML='<table><thead><tr><th>Código</th><th>Tipo</th><th>Valor</th><th>Estado</th><th>Usado por</th><th>Creado</th><th></th></tr></thead><tbody>'+
+    codes.map(function(c,i){
+      var typeLabel=c.type==='sticker'?'Sticker':'Descuento';
+      var typeColor=c.type==='sticker'?'#a855f7':'#4ade80';
+      var valLabel=c.type==='sticker'?'+1 sticker':c.value+'%';
+      var statusBadge=c.active
+        ?'<span class="badge" style="background:rgba(74,222,128,.1);color:#4ade80">Activo</span>'
+        :'<span class="badge" style="background:rgba(255,255,255,.06);color:rgba(255,255,255,.3)">Usado</span>';
+      return '<tr><td><code style="background:rgba(255,255,255,.06);padding:3px 8px;border-radius:4px;font-size:12px;letter-spacing:.08em">'+c.code+'</code></td>'+
+        '<td style="color:'+typeColor+';font-size:12px;font-weight:600">'+typeLabel+'</td>'+
+        '<td style="font-weight:700;font-size:13px">'+valLabel+'</td>'+
+        '<td>'+statusBadge+'</td>'+
+        '<td style="font-size:11px;color:rgba(255,255,255,.3)">'+(c.usedBy||'—')+'</td>'+
+        '<td style="font-size:11px;color:rgba(255,255,255,.3)">'+c.createdAt+'</td>'+
+        '<td style="display:flex;gap:6px">'+
+          (c.active?'<button class="btn btn-ghost" onclick="toggleCode('+i+')" style="padding:4px 10px;font-size:10px">Desactivar</button>':'')+
+          '<button class="btn btn-danger" onclick="deleteCode('+i+')" style="padding:4px 10px;font-size:10px">Borrar</button>'+
+        '</td></tr>';
+    }).join('')+'</tbody></table>';
+}
+
+function toggleCode(i){
+  var codes=JSON.parse(localStorage.getItem('dforzze_codes')||'[]');
+  if(codes[i]) codes[i].active=!codes[i].active;
+  localStorage.setItem('dforzze_codes',JSON.stringify(codes));
+  renderCodes();
+}
+
+function deleteCode(i){
+  var codes=JSON.parse(localStorage.getItem('dforzze_codes')||'[]');
+  codes.splice(i,1);
+  localStorage.setItem('dforzze_codes',JSON.stringify(codes));
+  renderCodes();
+}
+
+function clearAllCodes(){
+  if(confirm('¿Eliminar todos los códigos?')){
+    localStorage.removeItem('dforzze_codes');
+    renderCodes();
+  }
+}
+
+// ── SIMULACIÓN DE COMPRA ───────────────────────────────────────
+var _simProductId = null, _simSize = null, _simQty = 1, _simMaxStock = 0;
+
+function openSimModal(id){
+  var products = getProducts();
+  var p = products.find(function(x){ return x.id === id; });
+  if(!p) return;
+  _simProductId = id; _simSize = null; _simQty = 1; _simMaxStock = 0;
+  document.getElementById('simProdName').textContent = p.name;
+  document.getElementById('simProdPrice').textContent = 'S/. ' + p.price + ' por unidad';
+  document.getElementById('simQtyVal').textContent = 1;
+  document.getElementById('simSizeErr').style.display = 'none';
+  document.getElementById('simStockAvail').textContent = '';
+  document.getElementById('simPreview').style.display = 'none';
+  document.getElementById('simForm').style.display = 'block';
+  document.getElementById('simResult').style.display = 'none';
+  var btns = document.getElementById('simSizeBtns');
+  btns.innerHTML = (p.sizes||[]).map(function(sz){
+    var isOut = sz.stock === 0;
+    return '<button onclick="simSelectSize(this,\''+sz.size+'\','+sz.stock+')" '+(isOut?'disabled ':'')+
+      'style="min-width:48px;height:44px;padding:0 14px;border:1.5px solid '+(isOut?'rgba(255,255,255,.08)':'rgba(255,255,255,.15)')+
+      ';background:'+(isOut?'rgba(255,255,255,.02)':'rgba(255,255,255,.05)')+
+      ';border-radius:6px;font-size:13px;font-weight:700;cursor:'+(isOut?'not-allowed':'pointer')+
+      ';color:'+(isOut?'rgba(255,255,255,.2)':'#fff')+';transition:all .15s;position:relative">'+
+      sz.size+(isOut?'<span style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:7px;color:rgba(255,255,255,.2);white-space:nowrap">agotado</span>':'')+
+      '</button>';
+  }).join('');
+  document.getElementById('simModal').style.display = 'flex';
+}
+
+function simSelectSize(btn, size, stock){
+  _simSize = size; _simMaxStock = stock; _simQty = 1;
+  document.getElementById('simQtyVal').textContent = 1;
+  document.getElementById('simStockAvail').textContent = 'Disponible: ' + stock;
+  document.getElementById('simSizeErr').style.display = 'none';
+  document.getElementById('simPreview').style.display = 'none';
+  document.querySelectorAll('#simSizeBtns button').forEach(function(b){
+    if(!b.disabled){ b.style.borderColor='rgba(255,255,255,.15)'; b.style.background='rgba(255,255,255,.05)'; b.style.color='#fff'; }
+  });
+  btn.style.borderColor='#a855f7'; btn.style.background='rgba(168,85,247,.15)'; btn.style.color='#a855f7';
+}
+
+function simChangeQty(delta){
+  if(!_simSize){ document.getElementById('simSizeErr').style.display='block'; return; }
+  _simQty = Math.max(1, Math.min(_simMaxStock, _simQty + delta));
+  document.getElementById('simQtyVal').textContent = _simQty;
+  document.getElementById('simPreview').style.display = 'none';
+}
+
+function simPreview(){
+  if(!_simSize){ document.getElementById('simSizeErr').style.display='block'; return; }
+  var products = getProducts();
+  var p = products.find(function(x){ return x.id === _simProductId; });
+  if(!p) return;
+  var sd = (p.sizes||[]).find(function(sz){ return sz.size === _simSize; });
+  var cur = sd ? sd.stock : 0;
+  var after = Math.max(0, cur - _simQty);
+  document.getElementById('simPreviewSize').textContent = _simSize;
+  document.getElementById('simPreviewQty').textContent = _simQty + ' unidad' + (_simQty>1?'es':'');
+  document.getElementById('simPreviewBefore').textContent = cur + ' uds';
+  document.getElementById('simPreviewAfter').textContent = after + ' uds';
+  document.getElementById('simPreviewAfter').style.color = after===0?'#ef4444':after<=3?'#fbbf24':'#4ade80';
+  document.getElementById('simPreviewTotal').textContent = 'S/. ' + (p.price * _simQty);
+  document.getElementById('simPreview').style.display = 'block';
+}
+
+function simConfirm(){
+  if(!_simSize){ document.getElementById('simSizeErr').style.display='block'; return; }
+  var products = getProducts();
+  var p = products.find(function(x){ return x.id === _simProductId; });
+  if(!p) return;
+  var sd = (p.sizes||[]).find(function(sz){ return sz.size === _simSize; });
+  if(!sd || sd.stock < _simQty){
+    document.getElementById('simSizeErr').textContent = 'Stock insuficiente';
+    document.getElementById('simSizeErr').style.display = 'block';
+    return;
+  }
+  var prev = sd.stock;
+  sd.stock = Math.max(0, sd.stock - _simQty);
+  var next = sd.stock;
+  var movements = JSON.parse(localStorage.getItem('dforzze_inv_movements')||'[]');
+  movements.unshift({ id:'mov_sim_'+Date.now(), productId:p.id, productName:p.name, type:'purchase', size:_simSize, previousStock:prev, newStock:next, quantity:-_simQty, date:new Date().toLocaleDateString('es-PE'), time:new Date().toLocaleTimeString('es-PE'), reason:'Simulación admin' });
+  localStorage.setItem('dforzze_inv_movements', JSON.stringify(movements.slice(0,500)));
+  saveProducts(products);
+  document.getElementById('simForm').style.display = 'none';
+  document.getElementById('simResult').style.display = 'block';
+  document.getElementById('simResultIcon').textContent = next===0?'🔴':next<=3?'🟡':'✅';
+  document.getElementById('simResultTitle').textContent = '¡Simulación completada!';
+  document.getElementById('simResultMsg').textContent = 'Se descontaron '+_simQty+' unidad'+(_simQty>1?'es':'')+' de talla '+_simSize+'. Inventario actualizado.';
+  document.getElementById('simResultDetail').innerHTML =
+    '<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:rgba(255,255,255,.4)">Producto</span><span style="font-weight:700">'+p.name+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:rgba(255,255,255,.4)">Talla</span><span style="font-weight:700">'+_simSize+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:rgba(255,255,255,.4)">Vendido</span><span style="font-weight:700;color:#a855f7">−'+_simQty+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px"><span style="color:rgba(255,255,255,.4)">Stock anterior</span><span style="font-weight:700;color:#fbbf24">'+prev+'</span></div>'
+    +'<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:rgba(255,255,255,.4)">Stock actual</span><span style="font-weight:800;color:'+(next===0?'#ef4444':next<=3?'#fbbf24':'#4ade80')+'">'+next+'</span></div>';
+  renderInventario();
+}
+
+function simReset(){
+  document.getElementById('simForm').style.display = 'block';
+  document.getElementById('simResult').style.display = 'none';
+  if(_simProductId) openSimModal(_simProductId);
+}
+
+function closeSimModal(){
+  document.getElementById('simModal').style.display = 'none';
+  _simProductId = null;
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+renderDashboard();
+updateReqBadge();
+
+// ── SIDEBAR MÓVIL ──────────────────────────────────────────────
+function openSidebar(){
+  document.querySelector('.sidebar').classList.add('open');
+  document.getElementById('mobOverlay').classList.add('open');
+}
+function closeSidebar(){
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('mobOverlay').classList.remove('open');
+}
+</script>
+
+</body>
+</html>

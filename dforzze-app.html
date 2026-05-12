@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFORZZE — Sistema con Backend</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#0a0a0a;color:#fff;min-height:100vh}
+
+/* Header */
+.header{position:fixed;top:0;left:0;right:0;height:60px;background:rgba(10,10,10,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo img{height:28px;filter:brightness(0) invert(1)}
+.logo span{font-weight:800;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+
+/* Main Content */
+.main{padding-top:80px;padding-bottom:100px;max-width:1200px;margin:0 auto;padding-left:24px;padding-right:24px}
+
+/* Auth Section */
+.auth-container{max-width:400px;margin:0 auto;padding:32px}
+.auth-card{background:#161616;border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:32px}
+.auth-title{font-size:24px;font-weight:800;margin-bottom:8px;text-align:center}
+.auth-subtitle{color:rgba(255,255,255,.4);font-size:13px;text-align:center;margin-bottom:24px}
+.auth-tabs{display:flex;gap:8px;margin-bottom:24px}
+.auth-tab{flex:1;padding:10px;border:none;border-radius:8px;background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);font-weight:600;cursor:pointer;transition:all .2s}
+.auth-tab.active{background:rgba(168,85,247,.15);color:#a855f7}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px}
+.form-input{width:100%;padding:12px 14px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.04);color:#fff;font-size:14px;transition:all .2s}
+.form-input:focus{outline:none;border-color:#a855f7;background:rgba(168,85,247,.08)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:#a855f7;color:#fff}
+.btn-primary:hover{background:#9333ea}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.error-msg{color:#ef4444;font-size:12px;margin-top:8px;text-align:center}
+.success-msg{color:#4ade80;font-size:12px;margin-top:8px;text-align:center}
+
+/* Dashboard */
+.dashboard{display:none}
+.dashboard.active{display:block}
+.welcome{text-align:center;margin-bottom:32px}
+.welcome h1{font-size:28px;font-weight:800;margin-bottom:8px}
+.welcome p{color:rgba(255,255,255,.4)}
+
+/* Stats Grid */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px}
+.stat-card{background:#161616;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px}
+.stat-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px}
+.stat-value{font-size:32px;font-weight:800}
+.stat-value.purple{color:#a855f7}
+.stat-value.green{color:#4ade80}
+.stat-value.yellow{color:#fbbf24}
+
+/* Rank Badge */
+.rank-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:9999px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.rank-none{background:rgba(255,255,255,.06);color:rgba(255,255,255,.4)}
+.rank-initiated{background:rgba(52,211,153,.15);color:#34d399}
+.rank-builder{background:rgba(251,191,36,.15);color:#fbbf24}
+.rank-inner{background:rgba(192,132,252,.15);color:#c084fc}
+
+/* Products Grid */
+.products-section{margin-bottom:32px}
+.section-title{font-size:18px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.product-card{background:#161616;border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden;transition:all .2s}
+.product-card:hover{border-color:rgba(168,85,247,.3);transform:translateY(-2px)}
+.product-image{height:180px;background:#0a0a0a;display:flex;align-items:center;justify-content:center}
+.product-image img{max-height:140px;max-width:90%;object-fit:contain}
+.product-info{padding:16px}
+.product-name{font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.product-price{font-weight:800;font-size:18px;margin-bottom:8px}
+.product-stock{font-size:11px;color:rgba(255,255,255,.4)}
+.stock-badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase}
+.stock-ok{background:rgba(74,222,128,.15);color:#4ade80}
+.stock-low{background:rgba(251,191,36,.15);color:#fbbf24}
+.stock-out{background:rgba(239,68,68,.15);color:#ef4444}
+
+/* Stickers Section */
+.stickers-section{margin-bottom:32px}
+.stickers-grid{display:flex;flex-wrap:wrap;gap:12px}
+.sticker-item{background:#161616;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px}
+.sticker-emoji{font-size:24px}
+.sticker-info{font-size:12px}
+.sticker-count{background:rgba(168,85,247,.15);color:#a855f7;padding:2px 8px;border-radius:4px;font-weight:700;font-size:11px}
+
+/* Orders Section */
+.orders-section{margin-bottom:32px}
+.order-card{background:#161616;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;margin-bottom:12px}
+.order-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.order-id{font-size:11px;color:rgba(255,255,255,.3)}
+.order-status{padding:4px 10px;border-radius:4px;font-size:10px;font-weight:600;text-transform:uppercase}
+.order-total{font-size:18px;font-weight:800;color:#a855f7}
+
+/* Redeem Code */
+.redeem-section{background:#161616;border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px;margin-bottom:32px}
+.redeem-title{font-weight:700;margin-bottom:12px}
+.redeem-form{display:flex;gap:10px}
+.redeem-input{flex:1;padding:10px 14px;border:1px solid rgba(255,255,255,.1);border-radius:8px;background:rgba(255,255,255,.04);color:#fff;font-size:14px}
+
+/* Logout Button */
+.logout-btn{position:fixed;top:16px;right:24px;padding:8px 16px;border:1px solid rgba(239,68,68,.3);border-radius:6px;background:rgba(239,68,68,.1);color:#ef4444;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s}
+.logout-btn:hover{background:rgba(239,68,68,.2)}
+
+/* Loading */
+.loading{text-align:center;padding:40px;color:rgba(255,255,255,.3)}
+.spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,.1);border-top-color:#a855f7;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Connection Status */
+.connection-status{position:fixed;bottom:20px;left:20px;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:6px;z-index:100}
+.connected{background:rgba(74,222,128,.15);color:#4ade80}
+.disconnected{background:rgba(239,68,68,.15);color:#ef4444}
+.status-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* Hidden */
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">
+    <img src="images/logo.png" alt="DFORZZE">
+    <span>DFORZZE</span>
+  </div>
+</div>
+
+<!-- Auth Section -->
+<div id="authSection" class="auth-container">
+  <div class="auth-card">
+    <h2 class="auth-title">Bienvenido</h2>
+    <p class="auth-subtitle">Inicia sesión para acceder a tu cuenta</p>
+    
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="showAuthTab('login')">Iniciar Sesión</button>
+      <button class="auth-tab" onclick="showAuthTab('register')">Registrarse</button>
+    </div>
+    
+    <!-- Login Form -->
+    <form id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="loginEmail" required placeholder="tu@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-input" id="loginPassword" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" id="loginBtn">Iniciar Sesión</button>
+      <p id="loginError" class="error-msg hidden"></p>
+    </form>
+    
+    <!-- Register Form -->
+    <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label class="form-label">Nombre</label>
+        <input type="text" class="form-input" id="regName" required placeholder="Tu nombre">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-input" id="regEmail" required placeholder="tu@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input type="password" class="form-input" id="regPassword" required minlength="6" placeholder="Mínimo 6 caracteres">
+      </div>
+      <button type="submit" class="btn btn-primary" id="registerBtn">Crear Cuenta</button>
+      <p id="registerError" class="error-msg hidden"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Dashboard Section -->
+<div id="dashboard" class="dashboard main">
+  <button class="logout-btn" onclick="handleLogout()">Cerrar Sesión</button>
+  
+  <div class="welcome">
+    <h1 id="welcomeName">Hola</h1>
+    <p id="welcomeEmail"></p>
+  </div>
+  
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <p class="stat-label">Tu Rango</p>
+      <div id="rankBadge" class="rank-badge rank-none">Sin Rango</div>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Stickers</p>
+      <p id="stickerCount" class="stat-value purple">0</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Pedidos</p>
+      <p id="orderCount" class="stat-value green">0</p>
+    </div>
+    <div class="stat-card">
+      <p class="stat-label">Total Gastado</p>
+      <p id="totalSpent" class="stat-value yellow">S/. 0</p>
+    </div>
+  </div>
+  
+  <!-- Redeem Code -->
+  <div class="redeem-section">
+    <p class="redeem-title">🎴 Canjear Código de Sticker</p>
+    <div class="redeem-form">
+      <input type="text" class="redeem-input" id="redeemCode" placeholder="DFZ-XXXXXX">
+      <button class="btn btn-primary" style="width:auto;padding:10px 20px" onclick="handleRedeem()">Canjear</button>
+    </div>
+    <p id="redeemMsg" class="hidden"></p>
+  </div>
+  
+  <!-- Stickers -->
+  <div class="stickers-section">
+    <h2 class="section-title">🎴 Mis Stickers</h2>
+    <div id="stickersGrid" class="stickers-grid">
+      <p class="loading">Cargando stickers...</p>
+    </div>
+  </div>
+  
+  <!-- Products -->
+  <div class="products-section">
+    <h2 class="section-title">📦 Productos Disponibles</h2>
+    <div id="productsGrid" class="products-grid">
+      <div class="loading">
+        <div class="spinner"></div>
+        Cargando productos...
+      </div>
+    </div>
+  </div>
+  
+  <!-- Orders -->
+  <div class="orders-section">
+    <h2 class="section-title">🛒 Mis Pedidos</h2>
+    <div id="ordersContainer">
+      <p class="loading">Cargando pedidos...</p>
+    </div>
+  </div>
+</div>
+
+<!-- Connection Status -->
+<div id="connectionStatus" class="connection-status disconnected">
+  <span class="status-dot"></span>
+  <span>Sin conexión al servidor</span>
+</div>
+
+<!-- API Script -->
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DFORZZE API CLIENT - Conexión al Backend
+// ═══════════════════════════════════════════════════════════════
+
+const API_URL = 'http://localhost:3000/api';
+
+let token = localStorage.getItem('dforzze_token');
+let user = JSON.parse(localStorage.getItem('dforzze_user') || 'null');
+
+// ── API Request ─────────────────────────────────────────────────
+async function api(method, path, body = null) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  
+  const options = { method, headers };
+  if (body) options.body = JSON.stringify(body);
+  
+  try {
+    const res = await fetch(`${API_URL}${path}`, options);
+    const data = await res.json();
+    
+    if (!res.ok) {
+      throw new Error(data.error || data.message || 'Error del servidor');
+    }
+    
+    return data;
+  } catch (err) {
+    console.error('API Error:', err);
+    throw err;
+  }
+}
+
+// ── Auth Functions ──────────────────────────────────────────────
+async function handleLogin(e) {
+  e.preventDefault();
+  const btn = document.getElementById('loginBtn');
+  const error = document.getElementById('loginError');
+  
+  btn.disabled = true;
+  btn.textContent = 'Iniciando...';
+  error.classList.add('hidden');
+  
+  try {
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    const data = await api('POST', '/auth/login', { email, password });
+    
+    token = data.data.token;
+    user = data.data.user;
+    localStorage.setItem('dforzze_token', token);
+    localStorage.setItem('dforzze_user', JSON.stringify(user));
+    
+    showDashboard();
+  } catch (err) {
+    error.textContent = err.message;
+    error.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Iniciar Sesión';
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const btn = document.getElementById('registerBtn');
+  const error = document.getElementById('registerError');
+  
+  btn.disabled = true;
+  btn.textContent = 'Creando...';
+  error.classList.add('hidden');
+  
+  try {
+    const name = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
+    
+    const data = await api('POST', '/auth/register', { name, email, password });
+    
+    token = data.data.token;
+    user = data.data.user;
+    localStorage.setItem('dforzze_token', token);
+    localStorage.setItem('dforzze_user', JSON.stringify(user));
+    
+    showDashboard();
+  } catch (err) {
+    error.textContent = err.message;
+    error.classList.remove('hidden');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Crear Cuenta';
+  }
+}
+
+async function handleLogout() {
+  try {
+    await api('POST', '/auth/logout');
+  } catch (err) {}
+  
+  token = null;
+  user = null;
+  localStorage.removeItem('dforzze_token');
+  localStorage.removeItem('dforzze_user');
+  
+  document.getElementById('dashboard').classList.remove('active');
+  document.getElementById('authSection').classList.remove('hidden');
+  updateConnectionStatus(false);
+}
+
+function showAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  
+  if (tab === 'login') {
+    document.getElementById('loginForm').classList.remove('hidden');
+    document.getElementById('registerForm').classList.add('hidden');
+  } else {
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('registerForm').classList.remove('hidden');
+  }
+}
+
+// ── Dashboard ───────────────────────────────────────────────────
+async function showDashboard() {
+  document.getElementById('authSection').classList.add('hidden');
+  document.getElementById('dashboard').classList.add('active');
+  
+  document.getElementById('welcomeName').textContent = `¡Hola, ${user.name}!`;
+  document.getElementById('welcomeEmail').textContent = user.email;
+  
+  updateRankBadge(user.rank);
+  document.getElementById('stickerCount').textContent = user.stickerCount || 0;
+  
+  // Cargar datos
+  await Promise.all([
+    loadProducts(),
+    loadStickers(),
+    loadOrders()
+  ]);
+}
+
+function updateRankBadge(rank) {
+  const badge = document.getElementById('rankBadge');
+  badge.className = 'rank-badge';
+  
+  const ranks = {
+    'NONE': { class: 'rank-none', text: 'Sin Rango' },
+    'INITIATED': { class: 'rank-initiated', text: 'Initiated' },
+    'BUILDER': { class: 'rank-builder', text: 'Builder' },
+    'INNER': { class: 'rank-inner', text: 'INNER' }
+  };
+  
+  const r = ranks[rank] || ranks['NONE'];
+  badge.classList.add(r.class);
+  badge.textContent = r.text;
+}
+
+// ── Products ────────────────────────────────────────────────────
+async function loadProducts() {
+  try {
+    const data = await api('GET', '/products');
+    renderProducts(data.data.products || data.data);
+    updateConnectionStatus(true);
+  } catch (err) {
+    document.getElementById('productsGrid').innerHTML = 
+      '<p style="color:#ef4444">Error cargando productos. Asegúrate de que el servidor esté corriendo.</p>';
+    updateConnectionStatus(false);
+  }
+}
+
+function renderProducts(products) {
+  const grid = document.getElementById('productsGrid');
+  
+  if (!products || products.length === 0) {
+    grid.innerHTML = '<p style="color:rgba(255,255,255,.3)">No hay productos disponibles</p>';
+    return;
+  }
+  
+  grid.innerHTML = products.map(p => {
+    const stockClass = p.stock === 0 ? 'stock-out' : p.stock <= 5 ? 'stock-low' : 'stock-ok';
+    const stockText = p.stock === 0 ? 'Agotado' : p.stock <= 5 ? 'Stock bajo' : 'Disponible';
+    const img = p.images?.[0] || `images/${p.id}.png`;
+    
+    return `
+      <div class="product-card">
+        <div class="product-image">
+          <img src="${img}" alt="${p.name}" onerror="this.style.opacity=0.3">
+        </div>
+        <div class="product-info">
+          <p class="product-name">${p.name}</p>
+          <p class="product-price">S/. ${parseFloat(p.price).toFixed(0)}</p>
+          <span class="stock-badge ${stockClass}">${stockText} (${p.stock})</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Stickers ────────────────────────────────────────────────────
+async function loadStickers() {
+  try {
+    const data = await api('GET', '/stickers/my-collection');
+    renderStickers(data.data);
+  } catch (err) {
+    document.getElementById('stickersGrid').innerHTML = 
+      '<p style="color:rgba(255,255,255,.3)">Inicia sesión para ver tus stickers</p>';
+  }
+}
+
+function renderStickers(data) {
+  const grid = document.getElementById('stickersGrid');
+  
+  if (!data || !data.stickers || data.stickers.length === 0) {
+    grid.innerHTML = '<p style="color:rgba(255,255,255,.3)">Aún no tienes stickers. ¡Haz una compra!</p>';
+    return;
+  }
+  
+  // Agrupar por nombre
+  const grouped = {};
+  data.stickers.forEach(s => {
+    if (!grouped[s.name]) {
+      grouped[s.name] = { ...s, count: 0 };
+    }
+    grouped[s.name].count++;
+  });
+  
+  grid.innerHTML = Object.values(grouped).map(s => `
+    <div class="sticker-item">
+      <span class="sticker-emoji">${s.emoji || '🎴'}</span>
+      <div class="sticker-info">
+        <p style="font-weight:600">${s.name}</p>
+        <span class="sticker-count">×${s.count}</span>
+      </div>
+    </div>
+  `).join('');
+  
+  document.getElementById('stickerCount').textContent = data.total || data.stickers.length;
+}
+
+// ── Orders ──────────────────────────────────────────────────────
+async function loadOrders() {
+  try {
+    const data = await api('GET', '/orders');
+    renderOrders(data.data);
+  } catch (err) {
+    document.getElementById('ordersContainer').innerHTML = 
+      '<p style="color:rgba(255,255,255,.3)">No se pudieron cargar los pedidos</p>';
+  }
+}
+
+function renderOrders(data) {
+  const container = document.getElementById('ordersContainer');
+  
+  if (!data || !data.orders || data.orders.length === 0) {
+    container.innerHTML = '<p style="color:rgba(255,255,255,.3)">Aún no tienes pedidos</p>';
+    document.getElementById('orderCount').textContent = '0';
+    return;
+  }
+  
+  let totalSpent = 0;
+  
+  container.innerHTML = data.orders.map(o => {
+    totalSpent += parseFloat(o.total);
+    const date = new Date(o.createdAt).toLocaleDateString('es-PE');
+    const statusColors = {
+      'PENDING': 'background:rgba(251,191,36,.15);color:#fbbf24',
+      'PROCESSING': 'background:rgba(96,165,250,.15);color:#60a5fa',
+      'SHIPPED': 'background:rgba(168,85,247,.15);color:#a855f7',
+      'DELIVERED': 'background:rgba(74,222,128,.15);color:#4ade80',
+      'CANCELLED': 'background:rgba(239,68,68,.15);color:#ef4444'
+    };
+    
+    return `
+      <div class="order-card">
+        <div class="order-header">
+          <span class="order-id">#${o.id.slice(0, 8)}</span>
+          <span class="order-status" style="${statusColors[o.status] || statusColors['PENDING']}">${o.status}</span>
+        </div>
+        <p class="order-total">S/. ${parseFloat(o.total).toFixed(2)}</p>
+        <p style="font-size:12px;color:rgba(255,255,255,.4)">${date} • ${o.stickersEarned || 0} stickers ganados</p>
+      </div>
+    `;
+  }).join('');
+  
+  document.getElementById('orderCount').textContent = data.orders.length;
+  document.getElementById('totalSpent').textContent = `S/. ${totalSpent.toFixed(0)}`;
+}
+
+// ── Redeem Code ─────────────────────────────────────────────────
+async function handleRedeem() {
+  const code = document.getElementById('redeemCode').value.trim();
+  const msg = document.getElementById('redeemMsg');
+  
+  if (!code) return;
+  
+  msg.className = '';
+  msg.style.color = 'rgba(255,255,255,.4)';
+  msg.textContent = 'Canjeando...';
+  
+  try {
+    const data = await api('POST', '/stickers/redeem', { code });
+    msg.style.color = '#4ade80';
+    msg.textContent = `¡Sticker canjeado! ${data.data.emoji} ${data.data.name}`;
+    
+    document.getElementById('redeemCode').value = '';
+    await loadStickers();
+  } catch (err) {
+    msg.style.color = '#ef4444';
+    msg.textContent = err.message;
+  }
+}
+
+// ── Connection Status ───────────────────────────────────────────
+function updateConnectionStatus(connected) {
+  const status = document.getElementById('connectionStatus');
+  if (connected) {
+    status.className = 'connection-status connected';
+    status.innerHTML = '<span class="status-dot"></span><span>Conectado al servidor</span>';
+  } else {
+    status.className = 'connection-status disconnected';
+    status.innerHTML = '<span class="status-dot"></span><span>Sin conexión</span>';
+  }
+}
+
+// ── Init ────────────────────────────────────────────────────────
+async function init() {
+  if (token && user) {
+    try {
+      // Verificar que el token sigue válido
+      await api('GET', '/products');
+      showDashboard();
+      updateConnectionStatus(true);
+    } catch (err) {
+      // Token expirado
+      handleLogout();
+    }
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>

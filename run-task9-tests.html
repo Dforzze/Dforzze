@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task 9 - Property Tests Execution</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Monaco', 'Courier New', monospace;
+      background: #0a0a0a;
+      color: #fff;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #a855f7;
+    }
+    .console {
+      background: #1a1a1a;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 20px;
+      font-size: 12px;
+      line-height: 1.6;
+      max-height: 600px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+    .console-line {
+      margin-bottom: 4px;
+    }
+    .success { color: #4ade80; }
+    .error { color: #ef4444; }
+    .warning { color: #fbbf24; }
+    .info { color: #60a5fa; }
+    .section-title { color: #a855f7; font-weight: bold; margin-top: 12px; }
+    button {
+      background: #a855f7;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #9333ea;
+    }
+    .summary {
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.2);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .summary-item:last-child {
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🧪 Task 9 - Property Tests Execution</h1>
+  
+  <button onclick="runTests()">▶ Run Tests</button>
+  <button onclick="clearConsole()" style="background: rgba(255,255,255,0.1); margin-left: 10px;">Clear Console</button>
+  
+  <div class="console" id="console"></div>
+  
+  <div class="summary" id="summary" style="display: none;">
+    <div class="summary-item">
+      <span>Total Tests:</span>
+      <span id="totalTests">0</span>
+    </div>
+    <div class="summary-item">
+      <span>Passed:</span>
+      <span id="passedTests" class="success">0</span>
+    </div>
+    <div class="summary-item">
+      <span>Failed:</span>
+      <span id="failedTests" class="error">0</span>
+    </div>
+    <div class="summary-item">
+      <span>Pass Rate:</span>
+      <span id="passRate">0%</span>
+    </div>
+  </div>
+</div>
+
+<script src="admin-enhanced.js"></script>
+<script>
+const consoleEl = document.getElementById('console');
+const summaryEl = document.getElementById('summary');
+
+function log(message, type = 'info') {
+  const line = document.createElement('div');
+  line.className = `console-line ${type}`;
+  line.textContent = message;
+  consoleEl.appendChild(line);
+  consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+
+function clearConsole() {
+  consoleEl.innerHTML = '';
+  summaryEl.style.display = 'none';
+}
+
+function setupTestEnvironment() {
+  const keysToRemove = Object.keys(localStorage).filter(k => k.startsWith('dforzze_'));
+  keysToRemove.forEach(k => localStorage.removeItem(k));
+}
+
+function teardownTestEnvironment() {
+  setupTestEnvironment();
+}
+
+function runTests() {
+  clearConsole();
+  
+  let property8Tests = 0;
+  let property8Passed = 0;
+  let property9Tests = 0;
+  let property9Passed = 0;
+  
+  // ===== PROPERTY 8 =====
+  log('=== PROPERTY 8: ANALYTICS ACCURACY ===', 'section-title');
+  log('');
+  
+  // Test 1
+  log('Test 1: Analytics Metrics Accuracy');
+  try {
+    setupTestEnvironment();
+    
+    // Crear datos de prueba
+    const users = [
+      { name: 'User 1', email: 'user1@test.com', rank: 'NONE', stickerCount: 0, lastActivity: new Date().toISOString(), blocked: false },
+      { name: 'User 2', email: 'user2@test.com', rank: 'INITIATED', stickerCount: 5, lastActivity: new Date().toISOString(), blocked: false },
+      { name: 'User 3', email: 'user3@test.com', rank: 'BUILDER', stickerCount: 10, lastActivity: new Date(Date.now() - 60*24*60*60*1000).toISOString(), blocked: false },
+      { name: 'User 4', email: 'user4@test.com', rank: 'INNER', stickerCount: 20, lastActivity: new Date().toISOString(), blocked: false }
+    ];
+    
+    const metrics = AdminAnalytics.calculateMetrics(users);
+    
+    // Verificaciones
+    if (metrics.totalUsers !== users.length) throw new Error('Total users mismatch');
+    if (parseInt(metrics.totalStickers) !== 35) throw new Error('Total stickers mismatch');
+    if (metrics.avgStickers !== '8.75') throw new Error('Average stickers mismatch');
+    if (metrics.rankDistribution.NONE !== 1) throw new Error('Rank distribution mismatch');
+    
+    log('✓ PASSED', 'success');
+    property8Passed++;
+  } catch (error) {
+    log('✗ FAILED: ' + error.message, 'error');
+  }
+  property8Tests++;
+  
+  // Test 2
+  log('Test 2: Distribution by Range Calculation');
+  try {
+    setupTestEnvironment();
+    
+    const users = [
+      { name: 'User 1', email: 'user1@test.com', rank: 'NONE', stickerCount: 0 },
+      { name: 'User 2', email: 'user2@test.com', rank: 'INITIATED', stickerCount: 5 },
+      { name: 'User 3', email: 'user3@test.com', rank: 'BUILDER', stickerCount: 10 },
+      { name: 'User 4', email: 'user4@test.com', rank: 'INNER', stickerCount: 20 }
+    ];
+    
+    const distribution = AdminAnalytics.getDistributionByRange(users);
+    
+    if (!distribution.NONE || !distribution.INITIATED || !distribution.BUILDER || !distribution.INNER) {
+      throw new Error('Missing rank keys');
+    }
+    
+    const totalPercentage = Object.values(distribution).reduce((sum, d) => sum + parseFloat(d.percentage), 0);
+    if (Math.abs(totalPercentage - 100) > 1) throw new Error('Percentages do not sum to 100');
+    
+    const totalCount = Object.values(distribution).reduce((sum, d) => sum + d.count, 0);
+    if (totalCount !== users.length) throw new Error('Total count mismatch');
+    
+    log('✓ PASSED', 'success');
+    property8Passed++;
+  } catch (error) {
+    log('✗ FAILED: ' + error.message, 'error');
+  }
+  property8Tests++;
+  
+  // Test 3
+  log('Test 3: Redemption Patterns Tracking');
+  try {
+    setupTestEnvironment();
+    
+    const users = [
+      { 
+        name: 'User 1', 
+        email: 'user1@test.com', 
+        stickers: [
+          { name: 'Sticker 1', code: 'CODE1', date: new Date().toISOString() },
+          { name: 'Sticker 2', code: 'CODE2', date: new Date().toISOString() }
+        ]
+      },
+      { 
+        name: 'User 2', 
+        email: 'user2@test.com', 
+        stickers: [
+          { name: 'Sticker 3', code: 'CODE3', date: new Date().toISOString() }
+        ]
+      }
+    ];
+    
+    const patterns = AdminAnalytics.getRedemptionPatterns(users);
+    
+    if (patterns.totalRedemptions !== 3) throw new Error('Total redemptions mismatch');
+    if (patterns.averageRedemptionsPerUser !== '1.50') throw new Error('Average redemptions mismatch');
+    if (!Array.isArray(patterns.redemptionTrend)) throw new Error('Trend is not an array');
+    
+    log('✓ PASSED', 'success');
+    property8Passed++;
+  } catch (error) {
+    log('✗ FAILED: ' + error.message, 'error');
+  }
+  property8Tests++;
+  
+  log('');
+  log(`Property 8 Results: ${property8Passed}/${property8Tests} tests passed`, 'info');
+  
+  // ===== PROPERTY 9 =====
+  log('');
+  log('=== PROPERTY 9: AUDIT TRAIL COMPLETENESS ===', 'section-title');
+  log('');
+  
+  // Test 1
+  log('Test 1: Audit Entry Completeness');
+  try {
+    setupTestEnvironment();
+    
+    const testUsers = [
+      { email: 'user1@test.com', name: 'User 1', rank: 'NONE', stickerCount: 0 },
+      { email: 'user2@test.com', name: 'User 2', rank: 'INITIATED', stickerCount: 5 }
+    ];
+    localStorage.setItem('dforzze_users', JSON.stringify(testUsers));
+    
+    const result = AdminBulkOperations.addStickersToUsers(['user1@test.com', 'user2@test.com'], 5);
+    
+    if (!result.success) throw new Error('Operation failed');
+    
+    const auditLog = JSON.parse(localStorage.getItem('dforzze_audit_log') || '[]');
+    if (auditLog.length === 0) throw new Error('No audit entries created');
+    
+    const lastEntry = auditLog[auditLog.length - 1];
+    
+    if (!lastEntry.timestamp) throw new Error('Missing timestamp');
+    if (!lastEntry.action) throw new Error('Missing action');
+    if (!lastEntry.details) throw new Error('Missing details');
+    if (!lastEntry.admin) throw new Error('Missing admin');
+    if (!lastEntry.severity) throw new Error('Missing severity');
+    
+    if (new Date(lastEntry.timestamp).getTime() <= 0) throw new Error('Invalid timestamp');
+    if (!['low', 'medium', 'high'].includes(lastEntry.severity)) throw new Error('Invalid severity');
+    
+    log('✓ PASSED', 'success');
+    property9Passed++;
+  } catch (error) {
+    log('✗ FAILED: ' + error.message, 'error');
+  }
+  property9Tests++;
+  
+  // Test 2
+  log('Test 2: Audit Log Data Integrity');
+  try {
+    setupTestEnvironment();
+    
+    AdminAuditTrail.log('TEST_ACTION_1', { count: 10 });
+    AdminAuditTrail.log('TEST_ACTION_2', { count: 20 });
+    AdminAuditTrail.log('TEST_ACTION_3', { count: 30 });
+    
+    const auditLog = JSON.parse(localStorage.getItem('dforzze_audit_log') || '[]');
+    
+    if (auditLog.length !== 3) throw new Error('Expected 3 entries');
+    
+    auditLog.forEach((entry, index) => {
+      if (!entry.id) throw new Error(`Entry ${index} missing id`);
+      if (!entry.timestamp) throw new Error(`Entry ${index} missing timestamp`);
+      if (!entry.action) throw new Error(`Entry ${index} missing action`);
+      if (!entry.details) throw new Error(`Entry ${index} missing details`);
+    });
+    
+    log('✓ PASSED', 'success');
+    property9Passed++;
+  } catch (error) {
+    log('✗ FAILED: ' + error.message, 'error');
+  }
+  property9Tests++;
+  
+  // Test 3
+  log('Test 3: Security Alerts Generation');
+  try {
+    setupTestEnvironment();
+    
+    const users = Array.from({ length: 60 }, (_, i) => ({
+      email: `user${i}@test.com`,
+      name: `User ${i}`,
+      rank: 'NONE',
+      stickerCount: 0
+    }));
+    localStorage.setItem('dforzze_users', JSON.stringify(users));
+    
+    const userEmails = users.map(u => u.email);
+    AdminBulkOperations.addStickersToUsers(userEmails, 5);
+    
+    const alerts = JSON.parse(localStorage.getItem('dforzze_security_alerts') || '[]');
+    
+    const massChangeAlert = alerts.find(a => a.type === 'MASS_STICKER_CHANGE');
+    if (!massChangeAlert) throw new Error('No mass change alert generated');
+    
+    log('✓ PASSED', 'success');
+    property9Passed++;
+  } catch (error) {
+    log('✗ FAILED: ' + error.message, 'error');
+  }
+  property9Tests++;
+  
+  // Test 4
+  log('Test 4: Audit Log Filtering');
+  try {
+    setupTestEnvironment();
+    
+    AdminAuditTrail.log('ACTION_A', { severity: 'low' });
+    AdminAuditTrail.log('ACTION_B', { severity: 'medium' });
+    AdminAuditTrail.log('ACTION_A', { severity: 'high' });
+    AdminAuditTrail.log('ACTION_C', { severity: 'low' });
+    
+    const actionAEntries = AdminAuditTrail.getLog(100, { action: 'ACTION_A' });
+    if (actionAEntries.length !== 2) throw new Error('Action filter failed');
+    
+    actionAEntries.forEach(entry => {
+      if (entry.action !== 'ACTION_A') throw new Error('Filter returned wrong action');
+    });
+    
+    const highSeverityEntries = AdminAuditTrail.getLog(100, { severity: 'high' });
+    if (highSeverityEntries.length !== 1) throw new Error('Severity filter failed');
+    
+    highSeverityEntries.forEach(entry => {
+      if (entry.severity !== 'high') throw new Error('Filter returned wrong severity');
+    });
+    
+    log('✓ PASSED', 'success');
+    property9Passed++;
+  } catch (error) {
+    log('✗ FAILED: ' + error.message, 'error');
+  }
+  property9Tests++;
+  
+  log('');
+  log(`Property 9 Results: ${property9Passed}/${property9Tests} tests passed`, 'info');
+  
+  // ===== RESUMEN =====
+  log('');
+  log('=== RESUMEN FINAL ===', 'section-title');
+  
+  const totalTests = property8Tests + property9Tests;
+  const totalPassed = property8Passed + property9Passed;
+  const passPercentage = ((totalPassed / totalTests) * 100).toFixed(1);
+  
+  log(`Total Tests: ${totalTests}`, 'info');
+  log(`Passed: ${totalPassed}`, 'success');
+  log(`Failed: ${totalTests - totalPassed}`, totalTests - totalPassed > 0 ? 'error' : 'success');
+  log(`Pass Rate: ${passPercentage}%`, totalPassed === totalTests ? 'success' : 'warning');
+  
+  if (totalPassed === totalTests) {
+    log('');
+    log('✅ ALL TESTS PASSED!', 'success');
+  } else {
+    log('');
+    log('⚠️ SOME TESTS FAILED', 'warning');
+  }
+  
+  // Mostrar resumen
+  document.getElementById('totalTests').textContent = totalTests;
+  document.getElementById('passedTests').textContent = totalPassed;
+  document.getElementById('failedTests').textContent = totalTests - totalPassed;
+  document.getElementById('passRate').textContent = passPercentage + '%';
+  summaryEl.style.display = 'block';
+  
+  // Limpiar
+  teardownTestEnvironment();
+}
+
+// Auto-run on load
+window.addEventListener('load', () => {
+  log('Ready to run tests. Click "Run Tests" to start.', 'info');
+});
+</script>
+
+</body>
+</html>

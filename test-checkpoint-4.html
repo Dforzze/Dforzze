@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkpoint 4 - Tests de Propiedades</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #000, #333);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .test-header {
+            background: #f8f9fa;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 700;
+            color: #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .test-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .test-status.pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .test-status.fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .test-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .test-items {
+            padding: 20px;
+        }
+        
+        .test-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e9ecef;
+        }
+        
+        .test-item.pass {
+            background: #f0fdf4;
+            border-left-color: #10b981;
+        }
+        
+        .test-item.fail {
+            background: #fef2f2;
+            border-left-color: #ef4444;
+        }
+        
+        .test-icon {
+            font-size: 18px;
+            margin-right: 12px;
+            min-width: 24px;
+        }
+        
+        .test-name {
+            flex: 1;
+            font-size: 14px;
+            color: #000;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .summary-stat {
+            display: inline-block;
+            margin: 0 20px;
+            text-align: center;
+        }
+        
+        .summary-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #000;
+        }
+        
+        .summary-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 4px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #34d399);
+            transition: width 0.6s ease;
+        }
+        
+        .button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .button:hover {
+            background: #333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            font-size: 12px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .test-section {
+            animation: slideInUp 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✓ Checkpoint 4: Validación de Tests</h1>
+            <p>Sistema de Stickers Mejorado - Suite Completa de Propiedades</p>
+        </div>
+        
+        <div class="content" id="testContent">
+            <p style="text-align: center; color: #6c757d; margin-bottom: 30px;">
+                Cargando tests... Por favor espera.
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>Checkpoint 4 - Validación de Componentes Base del Sistema de Stickers Mejorado</p>
+        </div>
+    </div>
+    
+    <!-- Cargar archivos necesarios -->
+    <script>
+        // Definir constantes globales
+        const RANK_ORDER = ['NONE', 'INITIATED', 'BUILDER', 'INNER'];
+        const RANKS = {
+            NONE: { l: 'Sin Rango', c: 'rgba(255,255,255,.5)', bg: 'rgba(255,255,255,.08)', stk: 0, icon: '◆' },
+            INITIATED: { l: 'Initiated', c: '#34d399', bg: 'rgba(52,211,153,.15)', stk: 3, icon: '▲' },
+            BUILDER: { l: 'Builder', c: '#fbbf24', bg: 'rgba(251,191,36,.15)', stk: 7, icon: '■' },
+            INNER: { l: 'Inner', c: '#c084fc', bg: 'rgba(192,132,252,.15)', stk: 15, icon: '●' }
+        };
+        
+        // Variable global para usuario
+        let U = null;
+    </script>
+    
+    <script src="stickers-enhanced.js"></script>
+    <script src="stickers-tests.js"></script>
+    
+    <script>
+        // Ejecutar tests cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            const results = runAllTests();
+            renderTestResults(results);
+        });
+        
+        function renderTestResults(results) {
+            const testContent = document.getElementById('testContent');
+            
+            // Obtener resultados detallados
+            const testFunctions = [
+                { name: 'Property 1: Data Integrity Preservation', fn: testProperty1_DataIntegrityPreservation },
+                { name: 'Property 2: UI Consistency Across Interfaces', fn: testProperty2_UIConsistency },
+                { name: 'Property 3: Progress Calculation Accuracy', fn: testProperty3_ProgressCalculation },
+                { name: 'Property 4: Animation and Feedback Consistency', fn: testProperty4_AnimationFeedback },
+                { name: 'Property 5: Code Redemption Business Logic', fn: testProperty5_CodeRedemption },
+                { name: 'Property 6: Responsive Design Adaptation', fn: testProperty6_ResponsiveDesign },
+                { name: 'Property 7: Data Migration Compatibility', fn: testProperty7_MigrationCompatibility },
+                { name: 'Property 8: Analytics Accuracy', fn: testProperty8_AnalyticsAccuracy },
+                { name: 'Property 9: Audit Trail Completeness', fn: testProperty9_AuditTrail },
+                { name: 'Property 10: Offline Data Availability', fn: testProperty10_OfflineAvailability },
+                { name: 'Property 11: Error Handling Resilience', fn: testProperty11_ErrorHandling }
+            ];
+            
+            let html = '';
+            let totalTests = 0;
+            let passedTests = 0;
+            
+            testFunctions.forEach((test, index) => {
+                const assertions = test.fn();
+                const passCount = assertions.filter(a => a.condition).length;
+                const totalCount = assertions.length;
+                const isPassing = passCount === totalCount;
+                
+                totalTests += totalCount;
+                passedTests += passCount;
+                
+                html += `
+                    <div class="test-section">
+                        <div class="test-header">
+                            <span>${test.name}</span>
+                            <span class="test-status ${isPassing ? 'pass' : 'fail'}">
+                                ${isPassing ? '✓ PASS' : '✗ FAIL'} (${passCount}/${totalCount})
+                            </span>
+                        </div>
+                        <div class="test-items">
+                `;
+                
+                assertions.forEach(assertion => {
+                    const icon = assertion.condition ? '✓' : '✗';
+                    const status = assertion.condition ? 'pass' : 'fail';
+                    html += `
+                        <div class="test-item ${status}">
+                            <div class="test-icon">${icon}</div>
+                            <div class="test-name">${assertion.name}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Agregar resumen
+            const percentage = ((passedTests / totalTests) * 100).toFixed(2);
+            const allPassed = passedTests === totalTests;
+            
+            html += `
+                <div class="summary">
+                    <div style="margin-bottom: 20px;">
+                        <div class="summary-stat">
+                            <div class="summary-number">${passedTests}</div>
+                            <div class="summary-label">Tests Pasados</div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-number">${totalTests}</div>
+                            <div class="summary-label">Tests Totales</div>
+                        </div>
+                        <div class="summary-stat">
+                            <div class="summary-number">${percentage}%</div>
+                            <div class="summary-label">Éxito</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${percentage}%"></div>
+                    </div>
+                    <div style="margin-top: 20px; font-size: 16px; font-weight: 700; color: ${allPassed ? '#10b981' : '#ef4444'};">
+                        ${allPassed ? '✓ TODOS LOS TESTS PASARON' : '✗ ALGUNOS TESTS FALLARON'}
+                    </div>
+                </div>
+            `;
+            
+            testContent.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

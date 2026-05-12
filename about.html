@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — DFORZZE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:100px}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+
+@keyframes fadeUp{0%{opacity:0;transform:translateY(28px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{0%{opacity:0}100%{opacity:1}}
+@keyframes nebulaDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(30px)}}
+@keyframes lineGrow{0%{width:0}100%{width:100%}}
+
+.fade-up{opacity:0;transform:translateY(28px);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.fade-up.show{opacity:1;transform:translateY(0)}
+.fade-in{opacity:0;transition:opacity 1s ease}
+.fade-in.show{opacity:1}
+
+.person-card{position:relative;overflow:hidden;cursor:pointer}
+.person-card img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .8s cubic-bezier(.16,1,.3,1);display:block}
+.person-card:hover img{transform:scale(1.06)}
+.person-card .card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.3) 50%,transparent 100%);transition:opacity .4s}
+.person-card:hover .card-overlay{opacity:.85}
+.person-card .card-info{position:absolute;bottom:0;left:0;right:0;padding:28px;transform:translateY(8px);transition:transform .4s cubic-bezier(.16,1,.3,1)}
+.person-card:hover .card-info{transform:translateY(0)}
+.ig-handle{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.5);font-size:11px;font-weight:500;letter-spacing:.05em;transition:color .3s;margin-top:6px}
+.ig-handle:hover{color:#fff}
+
+.nav-link{color:rgba(255,255,255,.5);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;transition:color .25s}
+.nav-link:hover,.nav-link.active{color:#fff}
+
+.stat-item{border-top:1px solid rgba(255,255,255,.08);padding-top:24px}
+</style>
+</head>
+<body>
+
+<!-- SPLASH APPLE STYLE -->
+<div id="splash" style="position:fixed;inset:0;z-index:200;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:40px">
+    <img src="images/logo.png" alt="DFORZZE" style="height:72px;width:auto;filter:brightness(0) invert(1);opacity:0;transition:opacity .8s ease" id="splashLogo">
+    <div style="width:160px;height:2px;background:rgba(255,255,255,.08);border-radius:9999px;overflow:hidden">
+      <div id="splashBar" style="height:100%;width:0;background:rgba(255,255,255,.7);border-radius:9999px;transition:width 2s cubic-bezier(.4,0,.2,1)"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var logo = document.getElementById('splashLogo');
+  var bar = document.getElementById('splashBar');
+  var splash = document.getElementById('splash');
+  // fade in logo
+  setTimeout(function(){ logo.style.opacity='1'; }, 100);
+  // start bar
+  setTimeout(function(){ bar.style.width='100%'; }, 200);
+  // fade out splash
+  setTimeout(function(){
+    splash.style.opacity='0';
+    setTimeout(function(){ splash.style.display='none'; }, 700);
+  }, 2400);
+})();
+</script>
+
+<!-- HEADER -->
+<header style="position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(16px);background:rgba(0,0,0,.7);border-bottom:1px solid rgba(255,255,255,.06)">
+<div style="max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px">
+  <a href="dforzze.html" style="display:flex;align-items:center;gap:6px;flex:1">
+    <img src="images/logo.png" alt="DFORZZE" style="height:36px;width:auto;filter:brightness(0) invert(1)">
+    <span style="color:rgba(255,255,255,.4);font-weight:700;font-size:9px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+  </a>
+  <nav style="display:flex;align-items:center;gap:32px;flex:1;justify-content:center">
+    <a href="about.html" class="nav-link active">About</a>
+    <a href="dforzze.html" class="nav-link">Membership</a>
+    <a href="tienda.html" class="nav-link">Tienda</a>
+  </nav>
+  <div style="flex:1;display:flex;justify-content:flex-end">
+    <a href="dforzze.html" style="background:#fff;color:#000;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 22px;border-radius:9999px;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">Entrar</a>
+  </div>
+</div>
+</header>
+
+<!-- HERO -->
+<section style="min-height:100vh;display:flex;align-items:flex-end;position:relative;overflow:hidden;padding-top:60px">
+  <!-- VIDEO BACKGROUND dforzze x 26 -->
+  <video autoplay loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(.45)">
+    <source src="video/dforzze26.mp4" type="video/mp4">
+  </video>
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.3) 50%,rgba(0,0,0,.2) 100%)"></div>
+
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px 80px;width:100%;position:relative;z-index:10">
+    <div style="max-width:800px">
+      <h1 style="font-weight:800;font-size:clamp(56px,10vw,120px);letter-spacing:-.04em;line-height:.92;margin-bottom:40px">
+        <span class="fade-up" style="display:block;transition-delay:.1s">NO ES</span>
+        <span class="fade-up" style="display:block;color:rgba(255,255,255,.25);transition-delay:.2s">SOLO</span>
+        <span class="fade-up" style="display:block;transition-delay:.3s">ROPA.</span>
+      </h1>
+      <div style="height:1px;background:rgba(255,255,255,.08);margin-bottom:40px;overflow:hidden">
+        <div class="fade-in" style="height:100%;background:rgba(255,255,255,.3);width:0;transition:width 1.2s ease .5s" id="heroLine"></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:40px;flex-wrap:wrap">
+        <p class="fade-up" style="color:rgba(255,255,255,.5);font-size:18px;line-height:1.8;max-width:480px;transition-delay:.4s">DFORZZE nació de un proceso. No de una tendencia. Cada pieza, cada nivel, cada persona que la lleva — todo forma parte de algo que se construye desde adentro.</p>
+        <div class="fade-up" style="display:flex;flex-direction:column;gap:8px;transition-delay:.5s">
+          <p style="color:rgba(255,255,255,.3);font-size:11px;font-weight:500;letter-spacing:.15em;text-transform:uppercase">El artista que representa la escena peruana</p>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <a href="https://www.instagram.com/26is_______/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:9999px;padding:10px 18px;color:rgba(255,255,255,.6);font-size:12px;font-weight:500;letter-spacing:.04em;transition:all .3s;white-space:nowrap" onmouseover="this.style.background='rgba(255,255,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.6)'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+              @26is_______
+            </a>
+            <span style="color:rgba(255,255,255,.25);font-size:11px;font-weight:500;letter-spacing:.1em">14.04.25</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARTISTAS CONSOLIDADOS -->
+<section style="background:#000;padding:120px 0">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px">
+    <div style="margin-bottom:64px">
+      <p class="fade-up" style="color:rgba(255,255,255,.2);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px">Escena peruana</p>
+      <h2 class="fade-up" style="font-weight:800;font-size:clamp(32px,5vw,56px);letter-spacing:-.03em;line-height:1;transition-delay:.1s">Se vistieron<br>de DFORZZE.</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;align-items:start">
+
+      <!-- JEY BLESS -->
+      <a href="https://www.instagram.com/jeyblesslpb/" target="_blank" class="person-card fade-up" style="aspect-ratio:3/4;transition-delay:.1s">
+        <img src="images/jeybles.jpg" alt="Jey Bless" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block">
+        <div class="card-overlay"></div>
+        <div class="card-info">
+          <p style="color:rgba(255,255,255,.35);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px">Artista urbano</p>
+          <h3 style="color:#fff;font-weight:700;font-size:22px;letter-spacing:-.01em">Jey Bless</h3>
+          <p style="color:rgba(255,255,255,.5);font-size:13px;line-height:1.5;margin-top:8px">Uno de los nombres más sólidos del rap peruano. Releases constantes, colaboraciones reales y una identidad que no se negocia. Eligió DFORZZE.</p>
+        </div>
+      </a>
+
+      <!-- LEYTOR — subido -->
+      <a href="https://www.instagram.com/daniel.leytor/" target="_blank" class="person-card fade-up" style="aspect-ratio:3/4;transition-delay:.2s;margin-top:-40px">
+        <img src="images/leytor.jpg" alt="Leytor" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block">
+        <div class="card-overlay"></div>
+        <div class="card-info">
+          <p style="color:rgba(255,255,255,.35);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px">Artista urbano</p>
+          <h3 style="color:#fff;font-weight:700;font-size:22px;letter-spacing:-.01em">Leytor</h3>
+          <p style="color:rgba(255,255,255,.5);font-size:13px;line-height:1.5;margin-top:8px">Voz propia dentro de la escena peruana. Su sonido y su imagen van de la mano. Cuando viste DFORZZE, se nota que no es casualidad.</p>
+        </div>
+      </a>
+
+      <!-- ANDRE LOZZANO -->
+      <a href="https://www.instagram.com/andrelozzano/" target="_blank" class="person-card fade-up" style="aspect-ratio:3/4;transition-delay:.3s">
+        <img src="images/andrelozzano.jpg" alt="Andre Lozzano" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block">
+        <div class="card-overlay"></div>
+        <div class="card-info">
+          <p style="color:rgba(255,255,255,.35);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px">Artista urbano</p>
+          <h3 style="color:#fff;font-weight:700;font-size:22px;letter-spacing:-.01em">Andre Lozzano</h3>
+          <p style="color:rgba(255,255,255,.5);font-size:13px;line-height:1.5;margin-top:8px">Presencia real en la escena. Cada movimiento que hace suma. Vistió DFORZZE y lo llevó como lo que es — una señal.</p>
+        </div>
+      </a>
+
+    </div>
+
+    <div style="display:flex;gap:24px;margin-top:32px;flex-wrap:wrap">
+      <a href="https://www.instagram.com/jeyblesslpb/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9999px;padding:10px 20px;color:rgba(255,255,255,.5);font-size:12px;font-weight:500;letter-spacing:.04em;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.5)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>@jeyblesslpb</a>
+      <a href="https://www.instagram.com/daniel.leytor/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9999px;padding:10px 20px;color:rgba(255,255,255,.5);font-size:12px;font-weight:500;letter-spacing:.04em;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.5)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>@daniel.leytor</a>
+      <a href="https://www.instagram.com/andrelozzano/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9999px;padding:10px 20px;color:rgba(255,255,255,.5);font-size:12px;font-weight:500;letter-spacing:.04em;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.5)'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>@andrelozzano</a>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section style="background:#fff;padding:120px 0;position:relative;overflow:hidden">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px">
+    <div style="max-width:640px;margin:0 auto;text-align:center">
+        <p class="fade-up" style="color:rgba(0,0,0,.3);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;margin-bottom:20px">Manifiesto</p>
+        <h2 class="fade-up" style="color:#000;font-weight:800;font-size:clamp(36px,5vw,64px);letter-spacing:-.03em;line-height:.95;margin-bottom:32px;transition-delay:.1s">El proceso<br>es la marca.</h2>
+        <p class="fade-up" style="color:rgba(0,0,0,.55);font-size:16px;line-height:1.85;margin-bottom:24px;transition-delay:.2s">No vendemos ropa. Construimos un sistema donde cada acción tiene peso, cada compra suma, y cada nivel alcanzado dice algo sobre quién eres y en qué te estás convirtiendo.</p>
+        <p class="fade-up" style="color:rgba(0,0,0,.55);font-size:16px;line-height:1.85;transition-delay:.3s">DFORZZE no es para todos. Es para los que se mueven, los que construyen, los que entienden que el status no se compra — se demuestra.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PEOPLE — artistas emergentes -->
+<section style="background:#000;padding:120px 0">
+  <div style="max-width:1280px;margin:0 auto;padding:0 24px">
+    <div style="margin-bottom:64px">
+      <p class="fade-up" style="color:rgba(255,255,255,.2);font-size:11px;font-weight:500;letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px">Visten el proceso</p>
+      <h2 class="fade-up" style="font-weight:800;font-size:clamp(32px,5vw,56px);letter-spacing:-.03em;line-height:1;transition-delay:.1s">Parte del proceso.</h2>
+      <p class="fade-up" style="color:rgba(255,255,255,.3);font-size:16px;line-height:1.6;max-width:480px;margin-top:16px;transition-delay:.2s">Se identifican con lo que DFORZZE representa. No lo llevan por moda — lo llevan porque lo entienden.</p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px">
+
+      <!-- XVNDER -->
+      <a href="https://www.instagram.com/xvnder12/" target="_blank" class="person-card fade-up" style="aspect-ratio:3/4;transition-delay:.1s">
+        <img src="images/about-xvnder.jpg" alt="Xvnder" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block">
+        <div class="card-overlay"></div>
+        <div class="card-info">
+          <p style="color:rgba(255,255,255,.35);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px">Artista emergente</p>
+          <h3 style="color:#fff;font-weight:700;font-size:22px;letter-spacing:-.01em">Xvnder</h3>
+          <p style="color:rgba(255,255,255,.5);font-size:13px;line-height:1.5;margin-top:8px">El que se mueve en silencio y habla con lo que lleva puesto. Desde el inicio.</p>
+        </div>
+      </a>
+
+      <!-- SOTO -->
+      <a href="https://www.instagram.com/joakingoto/" target="_blank" class="person-card fade-up" style="aspect-ratio:3/4;transition-delay:.2s;margin-top:40px">
+        <img src="images/about-soto.jpg" alt="Soto">
+        <div class="card-overlay"></div>
+        <div class="card-info">
+          <p style="color:rgba(255,255,255,.35);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px">Deportista</p>
+          <h3 style="color:#fff;font-weight:700;font-size:22px;letter-spacing:-.01em">Soto</h3>
+          <p style="color:rgba(255,255,255,.5);font-size:13px;line-height:1.5;margin-top:8px">Skate, calle y proceso. La actitud que define lo que DFORZZE representa.</p>
+        </div>
+      </a>
+
+      <!-- RICHI -->
+      <a href="https://www.instagram.com/lilrichwhite/" target="_blank" class="person-card fade-up" style="aspect-ratio:3/4;transition-delay:.3s">
+        <img src="images/about-richi.jpg" alt="Richi">
+        <div class="card-overlay"></div>
+        <div class="card-info">
+          <p style="color:rgba(255,255,255,.35);font-size:10px;font-weight:500;letter-spacing:.15em;text-transform:uppercase;margin-bottom:4px">Content Creator</p>
+          <h3 style="color:#fff;font-weight:700;font-size:22px;letter-spacing:-.01em">Richi</h3>
+          <p style="color:rgba(255,255,255,.5);font-size:13px;line-height:1.5;margin-top:8px">Arte, identidad y marca propia. Richi lleva DFORZZE como una extensión de lo que es.</p>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- IG mentions row -->
+    <div style="display:flex;gap:24px;margin-top:32px;flex-wrap:wrap">
+      <a href="https://www.instagram.com/xvnder12/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9999px;padding:10px 20px;color:rgba(255,255,255,.5);font-size:12px;font-weight:500;letter-spacing:.04em;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.5)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+        @xvnder12
+      </a>
+      <a href="https://www.instagram.com/joakingoto/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9999px;padding:10px 20px;color:rgba(255,255,255,.5);font-size:12px;font-weight:500;letter-spacing:.04em;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.5)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+        @joakingoto
+      </a>
+      <a href="https://www.instagram.com/lilrichwhite/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9999px;padding:10px 20px;color:rgba(255,255,255,.5);font-size:12px;font-weight:500;letter-spacing:.04em;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.08)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.04)';this.style.color='rgba(255,255,255,.5)'">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+        @lilrichwhite
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO — DFORZZE x HADES -->
+<section style="position:relative;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center">
+  <video autoplay loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;filter:brightness(.6)">
+    <source src="video/hades.mp4" type="video/mp4">
+  </video>
+  <div style="position:absolute;inset:0;background:linear-gradient(to bottom,#000 0%,transparent 15%,transparent 80%,#000 100%)"></div>
+  <div style="position:relative;z-index:10;text-align:center;padding:0 24px">
+    <p class="fade-up" style="color:rgba(255,255,255,.35);font-size:11px;font-weight:500;letter-spacing:.3em;text-transform:uppercase;margin-bottom:16px">Colaboración</p>
+    <h2 class="fade-up" style="font-weight:800;font-size:clamp(40px,7vw,88px);letter-spacing:-.03em;line-height:.95;transition-delay:.15s">DFORZZE<br><span style="color:rgba(255,255,255,.3)">×</span> HADES</h2>
+    <a href="https://www.instagram.com/__hadees.66/" target="_blank" class="fade-up" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:9999px;padding:10px 18px;color:rgba(255,255,255,.6);font-size:12px;font-weight:500;letter-spacing:.04em;transition:all .3s;margin-top:24px;transition-delay:.25s" onmouseover="this.style.background='rgba(255,255,255,.15)';this.style.color='#fff'" onmouseout="this.style.background='rgba(255,255,255,.08)';this.style.color='rgba(255,255,255,.6)'">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+      @__hadees.66
+    </a>
+    <p class="fade-up" style="color:rgba(255,255,255,.4);font-size:14px;line-height:1.75;max-width:480px;margin-top:24px;transition-delay:.35s">Rapero puertorriqueño consolidado en la escena urbana latina. Colaboraciones con Noriel, Bryant Myers, Blessd y Maluma. Actualmente de gira por Estados Unidos. Él eligió vestir DFORZZE.</p>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section style="background:#000;padding:120px 0;text-align:center">
+  <div style="max-width:640px;margin:0 auto;padding:0 24px">
+    <h2 class="fade-up" style="font-weight:800;font-size:clamp(36px,6vw,72px);letter-spacing:-.03em;line-height:.95;margin-bottom:32px">¿Estás en<br>el proceso?</h2>
+    <p class="fade-up" style="color:rgba(255,255,255,.4);font-size:16px;line-height:1.8;margin-bottom:40px;transition-delay:.1s">Empieza en Initiated. Es gratis. El resto lo construyes tú.</p>
+    <div class="fade-up" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;transition-delay:.2s">
+      <a href="dforzze.html" style="display:inline-flex;align-items:center;background:#fff;color:#000;font-weight:600;font-size:13px;letter-spacing:.05em;text-transform:uppercase;padding:14px 32px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.88)'" onmouseout="this.style.background='#fff'">Entrar al proceso →</a>
+      <a href="tienda.html" style="display:inline-flex;align-items:center;background:rgba(255,255,255,.06);color:#fff;font-weight:500;font-size:13px;letter-spacing:.05em;text-transform:uppercase;padding:14px 28px;border-radius:9999px;border:1px solid rgba(255,255,255,.1);transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.06)'">Ver tienda →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#000;border-top:1px solid rgba(255,255,255,.04);padding:32px 0">
+<div style="max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+  <div style="display:flex;align-items:center;gap:4px">
+    <img src="images/logo.png" alt="DFORZZE" style="height:18px;width:auto;filter:brightness(0) invert(1);opacity:.25">
+    <span style="color:rgba(255,255,255,.2);font-weight:700;font-size:8px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+  </div>
+  <div style="display:flex;gap:20px;flex-wrap:wrap">
+    <a href="terminos.html" style="color:rgba(255,255,255,.2);font-size:11px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Términos</a>
+    <a href="envios.html" style="color:rgba(255,255,255,.2);font-size:11px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Envíos</a>
+    <a href="privacidad.html" style="color:rgba(255,255,255,.2);font-size:11px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Privacidad</a>
+  </div>
+  <p style="color:rgba(255,255,255,.12);font-size:10px;letter-spacing:.05em">© 2025 DFORZZE.</p>
+</div>
+</footer>
+
+<script>
+// Scroll animations
+const obs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('show');
+      // hero line
+      if(e.target.id==='heroLine') e.target.style.width='100%';
+      obs.unobserve(e.target);
+    }
+  });
+},{threshold:.12});
+
+document.querySelectorAll('.fade-up,.fade-in').forEach(el=>obs.observe(el));
+
+// Hero line trigger
+const heroLine = document.getElementById('heroLine');
+if(heroLine) obs.observe(heroLine);
+</script>
+
+</body>
+</html>

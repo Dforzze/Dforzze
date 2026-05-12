@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carrito — DFORZZE</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#f0f0f0;color:#000}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+.nav-link{color:rgba(0,0,0,.5);font-weight:500;font-size:13px;letter-spacing:.06em;text-transform:uppercase;transition:color .25s}
+.nav-link:hover{color:#000}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:768px){
+  .cart-header-nav{display:none!important}
+  .cart-grid{grid-template-columns:1fr!important;gap:16px!important}
+  .cart-summary{position:static!important;top:auto!important}
+  .cart-main{padding:20px 16px 60px!important}
+  .cart-title{font-size:22px!important}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header style="background:#f0f0f0;border-bottom:1px solid rgba(0,0,0,.08);position:sticky;top:0;z-index:50">
+  <div style="max-width:1400px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px">
+    <a href="tienda.html" style="display:flex;align-items:center;gap:6px">
+      <img src="images/logo.png" alt="DFORZZE" style="height:32px;width:auto">
+      <span style="font-weight:800;font-size:11px;letter-spacing:.2em;text-transform:uppercase">DFORZZE</span>
+    </a>
+    <nav style="display:flex;align-items:center;gap:28px" class="cart-header-nav">
+      <a href="about.html" class="nav-link">About</a>
+      <a href="dforzze.html" class="nav-link">Membership</a>
+      <a href="tienda.html" class="nav-link">Tienda</a>
+    </nav>
+    <a href="catalogo.html" style="color:rgba(0,0,0,.5);font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:color .3s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.5)'">← Seguir comprando</a>
+  </div>
+</header>
+
+<main style="max-width:1100px;margin:0 auto;padding:40px 24px 80px" class="cart-main">
+
+  <h1 style="font-weight:800;font-size:28px;letter-spacing:-.02em;margin-bottom:32px" class="cart-title">Tu carrito</h1>
+
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:32px;align-items:start" class="cart-grid">
+
+    <!-- Items -->
+    <div id="cartItems">
+      <!-- Rendered by JS -->
+    </div>
+
+    <!-- Summary -->
+    <div style="background:#fff;border-radius:8px;padding:28px;border:1px solid rgba(0,0,0,.06);position:sticky;top:80px" class="cart-summary">
+      <p style="font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid rgba(0,0,0,.06)">Resumen</p>
+      <!-- Detalle de items -->
+      <div id="summaryItems" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(0,0,0,.06)"></div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <span style="color:rgba(0,0,0,.5)">Subtotal</span>
+          <span id="subtotal" style="font-weight:600">S/. 0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <span style="color:rgba(0,0,0,.5)">Envío</span>
+          <span style="color:rgba(0,0,0,.5)">Se calcula al pagar</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;border-top:1px solid rgba(0,0,0,.08);padding-top:16px;margin-bottom:20px">
+        <span>Total estimado</span>
+        <span id="total">S/. 0</span>
+      </div>
+      <button onclick="goCheckout()" id="checkoutBtn" style="width:100%;background:#000;color:#fff;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:16px;border:none;border-radius:6px;transition:background .2s" onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">Proceder al pago →</button>
+      <div id="checkoutStockErr" style="display:none;margin-top:10px;background:#fff5f5;border:1px solid #fca5a5;border-radius:6px;padding:10px 14px;font-size:11px;color:#dc2626;line-height:1.6"></div>
+      <p style="font-size:10px;color:rgba(0,0,0,.35);text-align:center;margin-top:12px;letter-spacing:.04em">Pago seguro · SSL</p>
+    </div>
+
+  </div>
+
+  <!-- Empty cart -->
+  <div id="emptyCart" style="display:none;text-align:center;padding:80px 0">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 16px;display:block"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <p style="font-size:14px;color:rgba(0,0,0,.4);margin-bottom:20px">Tu carrito está vacío</p>
+    <a href="catalogo.html" style="display:inline-flex;background:#000;color:#fff;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:12px 28px;border-radius:6px">Ver productos</a>
+  </div>
+
+</main>
+
+<script>
+const imgs = {'1':'images/1.png','2':'images/2.png'};
+
+// Construir mapa de imágenes desde el inventario real
+function getImgMap(){
+  var map = Object.assign({}, imgs);
+  try{
+    var products = JSON.parse(localStorage.getItem('dforzze_products')||'[]');
+    products.forEach(function(p){ if(p.id && p.image) map[p.id] = p.image; });
+  }catch(e){}
+  return map;
+}
+
+function renderCart(){
+  const cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  const container = document.getElementById('cartItems');
+  const empty = document.getElementById('emptyCart');
+
+  if(cart.length === 0){
+    container.style.display = 'none';
+    empty.style.display = 'block';
+    document.getElementById('subtotal').textContent = 'S/. 0';
+    document.getElementById('total').textContent = 'S/. 0';
+    return;
+  }
+
+  container.style.display = 'block';
+  empty.style.display = 'none';
+
+  let subtotal = 0;
+  // Cargar inventario para validar stock
+  var invProducts = [];
+  try{ invProducts = JSON.parse(localStorage.getItem('dforzze_products')||'[]'); }catch(e){}
+  const imgs = getImgMap();
+
+  container.innerHTML = cart.map((item, idx) => {
+    subtotal += item.price * item.qty;
+    const sizeTag = item.size ? `<span style="display:inline-block;background:#f0f0f0;color:#000;font-size:10px;font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:2px;margin-left:6px">Talla ${item.size}</span>` : '';
+
+    // Buscar stock real de esta talla
+    var invProd = invProducts.find(function(p){ return p.id === item.id; });
+    var sizeStock = 9999;
+    if(invProd && invProd.sizes){
+      var sd = invProd.sizes.find(function(sz){ return sz.size === item.size; });
+      if(sd) sizeStock = sd.stock;
+    }
+    var atMax = item.qty >= sizeStock;
+    var overStock = item.qty > sizeStock;
+    var stockLabel = sizeStock < 9999
+      ? (sizeStock === 0
+          ? '<span style="font-size:10px;color:#dc2626;font-weight:600;margin-left:8px">Agotado</span>'
+          : (sizeStock <= 5
+              ? '<span style="font-size:10px;color:#b45309;font-weight:600;margin-left:8px">Quedan '+sizeStock+'</span>'
+              : ''))
+      : '';
+
+    return `
+    <div style="background:#fff;border-radius:4px;padding:16px 20px;border:1px solid ${overStock?'#fca5a5':'rgba(0,0,0,.08)'};margin-bottom:10px;display:flex;gap:16px;align-items:center">
+      <img src="${imgs[item.id] || 'images/1.png'}" style="width:72px;height:72px;object-fit:contain;background:#f0f0f0;border-radius:4px;padding:6px;flex-shrink:0">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin-bottom:4px">
+          <p style="font-weight:800;font-size:12px;letter-spacing:.05em;text-transform:uppercase">${item.name}</p>
+          ${sizeTag}
+          ${stockLabel}
+        </div>
+        <p style="font-size:12px;color:rgba(0,0,0,.4);margin-bottom:10px">S/. ${item.price} c/u</p>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="changeQty(${idx},-1)" style="width:28px;height:28px;border:1.5px solid rgba(0,0,0,.15);background:#fff;border-radius:2px;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='#000'" onmouseout="this.style.borderColor='rgba(0,0,0,.15)'">−</button>
+          <span style="font-weight:800;font-size:14px;min-width:24px;text-align:center">${item.qty}</span>
+          <button onclick="changeQty(${idx},1)" ${atMax?'disabled':''} style="width:28px;height:28px;border:1.5px solid ${atMax?'rgba(0,0,0,.08)':'rgba(0,0,0,.15)'};background:${atMax?'#f5f5f5':'#fff'};border-radius:2px;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:${atMax?'not-allowed':'pointer'};transition:all .15s;color:${atMax?'rgba(0,0,0,.2)':'#000'}" ${!atMax?'onmouseover="this.style.borderColor=\'#000\'" onmouseout="this.style.borderColor=\'rgba(0,0,0,.15)\'"':''}>+</button>
+        </div>
+        <p id="stockMsg_${idx}" style="display:none;font-size:10px;color:#dc2626;margin-top:6px;font-weight:600">Stock máximo alcanzado para esta talla</p>
+        ${overStock ? `<p style="font-size:10px;color:#dc2626;margin-top:6px;font-weight:600">⚠ Solo hay ${sizeStock} unidades disponibles — ajusta la cantidad</p>` : ''}
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <p style="font-weight:800;font-size:16px;margin-bottom:8px">S/. ${item.price * item.qty}</p>
+        <button onclick="removeItem(${idx})" style="font-size:11px;color:rgba(0,0,0,.3);background:none;border:none;cursor:pointer;letter-spacing:.04em;text-decoration:underline;transition:color .2s" onmouseover="this.style.color='#c00'" onmouseout="this.style.color='rgba(0,0,0,.3)'">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Resumen con detalle por item
+  const summaryItems = document.getElementById('summaryItems');
+  if(summaryItems){
+    summaryItems.innerHTML = cart.map(item => `
+      <div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(0,0,0,.5)">
+        <span>${item.name}${item.size?' ('+item.size+')':''} × ${item.qty}</span>
+        <span style="font-weight:600;color:#000">S/. ${item.price * item.qty}</span>
+      </div>`).join('');
+  }
+
+  document.getElementById('subtotal').textContent = 'S/. ' + subtotal;
+  document.getElementById('total').textContent = 'S/. ' + subtotal;
+
+  // Deshabilitar botón de checkout si hay items con stock excedido
+  var hasStockIssue = cart.some(function(item){
+    var prod = invProducts.find(function(p){ return p.id === item.id; });
+    if(prod && prod.sizes){
+      var sd = prod.sizes.find(function(sz){ return sz.size === item.size; });
+      if(sd) return item.qty > sd.stock;
+    }
+    return false;
+  });
+  var checkoutBtn = document.getElementById('checkoutBtn');
+  var errEl = document.getElementById('checkoutStockErr');
+  if(checkoutBtn){
+    if(hasStockIssue){
+      checkoutBtn.disabled = true;
+      checkoutBtn.style.background = 'rgba(0,0,0,.25)';
+      checkoutBtn.style.cursor = 'not-allowed';
+      checkoutBtn.onmouseover = null;
+      checkoutBtn.onmouseout = null;
+      if(errEl) errEl.style.display = 'none'; // se muestra al intentar click
+    } else {
+      checkoutBtn.disabled = false;
+      checkoutBtn.style.background = '#000';
+      checkoutBtn.style.cursor = 'pointer';
+      checkoutBtn.onmouseover = function(){ this.style.background='#222'; };
+      checkoutBtn.onmouseout = function(){ this.style.background='#000'; };
+      if(errEl) errEl.style.display = 'none';
+    }
+  }
+}
+
+function changeQty(idx, delta){
+  let cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  if(!cart[idx]) return;
+
+  if(delta > 0){
+    // Verificar stock disponible para esta talla
+    var products = [];
+    try{ products = JSON.parse(localStorage.getItem('dforzze_products')||'[]'); }catch(e){}
+    var product = products.find(function(p){ return p.id === cart[idx].id; });
+    var maxStock = 9999;
+    if(product && product.sizes){
+      var sizeData = product.sizes.find(function(sz){ return sz.size === cart[idx].size; });
+      if(sizeData) maxStock = sizeData.stock;
+    }
+    if(cart[idx].qty >= maxStock){
+      // Mostrar feedback visual en el botón +
+      var btns = document.querySelectorAll('[onclick="changeQty('+idx+',1)"]');
+      btns.forEach(function(btn){
+        var orig = btn.style.borderColor;
+        btn.style.borderColor = '#dc2626';
+        btn.style.color = '#dc2626';
+        setTimeout(function(){ btn.style.borderColor='rgba(0,0,0,.15)'; btn.style.color=''; }, 800);
+      });
+      // Mostrar mensaje de stock máximo
+      var msgEl = document.getElementById('stockMsg_'+idx);
+      if(msgEl){ msgEl.style.display='block'; setTimeout(function(){ msgEl.style.display='none'; }, 2000); }
+      return;
+    }
+  }
+
+  cart[idx].qty += delta;
+  if(cart[idx].qty <= 0) cart.splice(idx,1);
+  localStorage.setItem('dforzzeCart', JSON.stringify(cart));
+  renderCart();
+}
+
+function removeItem(idx){
+  let cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  cart.splice(idx,1);
+  localStorage.setItem('dforzzeCart', JSON.stringify(cart));
+  renderCart();
+}
+
+function goCheckout(){
+  try{
+    var u = JSON.parse(localStorage.getItem('dforzze_user'));
+    if(!u){ openAuthModal(); return; }
+    var uList = JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+    var fresh = uList.find(function(x){ return x.email===u.email; });
+    if(fresh){ u=fresh; localStorage.setItem('dforzze_user',JSON.stringify(u)); }
+    if(u.blocked){ openAuthModal(); return; }
+  }catch(e){ openAuthModal(); return; }
+
+  const cart = JSON.parse(localStorage.getItem('dforzzeCart') || '[]');
+  if(cart.length === 0) return;
+
+  // Validar stock antes de ir al checkout
+  var invProducts = [];
+  try{ invProducts = JSON.parse(localStorage.getItem('dforzze_products')||'[]'); }catch(e){}
+  var stockErrors = [];
+  cart.forEach(function(item){
+    var prod = invProducts.find(function(p){ return p.id === item.id; });
+    if(prod && prod.sizes){
+      var sd = prod.sizes.find(function(sz){ return sz.size === item.size; });
+      if(sd && item.qty > sd.stock){
+        stockErrors.push(item.name + (item.size?' ('+item.size+')':'') + ': solo hay ' + sd.stock + ' unidades');
+      }
+    }
+  });
+
+  if(stockErrors.length > 0){
+    var errEl = document.getElementById('checkoutStockErr');
+    if(errEl){
+      errEl.innerHTML = '<strong>No puedes continuar:</strong><br>' + stockErrors.join('<br>');
+      errEl.style.display = 'block';
+      errEl.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+    return;
+  }
+
+  const first = cart[0];
+  window.location.href = 'checkout.html?p=' + first.id;
+}
+
+renderCart();
+
+// ── AUTH MODAL ─────────────────────────────────────────────────
+var _aTab = 'register';
+function openAuthModal(tab){
+  _aTab = tab || 'register';
+  _authTab(_aTab);
+  document.getElementById('authM').style.display = 'flex';
+  document.getElementById('authErr').style.display = 'none';
+  document.body.style.overflow = 'hidden';
+}
+function closeAuth(){
+  document.getElementById('authM').style.display = 'none';
+  document.body.style.overflow = '';
+}
+function _authTab(t){
+  _aTab = t;
+  document.getElementById('tReg').style.cssText = 'flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;font-family:inherit;background:'+(t==='register'?'#fff':'transparent')+';color:'+(t==='register'?'#000':'rgba(255,255,255,.4)');
+  document.getElementById('tLog').style.cssText = 'flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;font-family:inherit;background:'+(t==='login'?'#fff':'transparent')+';color:'+(t==='login'?'#000':'rgba(255,255,255,.4)');
+  document.getElementById('nameF').style.display = t==='register' ? 'block' : 'none';
+  document.getElementById('aSub').textContent = t==='register' ? 'Crear cuenta' : 'Iniciar sesión';
+  document.getElementById('authErr').style.display = 'none';
+}
+function doAuth(e){
+  e.preventDefault();
+  var nm = document.getElementById('aName').value.trim();
+  var em = document.getElementById('aEmail').value.trim();
+  var pw = document.getElementById('aPass').value;
+  var err = document.getElementById('authErr');
+  if(_aTab==='register' && !nm){ err.textContent='Ingresa un nombre'; err.style.display='block'; return; }
+  if(!em){ err.textContent='Ingresa tu email'; err.style.display='block'; return; }
+  if(pw.length < 6){ err.textContent='Mínimo 6 caracteres'; err.style.display='block'; return; }
+  // Admin
+  if(em==='admin@dforzze.com' && pw==='dforzze2025'){
+    var U={name:'Admin',email:em,rank:'INNER',stickerCount:0,stickers:[],image:null,role:'ADMIN',createdAt:new Date().toLocaleDateString('es-PE'),blocked:false};
+    try{localStorage.setItem('dforzze_user',JSON.stringify(U));}catch(ex){}
+    closeAuth(); goCheckout(); return;
+  }
+  // Buscar usuario existente
+  var uList = JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+  var existing = uList.find(function(x){ return x.email===em; });
+  if(existing && existing.blocked){ err.textContent='Cuenta bloqueada. Contacta al administrador.'; err.style.display='block'; return; }
+  var U = existing || {name:_aTab==='register'?nm:em.split('@')[0], email:em, rank:'NONE', stickerCount:0, stickers:[], image:null, role:'USER', createdAt:new Date().toLocaleDateString('es-PE'), blocked:false};
+  if(!existing){ uList.push(U); localStorage.setItem('dforzze_users',JSON.stringify(uList)); }
+  try{localStorage.setItem('dforzze_user',JSON.stringify(U));}catch(ex){}
+  closeAuth();
+  goCheckout();
+}
+</script>
+
+<!-- MODAL AUTH -->
+<div id="authM" onclick="if(event.target===this)closeAuth()" style="display:none;position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.85);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:16px">
+  <div onclick="event.stopPropagation()" style="background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:0 0 80px rgba(0,0,0,.5);overflow:hidden;width:100%;max-width:400px;position:relative;animation:authIn .3s ease-out">
+    <button onclick="closeAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;line-height:1;padding:4px;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">✕</button>
+    <div style="padding:32px">
+      <div style="display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:24px">
+        <img src="images/logo.png" alt="DFORZZE" style="height:32px;width:auto;object-fit:contain;filter:brightness(0) invert(1)">
+        <span style="color:rgba(255,255,255,.5);font-weight:700;font-size:9px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+      </div>
+      <div style="display:flex;margin-bottom:24px;background:rgba(255,255,255,.04);border-radius:8px;padding:4px">
+        <button id="tReg" onclick="_authTab('register')" style="flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;background:#fff;color:#000;font-family:inherit">Crear cuenta</button>
+        <button id="tLog" onclick="_authTab('login')" style="flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,.4);font-family:inherit">Iniciar sesión</button>
+      </div>
+      <div id="authErr" style="display:none;margin-bottom:16px;padding:12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:#f87171;font-size:12px;text-align:center"></div>
+      <form onsubmit="doAuth(event)" style="display:flex;flex-direction:column;gap:16px">
+        <div id="nameF">
+          <label style="display:block;color:rgba(255,255,255,.4);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Nombre de usuario</label>
+          <input type="text" id="aName" maxlength="20" placeholder="Tu nombre" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='rgba(255,255,255,.2)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        </div>
+        <div>
+          <label style="display:block;color:rgba(255,255,255,.4);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Email</label>
+          <input type="email" id="aEmail" required placeholder="tu@email.com" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='rgba(255,255,255,.2)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        </div>
+        <div>
+          <label style="display:block;color:rgba(255,255,255,.4);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px">Contraseña</label>
+          <input type="password" id="aPass" required minlength="6" placeholder="Mínimo 6 caracteres" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;font-family:inherit" onfocus="this.style.borderColor='rgba(255,255,255,.2)'" onblur="this.style.borderColor='rgba(255,255,255,.08)'">
+        </div>
+        <button type="submit" id="aSub" style="width:100%;background:#fff;color:#000;font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:14px;border-radius:9999px;border:none;cursor:pointer;font-family:inherit" onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">Crear cuenta</button>
+      </form>
+    </div>
+  </div>
+</div>
+<style>@keyframes authIn{0%{opacity:0;transform:scale(.95) translateY(10px)}100%{opacity:1;transform:scale(1) translateY(0)}}</style>
+
+</body>
+</html>

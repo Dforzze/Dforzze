@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Task 5 - Animaciones y Celebraciones</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      padding: 20px;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { margin-bottom: 20px; font-size: 24px; }
+    .test-section { 
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    .test-result {
+      padding: 12px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .pass { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .fail { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+    .summary {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+    .summary-stat { margin: 8px 0; }
+    .stat-value { font-weight: 700; color: #fbbf24; }
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    button:hover { background: #f0f0f0; }
+    @keyframes bounce {
+      0%, 20%, 53%, 80%, 100% { transform: translate3d(0,0,0); }
+      40%, 43% { transform: translate3d(0,-30px,0); }
+      70% { transform: translate3d(0,-15px,0); }
+      90% { transform: translate3d(0,-4px,0); }
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(32px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎉 Test Task 5 - Animaciones y Celebraciones</h1>
+    
+    <button onclick="runAllTests()">Ejecutar Todos los Tests</button>
+    <button onclick="testAnimationSystem()">Test Sistema de Animaciones</button>
+    <button onclick="testNotificationSystem()">Test Sistema de Notificaciones</button>
+    
+    <div id="results"></div>
+  </div>
+
+  <script src="stickers-enhanced.js"></script>
+  <script src="stickers-tests.js"></script>
+  
+  <script>
+    // Variables globales necesarias para los tests
+    const RANK_ORDER = ['NONE', 'INITIATED', 'BUILDER', 'INNER'];
+    const RANKS = {
+      NONE: { l: 'Sin Rango', c: 'rgba(255,255,255,.5)', bg: 'rgba(255,255,255,.08)', stk: 0, icon: '◆' },
+      INITIATED: { l: 'Initiated', c: '#34d399', bg: 'rgba(52,211,153,.15)', stk: 3, icon: '▲' },
+      BUILDER: { l: 'Builder', c: '#fbbf24', bg: 'rgba(251,191,36,.15)', stk: 7, icon: '■' },
+      INNER: { l: 'Inner', c: '#c084fc', bg: 'rgba(192,132,252,.15)', stk: 15, icon: '●' }
+    };
+    
+    let U = {
+      name: 'Test User',
+      email: 'test@test.com',
+      rank: 'INITIATED',
+      stickerCount: 5,
+      stickers: [
+        { name: 'Sticker 1', code: 'DFZ-TEST01', date: '01/01/2025', type: 'standard' },
+        { name: 'Sticker 2', code: 'DFZ-TEST02', date: '02/01/2025', type: 'standard' }
+      ],
+      preferences: {
+        animationsEnabled: true,
+        celebrationsEnabled: true,
+        tutorialCompleted: false
+      },
+      achievements: ['first_sticker', 'initiated_rank'],
+      lastActivity: new Date().toISOString()
+    };
+
+    function renderResults(testName, assertions) {
+      const resultsDiv = document.getElementById('results');
+      let html = `<div class="test-section"><h3>${testName}</h3>`;
+      
+      let passed = 0;
+      assertions.forEach(assertion => {
+        const className = assertion.condition ? 'pass' : 'fail';
+        const status = assertion.condition ? '✓ PASS' : '✗ FAIL';
+        if (assertion.condition) passed++;
+        
+        html += `<div class="test-result ${className}">${status} - ${assertion.name}</div>`;
+      });
+      
+      html += `<div style="margin-top: 12px; font-weight: 600; color: #fbbf24;">${passed}/${assertions.length} assertions pasadas</div>`;
+      html += '</div>';
+      
+      resultsDiv.innerHTML += html;
+      return passed;
+    }
+
+    function testAnimationSystem() {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '<h2>Test Sistema de Animaciones</h2>';
+      
+      const assertions = [
+        {
+          name: 'AnimationSystem existe',
+          condition: typeof AnimationSystem !== 'undefined'
+        },
+        {
+          name: 'showStickerRedemptionAnimation es función',
+          condition: typeof AnimationSystem.showStickerRedemptionAnimation === 'function'
+        },
+        {
+          name: 'updateCelebrationProgress es función',
+          condition: typeof AnimationSystem.updateCelebrationProgress === 'function'
+        },
+        {
+          name: 'closeCelebration es función',
+          condition: typeof AnimationSystem.closeCelebration === 'function'
+        },
+        {
+          name: 'showRankAdvancementCelebration es función',
+          condition: typeof AnimationSystem.showRankAdvancementCelebration === 'function'
+        },
+        {
+          name: 'closeRankCelebration es función',
+          condition: typeof AnimationSystem.closeRankCelebration === 'function'
+        }
+      ];
+      
+      renderResults('Sistema de Animaciones', assertions);
+    }
+
+    function testNotificationSystem() {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '<h2>Test Sistema de Notificaciones</h2>';
+      
+      const assertions = [
+        {
+          name: 'NotificationSystem existe',
+          condition: typeof NotificationSystem !== 'undefined'
+        },
+        {
+          name: 'showToast es función',
+          condition: typeof NotificationSystem.showToast === 'function'
+        },
+        {
+          name: 'success es función',
+          condition: typeof NotificationSystem.success === 'function'
+        },
+        {
+          name: 'error es función',
+          condition: typeof NotificationSystem.error === 'function'
+        },
+        {
+          name: 'warning es función',
+          condition: typeof NotificationSystem.warning === 'function'
+        },
+        {
+          name: 'info es función',
+          condition: typeof NotificationSystem.info === 'function'
+        },
+        {
+          name: 'notificationQueue es array',
+          condition: Array.isArray(NotificationSystem.notificationQueue)
+        },
+        {
+          name: 'isProcessing es boolean',
+          condition: typeof NotificationSystem.isProcessing === 'boolean'
+        }
+      ];
+      
+      renderResults('Sistema de Notificaciones', assertions);
+    }
+
+    function runAllTests() {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+      
+      console.log('='.repeat(60));
+      console.log('SISTEMA DE STICKERS MEJORADO - TEST SUITE TASK 5');
+      console.log('='.repeat(60));
+      
+      const testFunctions = [
+        { name: 'Property 1: Data Integrity Preservation', fn: testProperty1_DataIntegrityPreservation },
+        { name: 'Property 2: UI Consistency Across Interfaces', fn: testProperty2_UIConsistency },
+        { name: 'Property 3: Progress Calculation Accuracy', fn: testProperty3_ProgressCalculation },
+        { name: 'Property 4: Animation and Feedback Consistency', fn: testProperty4_AnimationFeedback },
+        { name: 'Property 5: Code Redemption Business Logic', fn: testProperty5_CodeRedemption },
+        { name: 'Property 6: Responsive Design Adaptation', fn: testProperty6_ResponsiveDesign },
+        { name: 'Property 7: Data Migration Compatibility', fn: testProperty7_MigrationCompatibility },
+        { name: 'Property 8: Analytics Accuracy', fn: testProperty8_AnalyticsAccuracy },
+        { name: 'Property 9: Audit Trail Completeness', fn: testProperty9_AuditTrail },
+        { name: 'Property 10: Offline Data Availability', fn: testProperty10_OfflineAvailability },
+        { name: 'Property 11: Error Handling Resilience', fn: testProperty11_ErrorHandling }
+      ];
+      
+      let totalTests = 0;
+      let passedTests = 0;
+      
+      testFunctions.forEach((test, index) => {
+        const assertions = test.fn();
+        const passed = renderResults(`[Property ${index + 1}] ${test.name}`, assertions);
+        
+        assertions.forEach(a => totalTests++);
+        passedTests += passed;
+      });
+      
+      // Resumen final
+      const summaryHtml = `
+        <div class="summary">
+          <h3>📊 Resumen de Resultados</h3>
+          <div class="summary-stat">Total de Tests: <span class="stat-value">${totalTests}</span></div>
+          <div class="summary-stat">Tests Pasados: <span class="stat-value">${passedTests}</span></div>
+          <div class="summary-stat">Tests Fallidos: <span class="stat-value">${totalTests - passedTests}</span></div>
+          <div class="summary-stat">Porcentaje de Éxito: <span class="stat-value">${((passedTests / totalTests) * 100).toFixed(2)}%</span></div>
+        </div>
+      `;
+      
+      resultsDiv.innerHTML += summaryHtml;
+      
+      console.log('\n' + '='.repeat(60));
+      console.log(`RESULTADOS: ${passedTests}/${totalTests} tests pasados`);
+      console.log(`Porcentaje de éxito: ${((passedTests / totalTests) * 100).toFixed(2)}%`);
+      console.log('='.repeat(60));
+    }
+  </script>
+</body>
+</html>

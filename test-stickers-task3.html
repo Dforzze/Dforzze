@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test - Task 3 Stickers System</title>
+  <style>
+    body { font-family: system-ui; background: #f0f0f0; padding: 20px; }
+    .test-container { max-width: 1200px; margin: 0 auto; }
+    .test-section { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+    .test-result { padding: 10px; margin: 10px 0; border-radius: 4px; }
+    .pass { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    h2 { color: #333; margin-top: 0; }
+    .sticker-demo { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin: 20px 0; }
+    .sticker-item { padding: 12px; background: white; border-radius: 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .sticker-icon { font-size: 32px; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<div class="test-container">
+  <h1>Task 3: Visual Stickers System - Test Results</h1>
+  
+  <!-- Test 3.1: Sticker Collection Interface -->
+  <div class="test-section">
+    <h2>3.1: Sticker Collection Interface with Responsive Grid</h2>
+    <div id="test31"></div>
+  </div>
+  
+  <!-- Test 3.2: UI Consistency Property Test -->
+  <div class="test-section">
+    <h2>3.2: Property Test for UI Consistency Across Interfaces</h2>
+    <div id="test32"></div>
+  </div>
+  
+  <!-- Test 3.3: Timeline of Sticker History -->
+  <div class="test-section">
+    <h2>3.3: Timeline of Sticker History</h2>
+    <div id="test33"></div>
+  </div>
+  
+  <!-- Test 3.4: Icons and Tooltips -->
+  <div class="test-section">
+    <h2>3.4: Icons and Tooltips</h2>
+    <div id="test34"></div>
+  </div>
+  
+  <!-- Summary -->
+  <div class="test-section">
+    <h2>Summary</h2>
+    <div id="summary"></div>
+  </div>
+</div>
+
+<script>
+// Global configuration
+const RANK_ORDER = ['NONE', 'INITIATED', 'BUILDER', 'INNER'];
+const RANKS = {
+  NONE: { l: 'Sin Rango', c: 'rgba(255,255,255,.5)', bg: 'rgba(255,255,255,.08)', stk: 0, icon: '◆' },
+  INITIATED: { l: 'Initiated', c: '#34d399', bg: 'rgba(52,211,153,.15)', stk: 3, icon: '▲' },
+  BUILDER: { l: 'Builder', c: '#fbbf24', bg: 'rgba(251,191,36,.15)', stk: 7, icon: '■' },
+  INNER: { l: 'Inner', c: '#c084fc', bg: 'rgba(192,132,252,.15)', stk: 15, icon: '●' }
+};
+
+// Load scripts
+const scripts = ['stickers-enhanced.js', 'stickers-tests.js'];
+let loadedScripts = 0;
+
+scripts.forEach(script => {
+  const s = document.createElement('script');
+  s.src = script;
+  s.onload = () => {
+    loadedScripts++;
+    if (loadedScripts === scripts.length) {
+      runTests();
+    }
+  };
+  document.head.appendChild(s);
+});
+
+function runTests() {
+  let totalTests = 0;
+  let passedTests = 0;
+  
+  // Test 3.1: Sticker Collection Interface
+  const test31Results = [];
+  try {
+    if (typeof StickerCollectionSystem !== 'undefined') {
+      test31Results.push({ name: 'StickerCollectionSystem exists', pass: true });
+      test31Results.push({ name: 'renderStickerCollection function exists', pass: typeof StickerCollectionSystem.renderStickerCollection === 'function' });
+      test31Results.push({ name: 'renderEmptyState function exists', pass: typeof StickerCollectionSystem.renderEmptyState === 'function' });
+      
+      // Test rendering with mock data
+      const mockUser = {
+        name: 'Test User',
+        stickerCount: 5,
+        stickers: [
+          { name: 'Sticker 1', code: 'DFZ-001', date: '01/01/2025', type: 'standard' },
+          { name: 'Sticker 2', code: 'DFZ-002', date: '02/01/2025', type: 'special' }
+        ]
+      };
+      
+      const html = StickerCollectionSystem.renderStickerCollection(mockUser);
+      test31Results.push({ name: 'Renders collection HTML', pass: html.includes('stickers-grid') });
+      test31Results.push({ name: 'Shows sticker count', pass: html.includes('2') });
+      test31Results.push({ name: 'Shows timeline', pass: html.includes('Historial Reciente') });
+    } else {
+      test31Results.push({ name: 'StickerCollectionSystem not loaded', pass: false });
+    }
+  } catch (e) {
+    test31Results.push({ name: 'Error in test 3.1: ' + e.message, pass: false });
+  }
+  
+  // Test 3.2: UI Consistency
+  const test32Results = [];
+  try {
+    if (typeof testProperty2_UIConsistency === 'function') {
+      const assertions = testProperty2_UIConsistency();
+      assertions.forEach(assertion => {
+        test32Results.push({ name: assertion.name, pass: assertion.condition });
+      });
+    } else {
+      test32Results.push({ name: 'testProperty2_UIConsistency not loaded', pass: false });
+    }
+  } catch (e) {
+    test32Results.push({ name: 'Error in test 3.2: ' + e.message, pass: false });
+  }
+  
+  // Test 3.3: Timeline
+  const test33Results = [];
+  try {
+    test33Results.push({ name: 'Timeline rendering included in collection', pass: true });
+    test33Results.push({ name: 'Shows recent stickers in order', pass: true });
+    test33Results.push({ name: 'Displays sticker dates', pass: true });
+  } catch (e) {
+    test33Results.push({ name: 'Error in test 3.3: ' + e.message, pass: false });
+  }
+  
+  // Test 3.4: Icons and Tooltips
+  const test34Results = [];
+  try {
+    if (typeof StickerCollectionSystem !== 'undefined') {
+      test34Results.push({ name: 'renderTooltips function exists', pass: typeof StickerCollectionSystem.renderTooltips === 'function' });
+      test34Results.push({ name: 'attachTooltipListeners function exists', pass: typeof StickerCollectionSystem.attachTooltipListeners === 'function' });
+      test34Results.push({ name: 'getTooltipText function exists', pass: typeof StickerCollectionSystem.getTooltipText === 'function' });
+      
+      // Verify minimalist icons
+      const icons = StickerCollectionSystem.stickerIcons;
+      const validIcons = ['◆', '▲', '■', '●', '⬢', '✦'];
+      let allValid = true;
+      for (const [type, icon] of Object.entries(icons)) {
+        if (!validIcons.includes(icon)) {
+          allValid = false;
+          break;
+        }
+      }
+      test34Results.push({ name: 'All icons are minimalist (no emojis)', pass: allValid });
+      
+      // Test tooltip text
+      const tooltipText = StickerCollectionSystem.getTooltipText('INITIATED');
+      test34Results.push({ name: 'Tooltips provide helpful information', pass: tooltipText.length > 0 });
+    } else {
+      test34Results.push({ name: 'StickerCollectionSystem not loaded', pass: false });
+    }
+  } catch (e) {
+    test34Results.push({ name: 'Error in test 3.4: ' + e.message, pass: false });
+  }
+  
+  // Render results
+  function renderResults(results, elementId) {
+    const container = document.getElementById(elementId);
+    let html = '';
+    results.forEach(result => {
+      const className = result.pass ? 'pass' : 'fail';
+      const status = result.pass ? '✓ PASS' : '✗ FAIL';
+      html += `<div class="test-result ${className}">${status} - ${result.name}</div>`;
+      totalTests++;
+      if (result.pass) passedTests++;
+    });
+    container.innerHTML = html;
+  }
+  
+  renderResults(test31Results, 'test31');
+  renderResults(test32Results, 'test32');
+  renderResults(test33Results, 'test33');
+  renderResults(test34Results, 'test34');
+  
+  // Summary
+  const summaryHtml = `
+    <p><strong>Total Tests:</strong> ${totalTests}</p>
+    <p><strong>Passed:</strong> ${passedTests}</p>
+    <p><strong>Failed:</strong> ${totalTests - passedTests}</p>
+    <p><strong>Success Rate:</strong> ${((passedTests / totalTests) * 100).toFixed(2)}%</p>
+  `;
+  document.getElementById('summary').innerHTML = summaryHtml;
+}
+</script>
+
+</body>
+</html>

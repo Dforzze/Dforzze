@@ -1,0 +1,2098 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFORZZE - Entra al Proceso</title>
+<link id="dfz-favicon" rel="icon" type="image/png" href="images/logo.png">
+<script>
+(function(){
+  var img = new Image();
+  img.onload = function(){
+    var c = document.createElement('canvas');
+    c.width = 64; c.height = 64;
+    var ctx = c.getContext('2d');
+    ctx.beginPath();
+    ctx.arc(32,32,32,0,Math.PI*2);
+    ctx.fillStyle='#000';
+    ctx.fill();
+    ctx.drawImage(img,8,8,48,48);
+    ctx.globalCompositeOperation='source-atop';
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,64,64);
+    ctx.globalCompositeOperation='destination-over';
+    ctx.beginPath();
+    ctx.arc(32,32,32,0,Math.PI*2);
+    ctx.fillStyle='#000';
+    ctx.fill();
+    var link=document.getElementById('dfz-favicon');
+    if(link) link.href=c.toDataURL('image/png');
+  };
+  img.src='images/logo.png';
+})();
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#000;color:#fff;overflow-x:hidden}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:100px}
+.scrollbar-hide::-webkit-scrollbar{display:none}
+.scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+input{font-family:inherit}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    transform: translate3d(0,-30px,0);
+  }
+  70% {
+    transform: translate3d(0,-15px,0);
+  }
+  90% {
+    transform: translate3d(0,-4px,0);
+  }
+}
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes splashLogoIn{0%{opacity:0;transform:scale(.8)}100%{opacity:1;transform:scale(1)}}
+@keyframes loadingBar{0%{width:0}100%{width:100%}}
+@keyframes heroFadeIn{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes heroFadeInUp{0%{opacity:0;transform:translateY(30px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes floatParticle{0%,100%{transform:translate(0,0)}25%{transform:translate(10px,-20px)}50%{transform:translate(-5px,-10px)}75%{transform:translate(15px,5px)}}
+@keyframes pulseRing{0%{transform:scale(1);opacity:.5}100%{transform:scale(2.5);opacity:0}}
+@keyframes orbitSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes counterSpin{0%{transform:rotate(0deg)}100%{transform:rotate(-360deg)}}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:.8}}
+@keyframes nebulaDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(30px)}}
+@keyframes nebulaDriftReverse{0%,100%{transform:translateX(0)}50%{transform:translateX(-25px)}}
+@keyframes shootingStar{0%{transform:translateX(0);opacity:0}5%{opacity:.6}15%{opacity:0}100%{transform:translateX(200px);opacity:0}}
+@keyframes cosmicDust{0%,100%{transform:translate(0,0);opacity:.04}50%{transform:translate(20px,-15px);opacity:.08}}
+@keyframes centerPulse{0%,100%{transform:scale(1);opacity:.02}50%{transform:scale(1.1);opacity:.04}}
+@keyframes modalIn{0%{opacity:0;transform:scale(.95) translateY(10px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+@keyframes fadeInUp{0%{opacity:0;transform:translateY(32px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes fadeInUpCard{0%{opacity:0;transform:translateY(48px)}100%{opacity:1;transform:translateY(0)}}
+
+.hero-fade{animation:heroFadeIn 1s ease-out forwards;opacity:0}
+.hero-up{animation:heroFadeInUp 1.2s cubic-bezier(.16,1,.3,1) forwards;opacity:0}
+.float-p{animation:floatParticle 10s ease-in-out infinite}
+.pulse-r{animation:pulseRing 3s ease-out infinite}
+.twinkle{animation:twinkle 14s ease-in-out infinite}
+.nebula{animation:nebulaDrift 20s ease-in-out infinite}
+.nebula-r{animation:nebulaDriftReverse 25s ease-in-out infinite}
+.shoot{animation:shootingStar 18s ease-out infinite}
+.cosmic{animation:cosmicDust 15s ease-in-out infinite}
+.center-p{animation:centerPulse 4s ease-in-out infinite}
+.modal-anim{animation:modalIn .3s ease-out forwards}
+
+.section-anim{opacity:0;transform:translateY(32px);transition:all 1s ease-out}
+.section-anim.show{opacity:1;transform:translateY(0)}
+.card-anim{opacity:0;transform:translateY(48px);transition:all 1s ease-out}
+.card-anim.show{opacity:1;transform:translateY(0)}
+.orbit-anim{opacity:0;transition:opacity 1s}
+.orbit-anim.show{opacity:1}
+
+.step-card{transition:all .5s}
+.step-card:hover{background:rgba(39,39,42,.9)!important;border-color:rgba(255,255,255,.2)!important;transform:scale(1.15);box-shadow:0 0 50px rgba(255,255,255,.08),0 0 100px rgba(139,92,246,.05)}
+
+.benefit-card{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:4/5;cursor:pointer}
+.benefit-card img.card-img{transition:transform .7s ease-out}
+.benefit-card:hover img.card-img{transform:scale(1.1)}
+.benefit-card:hover .card-glow{opacity:1}
+.benefit-card:hover .card-title{transform:translateY(-4px)}
+
+.overlay{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.8);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:#09090b;border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:0 0 80px rgba(0,0,0,.5);overflow:hidden}
+.btn-x{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;line-height:1;padding:4px;transition:color .2s}
+.btn-x:hover{color:rgba(255,255,255,.7)}
+.inp{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 16px;color:#fff;font-size:14px;outline:none;transition:border-color .2s}
+.inp:focus{border-color:rgba(255,255,255,.2)}
+.inp::placeholder{color:rgba(255,255,255,.2)}
+.tab-b{flex:1;padding:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;border-radius:6px;border:none;cursor:pointer;transition:all .3s;background:transparent;color:rgba(255,255,255,.4)}
+.tab-b.on{background:#fff;color:#000}
+.tab-b:hover:not(.on){color:rgba(255,255,255,.6)}
+.soc-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px;color:rgba(255,255,255,.6);font-size:12px;font-weight:500;cursor:pointer;transition:all .3s;border-color:rgba(255,255,255,.08)}
+.soc-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+.act-btn{width:100%;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px 16px;cursor:pointer;transition:all .3s;text-align:left;color:#fff}
+.act-btn:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)}
+.inv-tab{flex:1;padding:6px;font-size:10px;font-weight:500;letter-spacing:.05em;border-radius:6px;border:none;cursor:pointer;transition:all .2s}
+.inv-tab.on{background:rgba(255,255,255,.08);color:#fff}
+.inv-tab.off{background:transparent;color:rgba(255,255,255,.25)}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media(max-width:767px){
+  /* Header */
+  #hdrIn{padding:0 16px!important;height:56px!important}
+  #hdrLogo{height:36px!important}
+  #hdrTxt{font-size:11px!important}
+  #ctaBtn{padding:9px 16px!important;font-size:11px!important}
+  #profBtn{padding:6px 12px!important;font-size:11px!important}
+  #profNmSm{max-width:60px!important}
+
+  /* Hero */
+  #heroVid{object-position:center}
+  .hero-content-pad{padding:64px 16px 0!important}
+  .hero-desc{font-size:15px!important;margin-bottom:28px!important}
+  .hero-btns{flex-direction:column!important;align-items:stretch!important;gap:10px!important}
+  .hero-btns a,.hero-btns button{width:100%!important;justify-content:center!important;padding:14px 20px!important}
+
+  /* Benefits section */
+  #benefits{padding:48px 0!important}
+  #benefits .inner-pad{padding:0 16px!important}
+  #benHead{margin-bottom:28px!important}
+  .benefit-card{aspect-ratio:3/4!important}
+  .benefit-card .card-bottom{padding:20px!important}
+  .benefit-card h3{font-size:18px!important}
+
+  /* Steps section */
+  #steps{padding:48px 0!important}
+  #steps .inner-pad{padding:0 16px!important}
+  #stepHead{margin-bottom:36px!important}
+
+  /* Mobile steps scroll */
+  #mobScroll{gap:10px!important;padding-left:16px!important;padding-right:16px!important;margin:0 -16px!important}
+
+  /* Footer */
+  footer{padding:40px 0 24px!important}
+  footer .inner-pad{padding:0 16px!important}
+  footer .footer-grid{grid-template-columns:1fr 1fr!important;gap:28px!important;margin-bottom:36px!important}
+  footer .footer-brand{grid-column:span 2!important}
+
+  /* Auth modal */
+  #authM > div{border-radius:12px!important;margin:0 8px!important}
+  #authM .auth-pad{padding:24px 20px!important}
+
+  /* Profile modal */
+  #profM .modal-box{width:100%!important;max-width:100%!important;max-height:100%!important;border-radius:20px 20px 0 0!important;margin-top:auto!important}
+  #profM{align-items:flex-end!important;padding:0!important}
+  #profM .prof-pad{padding:24px 20px!important}
+
+  /* Inventory modal */
+  #invM .modal-box{width:100%!important;max-width:100%!important;max-height:92vh!important;border-radius:20px 20px 0 0!important;margin-top:auto!important}
+  #invM{align-items:flex-end!important;padding:0!important}
+  #invM .inv-pad{padding:20px 16px!important}
+
+  /* Redeem modal */
+  #redM .modal-box{width:100%!important;max-width:100%!important;border-radius:20px 20px 0 0!important;margin-top:auto!important}
+  #redM{align-items:flex-end!important;padding:0!important}
+  #redM .red-pad{padding:24px 20px!important}
+
+  /* Step hover scale off on mobile */
+  .step-card:hover{transform:none!important}
+
+  /* Rank timeline */
+  .rank-timeline-wrap{display:block!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important;margin:0 -4px!important;padding:0 4px!important}
+  .rank-timeline-wrap .rank-timeline-inner{min-width:300px!important;padding-bottom:4px!important}
+  .milestone-icon{width:32px!important;height:32px!important;font-size:14px!important}
+  .milestone-label{font-size:9px!important}
+}
+
+@media(max-width:400px){
+  #hdrTxt{display:none!important}
+  #ctaBtn{padding:8px 12px!important;font-size:10px!important}
+  footer .footer-grid{grid-template-columns:1fr!important}
+  footer .footer-brand{grid-column:span 1!important}
+}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash" onclick="killSplash()" style="position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s;cursor:pointer">
+<div style="animation:splashLogoIn 1s ease-out forwards">
+<img src="images/logo.png" alt="DFORZZE" style="height:96px;width:auto;filter:brightness(0) invert(1)">
+</div>
+<div style="margin-top:32px;width:128px;height:2px;background:rgba(255,255,255,.1);border-radius:9999px;overflow:hidden">
+<div style="height:100%;background:rgba(255,255,255,.8);border-radius:9999px;animation:loadingBar 2s ease-in-out forwards"></div>
+</div>
+<p style="margin-top:20px;color:rgba(255,255,255,.25);font-size:11px;letter-spacing:.1em;text-transform:uppercase">Click para entrar</p>
+</div>
+<script>
+function killSplash(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){try{s.remove()}catch(e){}},600)}}
+setTimeout(killSplash,3000);
+</script>
+
+<!-- SCROLL PROGRESS -->
+<div style="position:fixed;top:0;left:0;right:0;z-index:60;height:2px">
+<div id="scrollProg" style="height:100%;background:rgba(255,255,255,.7);width:0;transition:width .15s ease-out"></div>
+</div>
+
+<!-- MAIN -->
+<div style="min-height:100vh;display:flex;flex-direction:column;background:#000">
+
+<!-- HEADER -->
+<header id="hdr" style="position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(12px);background:rgba(255,255,255,.95);transition:all .5s">
+<div id="hdrIn" style="max-width:1280px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;transition:height .5s;height:64px">
+<div style="display:flex;align-items:center;gap:2px">
+<img id="hdrLogo" src="images/logo.png" alt="DFORZZE" style="height:48px;width:auto;object-fit:contain;transition:height .5s">
+<span id="hdrTxt" style="color:rgba(0,0,0,.7);font-weight:700;letter-spacing:.3em;text-transform:uppercase;font-size:14px;transition:font-size .5s">DFORZZE</span>
+</div>
+<nav id="deskNav" style="display:none;align-items:center;gap:32px">
+<a href="about.html" style="color:rgba(0,0,0,.8);font-weight:500;font-size:14px;letter-spacing:.05em;text-transform:uppercase;transition:color .3s">About</a>
+<a href="dforzze.html" style="color:rgba(0,0,0,.8);font-weight:500;font-size:14px;letter-spacing:.05em;text-transform:uppercase;transition:color .3s">Membership</a>
+<a href="tienda.html" style="color:rgba(0,0,0,.8);font-weight:500;font-size:14px;letter-spacing:.05em;text-transform:uppercase;transition:color .3s">Tienda</a>
+</nav>
+<button id="ctaBtn" onclick="openAuth('register')" style="background:#000;color:#fff;font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:12px 28px;border-radius:9999px;border:none;transition:all .2s">Entrar al proceso</button>
+<button id="profBtn" onclick="openProfile()" style="display:none;background:#000;color:#fff;font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:8px 20px;border-radius:9999px;border:none;transition:all .2s;align-items:center;gap:8px">
+<span id="profAvSm" style="width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.2);display:inline-flex;align-items:center;justify-content:center;overflow:hidden;font-size:11px;font-weight:700"></span>
+<span id="profNmSm" style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+</button>
+<button id="mobBtn" style="display:none;background:none;border:none;color:#000;cursor:pointer;padding:4px" onclick="toggleMob()">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+</div>
+<div id="mobMenu" style="max-height:0;overflow:hidden;transition:all .4s ease-in-out;background:#fff;border-top:1px solid #f3f4f6">
+<div style="padding:16px 24px;display:flex;flex-direction:column;gap:16px">
+<a href="about.html" onclick="closeMob()" style="color:rgba(0,0,0,.8);font-weight:500;font-size:14px;letter-spacing:.05em;text-transform:uppercase">About</a>
+<a href="dforzze.html" onclick="closeMob()" style="color:rgba(0,0,0,.8);font-weight:500;font-size:14px;letter-spacing:.05em;text-transform:uppercase">Membership</a>
+<a href="tienda.html" style="color:rgba(0,0,0,.8);font-weight:500;font-size:14px;letter-spacing:.05em;text-transform:uppercase">Tienda</a>
+<button onclick="openAuth('register');closeMob()" style="background:#000;color:#fff;font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:12px 28px;border-radius:9999px;border:none">Entrar al proceso</button>
+</div>
+</div>
+</header>
+
+<!-- HERO -->
+<section style="position:relative;flex:1;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden">
+<div style="position:absolute;inset:0;overflow:hidden">
+<video autoplay loop muted playsinline poster="images/video-poster.jpg" id="heroVid" style="width:100%;height:100%;object-fit:cover;will-change:transform">
+<source src="video/promo.mp4" type="video/mp4">
+</video>
+<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),rgba(0,0,0,.5) 50%,rgba(0,0,0,.3))"></div>
+</div>
+<div style="position:relative;z-index:10;max-width:1280px;margin:0 auto;padding:80px 24px 0;width:100%" class="hero-content-pad">
+<div style="max-width:672px;margin:0 auto;text-align:center">
+<p class="hero-fade" style="color:#d1d5db;font-weight:500;font-size:14px;letter-spacing:.25em;text-transform:uppercase;margin-bottom:20px;animation-delay:.3s">Membresía DFORZZE</p>
+<h1 style="color:#fff;font-weight:800;font-size:clamp(48px,10vw,96px);letter-spacing:-.02em;line-height:1.05;margin-bottom:24px">
+<span class="hero-up" style="display:inline-block;animation-delay:.5s">ENTRA AL</span><br>
+<span class="hero-up" style="display:inline-block;animation-delay:.7s">PROCESO</span>
+</h1>
+<p class="hero-fade hero-desc" style="color:rgba(255,255,255,.9);font-size:18px;line-height:1.625;margin-bottom:40px;max-width:512px;margin-left:auto;margin-right:auto;animation-delay:.9s">Más que comprar ropa. DFORZZE construye una comunidad con acceso, progreso y beneficios reales para quienes de verdad se mueven con la marca.</p>
+<div class="hero-fade hero-btns" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;animation-delay:1.1s">
+<button onclick="openAuth('register')" style="display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#000;font-weight:500;font-size:14px;letter-spacing:.05em;text-transform:uppercase;padding:14px 28px;border-radius:9999px;border:2px solid #000;transition:all .3s" onmouseover="this.style.background='#000';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#000'">Entrar al proceso →</button>
+<a href="catalogo.html" style="display:inline-flex;align-items:center;justify-content:center;background:#27272a;color:#fff;font-weight:500;font-size:14px;letter-spacing:.05em;text-transform:uppercase;padding:14px 28px;border-radius:9999px;border:2px solid #27272a;transition:all .3s" onmouseover="this.style.background='#3f3f46';this.style.borderColor='#52525b'" onmouseout="this.style.background='#27272a';this.style.borderColor='#27272a'">Explorar Tienda →</a>
+</div>
+</div>
+</div>
+<div id="particles" style="position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden"></div>
+</section>
+
+<!-- BENEFITS -->
+<section id="benefits" style="background:#fff;padding:80px 0;position:relative">
+<div style="max-width:1280px;margin:0 auto;padding:0 24px" class="inner-pad">
+<div class="section-anim" id="benHead" style="margin-bottom:40px">
+<h2 style="color:#000;font-weight:500;font-size:clamp(30px,5vw,48px);letter-spacing:-.02em;margin-bottom:16px">Member Benefits</h2>
+<p style="color:rgba(0,0,0,.5);font-size:16px;line-height:1.625;max-width:448px">Descubre lo que significa ser parte de DFORZZE.</p>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+<div class="benefit-card card-anim" data-d="0">
+<img src="images/benefit-comunidad.jpg" alt="Comunidad" class="card-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),rgba(0,0,0,.3) 50%,transparent)"></div>
+<div class="card-glow" style="position:absolute;inset:0;border-radius:8px;opacity:0;transition:opacity .5s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15),0 0 40px rgba(255,255,255,.05)"></div>
+<span style="position:absolute;top:20px;left:20px;color:rgba(255,255,255,.3);font-weight:500;font-size:12px;letter-spacing:.2em">01</span>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:32px;display:flex;flex-direction:column;gap:12px" class="card-bottom">
+<h3 class="card-title" style="color:#fff;font-weight:700;font-size:24px;letter-spacing:-.01em;transition:transform .5s">Comunidad & Acceso</h3>
+<p style="color:rgba(255,255,255,.8);font-size:14px;line-height:1.625">No es solo entrar. Es estar donde otros no están.</p>
+<a href="comunidad.html" style="display:inline-flex;align-items:center;background:#fff;color:#000;font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:10px 24px;border-radius:9999px;transition:all .3s;margin-top:8px;width:fit-content" onmouseover="this.style.background='#000';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#000'">Explorar →</a>
+</div>
+</div>
+<div class="benefit-card card-anim" data-d="150">
+<img src="images/benefit-exclusividad.jpg" alt="Exclusividad" class="card-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),rgba(0,0,0,.3) 50%,transparent)"></div>
+<div class="card-glow" style="position:absolute;inset:0;border-radius:8px;opacity:0;transition:opacity .5s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15),0 0 40px rgba(255,255,255,.05)"></div>
+<span style="position:absolute;top:20px;left:20px;color:rgba(255,255,255,.3);font-weight:500;font-size:12px;letter-spacing:.2em">02</span>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:32px;display:flex;flex-direction:column;gap:12px" class="card-bottom">
+<h3 class="card-title" style="color:#fff;font-weight:700;font-size:24px;letter-spacing:-.01em;transition:transform .5s">Exclusividad & Producto</h3>
+<p style="color:rgba(255,255,255,.8);font-size:14px;line-height:1.625">No todos visten lo mismo. Y se nota.</p>
+<a href="exclusividad.html" style="display:inline-flex;align-items:center;background:#fff;color:#000;font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:10px 24px;border-radius:9999px;transition:all .3s;margin-top:8px;width:fit-content" onmouseover="this.style.background='#000';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#000'">Explorar →</a>
+</div>
+</div>
+<div class="benefit-card card-anim" data-d="300">
+<img src="images/benefit-progreso.jpg" alt="Progreso" class="card-img" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),rgba(0,0,0,.3) 50%,transparent)"></div>
+<div class="card-glow" style="position:absolute;inset:0;border-radius:8px;opacity:0;transition:opacity .5s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15),0 0 40px rgba(255,255,255,.05)"></div>
+<span style="position:absolute;top:20px;left:20px;color:rgba(255,255,255,.3);font-weight:500;font-size:12px;letter-spacing:.2em">03</span>
+<div style="position:absolute;bottom:0;left:0;right:0;padding:32px;display:flex;flex-direction:column;gap:12px" class="card-bottom">
+<h3 class="card-title" style="color:#fff;font-weight:700;font-size:24px;letter-spacing:-.01em;transition:transform .5s">Proceso & Progreso</h3>
+<p style="color:rgba(255,255,255,.8);font-size:14px;line-height:1.625">Convertirse es la verdadera recompensa.</p>
+<a href="progreso.html" style="display:inline-flex;align-items:center;background:#fff;color:#000;font-weight:500;font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:10px 24px;border-radius:9999px;transition:all .3s;margin-top:8px;width:fit-content" onmouseover="this.style.background='#000';this.style.color='#fff'" onmouseout="this.style.background='#fff';this.style.color='#000'">Explorar →</a>
+</div>
+</div>
+</div>
+</div>
+
+</section>
+
+<!-- CÓMO ENTRAR -->
+<section id="steps" style="background:#000;padding:80px 0;position:relative;overflow:hidden"><div style="pointer-events:none;position:absolute;inset:0;z-index:0">
+<div class="nebula" style="position:absolute;top:25%;left:25%;width:500px;height:500px;border-radius:50%;background:rgba(88,28,135,.1);filter:blur(120px)"></div>
+<div class="nebula-r" style="position:absolute;bottom:25%;right:25%;width:400px;height:400px;border-radius:50%;background:rgba(30,58,138,.08);filter:blur(100px)"></div>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;border-radius:50%;background:rgba(30,27,75,.15);filter:blur(150px)"></div>
+</div>
+<div id="starsC" style="pointer-events:none;position:absolute;inset:0;z-index:1"></div>
+<div style="pointer-events:none;position:absolute;inset:0;z-index:3">
+<div class="shoot" style="position:absolute;top:15%;left:10%;width:80px;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,.4),transparent)"></div>
+<div class="shoot" style="position:absolute;top:40%;right:15%;width:60px;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,.3),transparent);animation-delay:4s"></div>
+<div class="shoot" style="position:absolute;bottom:30%;left:30%;width:70px;height:1px;background:linear-gradient(to right,transparent,rgba(255,255,255,.25),transparent);animation-delay:8s"></div>
+</div>
+<div style="max-width:1280px;margin:0 auto;padding:0 24px;position:relative;z-index:10" class="inner-pad">
+<div class="section-anim" id="stepHead" style="margin-bottom:64px">
+<h2 style="color:#fff;font-weight:500;font-size:clamp(30px,5vw,48px);letter-spacing:-.02em;margin-bottom:16px">Cómo Entrar</h2>
+<p style="color:rgba(255,255,255,.4);font-size:16px;line-height:1.625;max-width:448px">Tu camino dentro de DFORZZE. Paso a paso.</p>
+</div>
+
+<!-- Desktop Orbit -->
+<div class="orbit-anim" id="orbitC" style="display:none;align-items:center;justify-content:center">
+<div style="position:relative;width:780px;height:780px">
+<div style="position:absolute;inset:40px;border-radius:50%;border:1px solid rgba(255,255,255,.03)"></div>
+<div style="position:absolute;inset:80px;border-radius:50%;border:1px solid rgba(255,255,255,.05);box-shadow:0 0 15px rgba(255,255,255,.01)"></div>
+<div style="position:absolute;inset:120px;border-radius:50%;border:1px solid rgba(255,255,255,.08);box-shadow:0 0 20px rgba(255,255,255,.02)"></div>
+<div style="position:absolute;inset:200px;border-radius:50%;border:1px solid rgba(255,255,255,.04)"></div>
+<div style="position:absolute;inset:260px;border-radius:50%;border:1px solid rgba(255,255,255,.06);box-shadow:0 0 10px rgba(255,255,255,.01)"></div>
+<div style="position:absolute;inset:300px;border-radius:50%;border:1px solid rgba(255,255,255,.03)"></div>
+<div class="twinkle" style="position:absolute;top:80px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2)"></div>
+<div class="twinkle" style="position:absolute;top:50%;left:80px;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:rgba(196,181,253,.2);animation-delay:1s"></div>
+<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;display:flex;flex-direction:column;align-items:center">
+<div style="position:relative">
+<div class="center-p" style="position:absolute;inset:-80px;border-radius:50%;background:rgba(255,255,255,.02);filter:blur(40px)"></div>
+<div class="center-p" style="position:absolute;inset:-48px;border-radius:50%;background:rgba(168,85,247,.03);filter:blur(25px);animation-delay:1s"></div>
+<div style="position:absolute;inset:-24px;border-radius:50%;background:rgba(255,255,255,.05);filter:blur(10px)"></div>
+<img src="images/logo.png" alt="DFORZZE" style="position:relative;height:80px;width:auto;object-fit:contain;filter:brightness(0) invert(1)">
+</div>
+<span style="color:rgba(255,255,255,.25);font-weight:700;font-size:10px;letter-spacing:.3em;text-transform:uppercase;margin-top:16px">DFORZZE</span>
+<span style="color:rgba(255,255,255,.1);font-size:8px;letter-spacing:.15em;text-transform:uppercase;margin-top:4px">Members Club</span>
+</div>
+<div id="orbitSpin" style="position:absolute;inset:0;animation:orbitSpin 90s linear infinite"></div>
+<div id="orbitStars" style="pointer-events:none;position:absolute;inset:0"></div>
+</div>
+</div>
+
+<!-- Mobile Steps -->
+<div id="mobSteps" style="position:relative;display:none">
+<div style="pointer-events:none;position:absolute;inset:-40px;z-index:0">
+<div style="position:absolute;top:0;left:0;width:200px;height:200px;border-radius:50%;background:rgba(88,28,135,.1);filter:blur(60px)"></div>
+<div style="position:absolute;bottom:0;right:0;width:200px;height:200px;border-radius:50%;background:rgba(30,58,138,.08);filter:blur(50px)"></div>
+</div>
+<div class="scrollbar-hide" style="position:relative;z-index:10;display:flex;gap:12px;overflow-x:auto;padding-bottom:16px;margin:0 -24px;padding-left:24px;padding-right:24px;scroll-snap-type:x mandatory" id="mobScroll"></div>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer style="background:#000;border-top:1px solid rgba(255,255,255,.04);padding:60px 0 32px;margin-top:auto">
+<div style="max-width:1280px;margin:0 auto;padding:0 24px" class="inner-pad">
+
+  <!-- Top row -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:40px;margin-bottom:56px" class="footer-grid">
+
+    <!-- Brand -->
+    <div style="grid-column:span 1" class="footer-brand">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px">
+        <img src="images/logo.png" alt="DFORZZE" style="height:28px;width:auto;object-fit:contain;filter:brightness(0) invert(1);opacity:.7">
+        <span style="color:rgba(255,255,255,.5);font-weight:700;font-size:9px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+      </div>
+      <p style="color:rgba(255,255,255,.25);font-size:13px;line-height:1.7;max-width:220px">Más que ropa. Una comunidad con acceso, progreso y beneficios reales.</p>
+      <div style="display:flex;align-items:center;gap:16px;margin-top:20px">
+        <a href="https://instagram.com/dforzze" target="_blank" style="color:rgba(255,255,255,.25);transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.25)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+        </a>
+        <a href="https://tiktok.com/@dforzze" target="_blank" style="color:rgba(255,255,255,.25);transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.25)'">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 0 0-.79-.05A6.34 6.34 0 0 0 3.16 15.2a6.34 6.34 0 0 0 6.33 6.33 6.34 6.34 0 0 0 6.34-6.33V8.88a8.28 8.28 0 0 0 4.76 1.5V6.93a4.84 4.84 0 0 1-1-.24z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Membership -->
+    <div>
+      <p style="color:rgba(255,255,255,.2);font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px">Membresía</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="comunidad.html" style="color:rgba(255,255,255,.35);font-size:13px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Comunidad & Acceso</a>
+        <a href="exclusividad.html" style="color:rgba(255,255,255,.35);font-size:13px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Exclusividad & Producto</a>
+        <a href="progreso.html" style="color:rgba(255,255,255,.35);font-size:13px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Proceso & Progreso</a>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div>
+      <p style="color:rgba(255,255,255,.2);font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px">Información</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="envios.html" style="color:rgba(255,255,255,.35);font-size:13px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Envíos y Devoluciones</a>
+        <a href="terminos.html" style="color:rgba(255,255,255,.35);font-size:13px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Términos y Condiciones</a>
+        <a href="privacidad.html" style="color:rgba(255,255,255,.35);font-size:13px;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.35)'">Política de Privacidad</a>
+      </div>
+    </div>
+
+    <!-- Members Club -->
+    <div>
+      <p style="color:rgba(255,255,255,.2);font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;margin-bottom:16px">Members Club</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="color:rgba(255,255,255,.2);font-size:13px">Initiated</span>
+        <span style="color:rgba(168,85,247,.5);font-size:13px">Builder</span>
+        <span style="color:rgba(255,255,255,.5);font-size:13px">Inner</span>
+      </div>
+      <div style="margin-top:20px">
+        <button onclick="openAuth('register')" style="display:inline-flex;align-items:center;background:#fff;color:#000;font-weight:600;font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:10px 20px;border-radius:9999px;border:none;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">Entrar →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Divider -->
+  <div style="height:1px;background:rgba(255,255,255,.05);margin-bottom:24px"></div>
+
+  <!-- Bottom row -->
+  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px">
+    <p style="color:rgba(255,255,255,.12);font-size:11px;letter-spacing:.05em">© 2025 DFORZZE. Todos los derechos reservados.</p>
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <a href="terminos.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Términos</a>
+      <a href="envios.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Envíos</a>
+      <a href="privacidad.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Privacidad</a>
+    </div>
+  </div>
+
+</div>
+</footer>
+</div>
+
+<!-- AUTH MODAL -->
+<div id="authM" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeAuth()">
+<div onclick="event.stopPropagation()" style="background:#fff;border-radius:4px;width:100%;max-width:420px;position:relative;animation:modalIn .25s ease-out">
+  <button onclick="closeAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(0,0,0,.3);cursor:pointer;font-size:20px;line-height:1;padding:4px;transition:color .2s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.3)'">✕</button>
+  <div style="padding:40px 36px 32px">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:32px">
+      <img src="images/logo.png" alt="DFORZZE" style="height:28px;width:auto;object-fit:contain">
+      <span style="color:#000;font-weight:800;font-size:10px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
+    </div>
+    <div style="display:flex;gap:0;margin-bottom:28px;border-bottom:2px solid #f0f0f0">
+      <button id="tReg" onclick="authTab('register')" style="flex:1;padding:10px 0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;background:none;cursor:pointer;color:#000;border-bottom:2px solid #000;margin-bottom:-2px;transition:all .2s">Crear cuenta</button>
+      <button id="tLog" onclick="authTab('login')" style="flex:1;padding:10px 0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;background:none;cursor:pointer;color:rgba(0,0,0,.3);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s">Iniciar sesión</button>
+    </div>
+    <div id="authErr" style="display:none;margin-bottom:16px;padding:12px;background:#fff0f0;border-left:3px solid #e00;border-radius:2px;color:#c00;font-size:12px;font-weight:500"></div>
+    <form onsubmit="doAuth(event)" style="display:flex;flex-direction:column;gap:14px">
+      <div id="nameF">
+        <label style="display:block;color:#000;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Nombre</label>
+        <input type="text" id="aName" placeholder="Tu nombre" maxlength="20" style="width:100%;border:1.5px solid #e0e0e0;border-radius:2px;padding:12px 14px;font-size:14px;color:#000;outline:none;transition:border-color .2s;font-family:inherit;background:#fff" onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#e0e0e0'">
+      </div>
+      <div>
+        <label style="display:block;color:#000;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Email</label>
+        <input type="email" id="aEmail" placeholder="tu@email.com" required style="width:100%;border:1.5px solid #e0e0e0;border-radius:2px;padding:12px 14px;font-size:14px;color:#000;outline:none;transition:border-color .2s;font-family:inherit;background:#fff" onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#e0e0e0'">
+      </div>
+      <div>
+        <label style="display:block;color:#000;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Contraseña</label>
+        <input type="password" id="aPass" placeholder="Mínimo 6 caracteres" required minlength="6" style="width:100%;border:1.5px solid #e0e0e0;border-radius:2px;padding:12px 14px;font-size:14px;color:#000;outline:none;transition:border-color .2s;font-family:inherit;background:#fff" onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#e0e0e0'">
+      </div>
+      <button type="submit" id="aSub" style="width:100%;background:#000;color:#fff;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:15px;border:none;border-radius:2px;cursor:pointer;margin-top:4px;transition:background .2s" onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">Crear cuenta</button>
+    </form>
+  </div>
+</div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div id="profM" class="overlay" style="display:none">
+<div class="modal-box modal-anim" style="width:90%;max-width:480px;max-height:90vh;overflow-y:auto">
+<button class="btn-x" onclick="closeProf()">×</button>
+<div style="padding:32px" class="prof-pad">
+
+<!-- Header -->
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+<div id="profAv" style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:24px;font-weight:700;color:#fff;position:relative;cursor:pointer" onclick="document.getElementById('avInp').click()">
+<input type="file" id="avInp" accept="image/*" style="display:none" onchange="changeAv(event)">
+</div>
+<div style="flex:1">
+<div id="nameShow" style="display:flex;align-items:center;gap:8px">
+<h3 id="profNm" style="color:#fff;font-weight:700;font-size:20px;margin:0"></h3>
+<button onclick="editName()" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;padding:4px">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+</button>
+</div>
+<div id="nameEdit" style="display:none;align-items:center;gap:8px">
+<input type="text" id="nmInp" style="flex:1;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:4px;padding:6px 8px;color:#fff;font-size:16px;font-weight:700">
+<button onclick="saveNm()" style="background:#fff;color:#000;border:none;padding:6px 12px;border-radius:4px;font-size:12px;font-weight:600">✓</button>
+<button onclick="cancelNm()" style="background:rgba(255,255,255,.1);color:#fff;border:none;padding:6px 12px;border-radius:4px;font-size:12px">×</button>
+</div>
+<p id="profEm" style="color:rgba(255,255,255,.6);font-size:14px;margin:4px 0 0"></p>
+</div>
+</div>
+
+<!-- Progreso Visual Mejorado -->
+<div class="progress-container" style="padding:20px;background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);border-radius:12px;margin:16px 0">
+<div class="rank-timeline rank-timeline-wrap" style="display:flex;justify-content:space-between;margin-bottom:20px;position:relative">
+<div class="rank-timeline-inner" style="display:flex;justify-content:space-between;width:100%;position:relative"><div class="rank-timeline-bg" style="position:absolute;top:20px;left:0;right:0;height:2px;background:linear-gradient(to right,#e9ecef,#34d399,#fbbf24,#c084fc);z-index:1"></div>
+<div class="rank-milestone" data-rank="NONE" style="display:flex;flex-direction:column;align-items:center;position:relative;z-index:2">
+<div class="milestone-icon" style="width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;border:3px solid #e9ecef;transition:all 0.3s ease">◆</div>
+<span class="milestone-label" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:8px;color:#6c757d">Sin Status</span>
+</div>
+<div class="rank-milestone" data-rank="INITIATED" style="display:flex;flex-direction:column;align-items:center;position:relative;z-index:2">
+<div class="milestone-icon" style="width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;border:3px solid #e9ecef;transition:all 0.3s ease">▲</div>
+<span class="milestone-label" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:8px;color:#6c757d">Initiated</span>
+</div>
+<div class="rank-milestone" data-rank="BUILDER" style="display:flex;flex-direction:column;align-items:center;position:relative;z-index:2">
+<div class="milestone-icon" style="width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;border:3px solid #e9ecef;transition:all 0.3s ease">■</div>
+<span class="milestone-label" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:8px;color:#6c757d">Builder</span>
+</div>
+<div class="rank-milestone" data-rank="INNER" style="display:flex;flex-direction:column;align-items:center;position:relative;z-index:2">
+<div class="milestone-icon" style="width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;border:3px solid #e9ecef;transition:all 0.3s ease">●</div>
+<span class="milestone-label" style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-top:8px;color:#6c757d">Inner</span>
+</div>
+</div><!-- /rank-timeline-inner -->
+</div><!-- /rank-timeline -->
+
+<div class="progress-bar-container" style="position:relative;height:8px;background:#e9ecef;border-radius:4px;overflow:hidden;margin:20px 0">
+<div class="progress-bar-fill" id="progressFill" style="height:100%;background:linear-gradient(90deg,#34d399,#fbbf24,#c084fc);border-radius:4px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);position:relative;width:0">
+<div class="progress-shimmer" style="position:absolute;top:0;right:0;width:20px;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3));animation:shimmer 2s infinite"></div>
+</div>
+<div class="progress-indicators" style="position:absolute;top:0;left:0;right:0;height:100%">
+<span class="progress-marker" data-position="0" style="position:absolute;top:-2px;width:4px;height:12px;background:#fff;border:1px solid #dee2e6;border-radius:2px;left:0"></span>
+<span class="progress-marker" data-position="20" style="position:absolute;top:-2px;width:4px;height:12px;background:#fff;border:1px solid #dee2e6;border-radius:2px;left:20%"></span>
+<span class="progress-marker" data-position="47" style="position:absolute;top:-2px;width:4px;height:12px;background:#fff;border:1px solid #dee2e6;border-radius:2px;left:47%"></span>
+<span class="progress-marker" data-position="100" style="position:absolute;top:-2px;width:4px;height:12px;background:#fff;border:1px solid #dee2e6;border-radius:2px;left:100%"></span>
+</div>
+</div>
+
+<div class="progress-info" style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#6c757d">
+<div class="current-progress" style="font-weight:600">
+<span id="currentStickers">0</span> / <span id="nextRankStickers">3</span> stickers
+</div>
+<div class="progress-percentage" id="progressPercentage" style="font-weight:700;color:#000">0%</div>
+</div>
+</div>
+
+<!-- Status Actual -->
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+<div>
+<p style="color:rgba(255,255,255,.6);font-size:12px;margin-bottom:4px">Status Actual</p>
+<span id="rankB" style="display:inline-block;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em">Sin Status</span>
+</div>
+<div style="text-align:right">
+<p style="color:rgba(255,255,255,.6);font-size:12px;margin-bottom:4px">Stickers</p>
+<span id="stkCnt" style="color:#fff;font-size:16px;font-weight:700">0 stickers</span>
+</div>
+</div>
+
+
+<!-- Actions -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+<button class="act-btn" onclick="openRed()">
+<div style="width:32px;height:32px;background:rgba(255,255,255,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px">🎴</div>
+<div>
+<p style="font-weight:600;font-size:13px;margin-bottom:2px">Canjear Código</p>
+<p style="font-size:11px;color:rgba(255,255,255,.6)">Añadir stickers</p>
+</div>
+</button>
+<button class="act-btn" onclick="openInv()">
+<div style="width:32px;height:32px;background:rgba(255,255,255,.1);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px">📦</div>
+<div>
+<p style="font-weight:600;font-size:13px;margin-bottom:2px">Mi Colección</p>
+<p style="font-size:11px;color:rgba(255,255,255,.6)">Ver stickers</p>
+</div>
+</button>
+</div>
+
+<!-- Logros Section -->
+<div style="background:rgba(255,255,255,.05);border-radius:8px;padding:16px;margin-bottom:20px">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+<h4 style="color:#fff;font-size:14px;font-weight:600;margin:0">Logros</h4>
+<span id="achievementCount" style="color:rgba(255,255,255,.6);font-size:12px">0/5</span>
+</div>
+<div id="achievementsList" style="max-height:120px;overflow-y:auto">
+<!-- Logros se generan dinámicamente -->
+</div>
+</div>
+
+<!-- Admin Panel -->
+<button id="adminPanelBtn" onclick="window.open('admin.html','_blank')" style="display:none;width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:16px">Panel de Administración</button>
+
+<!-- Logout -->
+<button onclick="doLogout()" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer">Cerrar Sesión</button>
+
+</div>
+</div>
+</div>
+
+<!-- INVENTORY MODAL -->
+<div id="invM" class="overlay" style="display:none">
+<div class="modal-box modal-anim" style="width:90%;max-width:480px;max-height:85vh;display:flex;flex-direction:column">
+<button class="btn-x" onclick="closeInv()">×</button>
+<div style="padding:28px;flex:1;display:flex;flex-direction:column;overflow:hidden" class="inv-pad">
+
+<!-- Header -->
+<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:24px">
+<div>
+<h3 style="color:#fff;font-weight:700;font-size:16px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px">Mi Colección</h3>
+<p id="invSubtitle" style="color:rgba(255,255,255,.35);font-size:12px;margin:0">0 stickers</p>
+</div>
+<span id="stickerCountDisplay" style="font-size:28px;font-weight:800;color:#fff;line-height:1">0</span>
+</div>
+
+<!-- Lista de stickers -->
+<div id="stickersShowcase" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:1px"></div>
+
+</div>
+</div>
+</div>
+
+<!-- REDEEM MODAL -->
+<div id="redM" class="overlay" style="display:none">
+<div class="modal-box modal-anim" style="width:90%;max-width:380px">
+<button class="btn-x" onclick="closeRed()">×</button>
+<div style="padding:32px" class="red-pad">
+<h3 style="color:#fff;font-weight:700;font-size:16px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px">Canjear Código</h3>
+<p style="color:rgba(255,255,255,.35);font-size:13px;margin-bottom:24px">Ingresa el código para sumar un sticker a tu colección.</p>
+
+<input type="text" id="redInp" placeholder="DFZ-XXXXXX" maxlength="20"
+  style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:14px 16px;color:#fff;font-size:15px;font-family:monospace;letter-spacing:.12em;text-transform:uppercase;text-align:center;outline:none;transition:border-color .2s;margin-bottom:12px"
+  onfocus="this.style.borderColor='rgba(255,255,255,.3)'" onblur="this.style.borderColor='rgba(255,255,255,.12)'"
+  oninput="validateCodeInput(this)">
+
+<div id="redErr" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:6px;color:#ef4444;font-size:12px"></div>
+<div id="redOk" style="display:none;margin-bottom:12px;padding:10px 14px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:6px;color:#10b981;font-size:12px"></div>
+
+<button class="redeem-button" onclick="doRedeemEnhanced()"
+  style="width:100%;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:14px;border:none;border-radius:8px;cursor:pointer;transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px"
+  onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">
+  <span class="button-text">Canjear</span>
+  <span class="button-loader" style="display:none">···</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// ===== STATE =====
+var U=null,aTab='register';
+// Rangos: stickers necesarios para cada nivel
+var RANKS={
+  NONE:{l:'Sin Status',c:'rgba(255,255,255,.5)',bg:'rgba(255,255,255,.08)',stk:0,icon:'📍'},
+  INITIATED:{l:'Initiated',c:'#34d399',bg:'rgba(52,211,153,.15)',stk:3,icon:'🌱'},
+  BUILDER:{l:'Builder',c:'#fbbf24',bg:'rgba(251,191,36,.15)',stk:7,icon:'🔨'},
+  INNER:{l:'Inner',c:'#c084fc',bg:'rgba(192,132,252,.15)',stk:15,icon:'👑'}
+};
+var RANK_ORDER=['NONE','INITIATED','BUILDER','INNER'];
+var invF='all';
+
+// ===== SISTEMA MEJORADO - CONFIGURACIÓN =====
+var SystemConfig = {
+  animations: {
+    enabled: true,
+    duration: {
+      progress: 800,
+      celebration: 3000,
+      sticker: 400
+    }
+  },
+  ui: {
+    theme: 'default',
+    stickerIcons: {
+      standard: '🎴',
+      special: '⭐',
+      event: '🎉'
+    }
+  },
+  gamification: {
+    celebrationsEnabled: true,
+    achievementsEnabled: true,
+    soundEnabled: false
+  }
+};
+
+// ===== VALIDACIÓN DE DATOS MEJORADA =====
+var DataValidator = {
+  validateUser: function(userData) {
+    var required = ['name', 'email', 'rank'];
+    var missing = required.filter(function(field) { return !userData[field]; });
+    
+    if (missing.length > 0) {
+      throw new Error('Missing required fields: ' + missing.join(', '));
+    }
+    
+    if (RANK_ORDER.indexOf(userData.rank) === -1) {
+      userData.rank = 'NONE'; // Fallback seguro
+    }
+    
+    if (typeof userData.stickerCount !== 'number' || userData.stickerCount < 0) {
+      userData.stickerCount = 0;
+    }
+    
+    return userData;
+  },
+  
+  validateStickerCode: function(code) {
+    if (!code || typeof code !== 'string') {
+      return { valid: false, error: 'Código inválido' };
+    }
+    
+    if (code.length < 6 || code.length > 12) {
+      return { valid: false, error: 'Longitud de código incorrecta' };
+    }
+    
+    if (!/^[A-Z0-9-]+$/.test(code)) {
+      return { valid: false, error: 'Formato de código inválido' };
+    }
+    
+    return { valid: true };
+  }
+};
+
+// ===== MANEJO DE ERRORES CON DEGRADACIÓN ELEGANTE =====
+var ErrorHandler = {
+  handleAnimationError: function(error, fallback) {
+    console.warn('Animation failed, using fallback:', error);
+    if (typeof fallback === 'function') {
+      fallback();
+    }
+  },
+  
+  handleStorageError: function(error, operation) {
+    console.error('Storage operation failed:', operation, error);
+    this.showUserNotification('Error al guardar datos. Inténtalo de nuevo.', 'error');
+  },
+  
+  handleRenderError: function(error, component) {
+    console.error('Render error in component:', component, error);
+    this.renderFallbackComponent(component);
+  },
+  
+  showUserNotification: function(message, type) {
+    type = type || 'info';
+    var notification = document.createElement('div');
+    notification.className = 'notification notification-' + type;
+    notification.textContent = message;
+    notification.style.cssText = 'position:fixed;top:20px;right:20px;z-index:1001;background:' + 
+      (type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#3b82f6') + 
+      ';color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500;' +
+      'box-shadow:0 4px 12px rgba(0,0,0,0.15);transform:translateX(100%);transition:transform 0.3s ease';
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(function() {
+      notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(function() {
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(function() {
+        if (notification.parentNode) {
+          document.body.removeChild(notification);
+        }
+      }, 300);
+    }, 3000);
+  },
+  
+  renderFallbackComponent: function(component) {
+    // Implementación básica para componentes que fallan
+    console.log('Rendering fallback for component:', component);
+  }
+};
+
+// ===== SCROLL =====
+var sY=0;
+window.addEventListener('scroll',function(){
+  sY=window.scrollY;
+  var h=document.getElementById('hdr');
+  if(sY>50){h.style.background='rgba(255,255,255,.9)';h.style.boxShadow='0 1px 0 rgba(0,0,0,.05)';document.getElementById('hdrIn').style.height='48px';document.getElementById('hdrLogo').style.height='40px';document.getElementById('hdrTxt').style.fontSize='10px'}
+  else{h.style.background='rgba(255,255,255,.95)';h.style.boxShadow='none';document.getElementById('hdrIn').style.height='64px';document.getElementById('hdrLogo').style.height='48px';document.getElementById('hdrTxt').style.fontSize='14px'}
+  var v=document.getElementById('heroVid');if(v)v.style.transform='translateY('+sY*.35+'px) scale(1.1)';
+  var max=document.documentElement.scrollHeight-window.innerHeight;
+  document.getElementById('scrollProg').style.width=max>0?Math.min(sY/max*100,100)+'%':'0%';
+},{passive:true});
+
+// ===== MOBILE MENU =====
+var mOpen=false;
+function toggleMob(){mOpen=!mOpen;document.getElementById('mobMenu').style.maxHeight=mOpen?'300px':'0'}
+function closeMob(){mOpen=false;document.getElementById('mobMenu').style.maxHeight='0'}
+
+// ===== RESPONSIVE =====
+function checkW(){
+  var w=window.innerWidth;
+  var oc=document.getElementById('orbitC');
+  var ms=document.getElementById('mobSteps');
+  var dn=document.getElementById('deskNav');
+  var cb=document.getElementById('ctaBtn');
+  var pb=document.getElementById('profBtn');
+  var mb=document.getElementById('mobBtn');
+  if(w<768){oc.style.display='none';ms.style.display='block';mb.style.display='block';dn.style.display='none';cb.style.display=U?'none':'inline-flex';pb.style.display=U?'flex':'none'}
+  else{oc.style.display='flex';ms.style.display='none';mb.style.display='none';dn.style.display='flex';cb.style.display=U?'none':'inline-flex';pb.style.display=U?'flex':'none'}
+}
+checkW();window.addEventListener('resize',checkW);
+
+// ===== PARTICLES =====
+var pc=document.getElementById('particles');
+for(var i=0;i<6;i++){var d=document.createElement('div');d.style.cssText='position:absolute;width:4px;height:4px;background:rgba(255,255,255,.1);border-radius:50%;left:'+(15+i*15)+'%;top:'+(20+(i%3)*25)+'%;animation-delay:'+(i*1.5)+'s;animation-duration:'+(8+i*2)+'s';d.className='float-p';pc.appendChild(d)}
+
+// ===== STARS =====
+var sc=document.getElementById('starsC');
+for(var i=0;i<60;i++){var d=document.createElement('div');d.style.cssText='position:absolute;width:'+(1+Math.random())+'px;height:'+(1+Math.random())+'px;background:#fff;border-radius:50%;left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;opacity:'+ (.03+Math.random()*.08)+';animation:twinkle '+(14+Math.random()*10)+'s ease-in-out infinite;animation-delay:'+Math.random()*5+'s';sc.appendChild(d)}
+for(var i=0;i<25;i++){var d=document.createElement('div');d.style.cssText='position:absolute;width:'+(2+Math.random()*1.5)+'px;height:'+(2+Math.random()*1.5)+'px;background:#fff;border-radius:50%;left:'+(5+Math.random()*90)+'%;top:'+(5+Math.random()*90)+'%;animation:twinkle '+(14+Math.random()*8)+'s ease-in-out infinite;animation-delay:'+Math.random()*10+'s';d.className='twinkle';sc.appendChild(d)}
+
+// ===== ORBIT STARS =====
+var os=document.getElementById('orbitStars');
+for(var i=0;i<15;i++){var d=document.createElement('div');d.style.cssText='position:absolute;width:'+(2+Math.random()*2)+'px;height:'+(2+Math.random()*2)+'px;background:#fff;border-radius:50%;left:'+(15+Math.random()*70)+'%;top:'+(15+Math.random()*70)+'%;animation:twinkle '+(14+Math.random()*8)+'s ease-in-out infinite;animation-delay:'+Math.random()*10+'s';os.appendChild(d)}
+
+// ===== ORBIT CARDS =====
+var steps=[
+  {img:'images/step-unete.png',t:'Únete',n:'01',d:'Crea tu cuenta y entra al sistema. Empiezas desde cero. Como todos.',a:-90},
+  {img:'images/step-compra.png',t:'Compra',n:'02',d:'Cada compra cuenta. Dentro o fuera de la web.',a:-18},
+  {img:'images/step-gana.png',t:'Gana Stickers',n:'03',d:'Compras mayores a S/. 100 desbloquean el sticker exclusivo del drop activo. Cada colección tiene el suyo.',a:54},
+  {img:'images/step-sube.png',t:'Sube de status',n:'04',d:'Tu nivel sube automáticamente. Initiated → Builder → Inner',a:126},
+  {img:'images/step-canjea.png',t:'Canjea y Avanza',n:'05',d:'Compraste fuera de la web? Ingresa tu código. Todo suma. Nada se pierde.',a:198}
+];
+var spinner=document.getElementById('orbitSpin');
+var rad=270;
+steps.forEach(function(s){
+  var r=s.a*Math.PI/180;var x=Math.cos(r)*rad;var y=Math.sin(r)*rad;
+  var outer=document.createElement('div');outer.style.cssText='position:absolute;top:50%;left:50%;z-index:10;transform:translate(calc(-50% + '+x+'px),calc(-50% + '+y+'px))';
+  var inner=document.createElement('div');inner.style.cssText='animation:counterSpin 90s linear infinite';
+  var card=document.createElement('div');card.className='step-card';card.style.cssText='position:relative;background:rgba(24,24,27,.7);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;display:flex;flex-direction:column;align-items:center;text-align:center;width:150px;cursor:pointer';
+  card.innerHTML='<div style="position:relative;margin-bottom:12px;flex-shrink:0"><div style="width:56px;height:56px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center"><img src="'+s.img+'" alt="'+s.t+'" style="width:32px;height:32px;object-fit:contain"></div><div class="pulse-r" style="position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.1)"></div></div><span style="color:rgba(255,255,255,.2);font-weight:500;font-size:9px;letter-spacing:.2em;margin-bottom:6px">'+s.n+'</span><h3 style="color:#fff;font-weight:700;font-size:14px;margin-bottom:6px">'+s.t+'</h3><p style="color:rgba(255,255,255,.35);font-size:11px;line-height:1.6">'+s.d+'</p>';
+  card.addEventListener('mouseenter',function(){spinner.style.animationPlayState='paused';inner.style.animationPlayState='paused'});
+  card.addEventListener('mouseleave',function(){spinner.style.animationPlayState='running';inner.style.animationPlayState='running'});
+  inner.appendChild(card);outer.appendChild(inner);spinner.appendChild(outer);
+});
+
+// ===== MOBILE STEPS =====
+var msc=document.getElementById('mobScroll');
+steps.forEach(function(s,i){
+  var chevron=i<4?'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>':'';
+  var wrap=document.createElement('div');wrap.style.cssText='display:flex;align-items:center;gap:8px;flex-shrink:0;scroll-snap-align:start';
+  wrap.innerHTML='<div style="background:rgba(24,24,27,.6);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:16px;display:flex;flex-direction:column;align-items:center;text-align:center;width:140px"><div style="width:48px;height:48px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:12px"><img src="'+s.img+'" alt="'+s.t+'" style="width:28px;height:28px;object-fit:contain"></div><span style="color:rgba(255,255,255,.15);font-weight:500;font-size:9px;letter-spacing:.2em;margin-bottom:6px">'+s.n+'</span><h3 style="color:#fff;font-weight:700;font-size:12px;margin-bottom:4px">'+s.t+'</h3><p style="color:rgba(255,255,255,.4);font-size:10px;line-height:1.6">'+s.d+'</p></div>'+chevron;
+  msc.appendChild(wrap);
+});
+
+// ===== 3D TILT =====
+document.querySelectorAll('.benefit-card').forEach(function(c){
+  c.addEventListener('mousemove',function(e){var r=c.getBoundingClientRect();var cx=r.width/2,cy=r.height/2;var rx=((e.clientY-r.top-cy)/cy)*-6;var ry=((e.clientX-r.left-cx)/cx)*6;c.style.transform='perspective(800px) rotateX('+rx+'deg) rotateY('+ry+'deg) scale(1.02)'});
+  c.addEventListener('mouseleave',function(){c.style.transform='perspective(800px) rotateX(0) rotateY(0) scale(1)'})
+});
+
+// ===== SHOW ON SCROLL (with fallback) =====
+function showVisible(){
+  document.querySelectorAll('.section-anim').forEach(function(el){el.classList.add('show')});
+  document.querySelectorAll('.card-anim').forEach(function(el){
+    var d=parseInt(el.getAttribute('data-d'))||0;
+    setTimeout(function(){el.classList.add('show')},d);
+  });
+  document.getElementById('orbitC').classList.add('show');
+}
+// IntersectionObserver as primary
+try{
+  var io=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){
+    if(e.target.classList.contains('section-anim'))e.target.classList.add('show');
+    if(e.target.classList.contains('card-anim')){var d=parseInt(e.target.getAttribute('data-d'))||0;setTimeout(function(){e.target.classList.add('show')},d)}
+    if(e.target.id==='stepHead'){e.target.classList.add('show');document.getElementById('orbitC').classList.add('show')}
+  }})},{threshold:.1});
+  document.querySelectorAll('.section-anim,.card-anim,#stepHead').forEach(function(e){io.observe(e)});
+}catch(e){showVisible()}
+// Fallback: show everything after 2s no matter what
+setTimeout(showVisible,2000);
+
+// ===== AUTH =====
+function openAuth(tab){aTab=tab;authTab(tab);document.getElementById('authM').style.display='flex';document.getElementById('authErr').style.display='none'}
+function closeAuth(){document.getElementById('authM').style.display='none'}
+function authTab(t){
+  aTab=t;
+  var tReg=document.getElementById('tReg');var tLog=document.getElementById('tLog');
+  tReg.style.color=t==='register'?'#000':'rgba(0,0,0,.3)';
+  tReg.style.borderBottomColor=t==='register'?'#000':'transparent';
+  tLog.style.color=t==='login'?'#000':'rgba(0,0,0,.3)';
+  tLog.style.borderBottomColor=t==='login'?'#000':'transparent';
+  document.getElementById('nameF').style.display=t==='register'?'block':'none';
+  document.getElementById('aSub').textContent=t==='register'?'Crear cuenta':'Iniciar sesión';
+  document.getElementById('authErr').style.display='none';
+}
+function doAuth(e){
+  e.preventDefault();
+  var nm=document.getElementById('aName').value.trim();
+  var em=document.getElementById('aEmail').value.trim();
+  var pw=document.getElementById('aPass').value;
+  var err=document.getElementById('authErr');
+  var btn=document.getElementById('aSub');
+  
+  if(aTab==='register'&&!nm){err.textContent='Ingresa un nombre';err.style.display='block';return}
+  if(!em){err.textContent='Ingresa tu email';err.style.display='block';return}
+  if(pw.length<6){err.textContent='Mínimo 6 caracteres';err.style.display='block';return}
+  
+  // Deshabilitar botón mientras carga
+  btn.disabled=true;
+  btn.textContent='Cargando...';
+  err.style.display='none';
+  
+  var API='https://dforzze-backend-production.up.railway.app/api';
+  var endpoint=aTab==='register'?'/auth/register':'/auth/login';
+  var body=aTab==='register'?{name:nm,email:em,password:pw}:{email:em,password:pw};
+  
+  fetch(API+endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+    .then(function(res){return res.json().then(function(data){return{ok:res.ok,data:data}})})
+    .then(function(result){
+      if(!result.ok){
+        err.textContent=result.data.error||'Error al iniciar sesión';
+        err.style.display='block';
+        btn.disabled=false;
+        btn.textContent=aTab==='register'?'Crear cuenta':'Iniciar sesión';
+        return;
+      }
+      // Guardar token y usuario
+      localStorage.setItem('dforzze_token',result.data.data.token);
+      localStorage.setItem('dforzze_refresh_token',result.data.data.refreshToken||'');
+      var userData=result.data.data.user;
+      // Adaptar formato del backend al formato del frontend
+      U={
+        name:userData.name,
+        email:userData.email,
+        rank:userData.rank||'NONE',
+        stickerCount:userData.stickerCount||0,
+        stickers:[],
+        image:null,
+        role:userData.role||'USER',
+        createdAt:new Date().toLocaleDateString('es-PE'),
+        blocked:false,
+        preferences:{animationsEnabled:true,celebrationsEnabled:true,tutorialCompleted:false},
+        achievements:[],
+        lastActivity:new Date().toISOString(),
+        _backendId:userData.id
+      };
+      localStorage.setItem('dforzze_user',JSON.stringify(U));
+      // También agregar a dforzze_users para que persista al recargar
+      try{
+        var uList=JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+        var idx=uList.findIndex(function(x){return x.email===U.email;});
+        if(idx>=0)uList[idx]=U; else uList.push(U);
+        localStorage.setItem('dforzze_users',JSON.stringify(uList));
+      }catch(ex){}
+      closeAuth();
+      updateUI();
+      btn.disabled=false;
+      btn.textContent=aTab==='register'?'Crear cuenta':'Iniciar sesión';
+    })
+    .catch(function(error){
+      // Si el backend no responde, usar localStorage como fallback
+      console.warn('Backend no disponible, usando modo offline');
+      btn.disabled=false;
+      btn.textContent=aTab==='register'?'Crear cuenta':'Iniciar sesión';
+      
+      // Fallback a localStorage
+      U={name:aTab==='register'?nm:em.split('@')[0],email:em,rank:'NONE',stickerCount:0,stickers:[],image:null,role:'USER',createdAt:new Date().toLocaleDateString('es-PE'),blocked:false,preferences:{animationsEnabled:true,celebrationsEnabled:true,tutorialCompleted:false},achievements:[],lastActivity:new Date().toISOString()};
+      try{
+        var uList=JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+        var existing=uList.find(function(x){return x.email===em;});
+        if(existing){U=existing;}else{uList.push(U);localStorage.setItem('dforzze_users',JSON.stringify(uList));}
+        localStorage.setItem('dforzze_user',JSON.stringify(U));
+      }catch(ex){}
+      closeAuth();updateUI();
+    });
+}
+
+// ===== PROFILE =====
+function openProfile(){if(!U)return;document.getElementById('profM').style.display='flex';updateProf()}
+function closeProf(){document.getElementById('profM').style.display='none'}
+
+// ===== FUNCIONES DE PROGRESO MEJORADO =====
+function updateProgressWithAnimation() {
+  if (!U) return;
+  
+  try {
+    var cnt = U.stickerCount || 0;
+    var curIdx = RANK_ORDER.indexOf(U.rank || 'NONE');
+    var nextRank = RANK_ORDER[Math.min(curIdx + 1, RANK_ORDER.length - 1)];
+    var nextRkData = RANKS[nextRank];
+    var curRkData = RANKS[U.rank || 'NONE'];
+    
+    // Actualizar milestones activos
+    updateRankMilestones(U.rank || 'NONE');
+    
+    // Actualizar información de progreso
+    document.getElementById('currentStickers').textContent = cnt;
+    
+    if (U.rank === 'INNER') {
+      document.getElementById('nextRankStickers').textContent = '15';
+      document.getElementById('progressPercentage').textContent = '100%';
+      document.getElementById('progressFill').style.width = '100%';
+    } else {
+      var needed = nextRkData.stk;
+      var pct = Math.min((cnt / needed) * 100, 100);
+      
+      document.getElementById('nextRankStickers').textContent = needed;
+      document.getElementById('progressPercentage').textContent = Math.round(pct) + '%';
+      
+      // Animación suave de la barra de progreso
+      setTimeout(function() {
+        document.getElementById('progressFill').style.width = pct + '%';
+      }, 100);
+    }
+    
+  } catch (error) {
+    ErrorHandler.handleRenderError(error, 'progress_update');
+  }
+}
+
+function updateRankMilestones(currentRank) {
+  try {
+    var milestones = document.querySelectorAll('.rank-milestone');
+    var currentIndex = RANK_ORDER.indexOf(currentRank);
+    
+    milestones.forEach(function(milestone, index) {
+      var icon = milestone.querySelector('.milestone-icon');
+      var rankKey = RANK_ORDER[index];
+      var rankData = RANKS[rankKey];
+      
+      if (index <= currentIndex) {
+        // Rango alcanzado
+        icon.style.borderColor = rankData.c;
+        icon.style.background = rankData.c;
+        icon.style.color = '#fff';
+        icon.style.transform = 'scale(1.1)';
+      } else {
+        // Rango no alcanzado
+        icon.style.borderColor = '#e9ecef';
+        icon.style.background = '#fff';
+        icon.style.color = '#6c757d';
+        icon.style.transform = 'scale(1)';
+      }
+    });
+  } catch (error) {
+    ErrorHandler.handleAnimationError(error, function() {
+      console.log('Milestone animation fallback');
+    });
+  }
+}
+
+function updateProf(){
+  if(!U)return;
+  
+  try {
+    var av=document.getElementById('profAv');
+    if(U.image)av.innerHTML='<img src="'+U.image+'" style="width:100%;height:100%;object-fit:cover">';
+    else av.innerHTML=U.name.charAt(0).toUpperCase();
+    document.getElementById('profNm').textContent=U.name;
+    document.getElementById('profEm').textContent=U.email;
+    var cnt=U.stickerCount||0;
+    document.getElementById('stkCnt').textContent=cnt+' sticker'+(cnt!==1?'s':'');
+    
+    // Rango
+    var rk=RANKS[U.rank]||RANKS.NONE;
+    var rb=document.getElementById('rankB');
+    rb.textContent=rk.l;rb.style.color=rk.c;rb.style.background=rk.bg;
+    
+    // Progreso mejorado
+    updateProgressWithAnimation();
+    
+    // Admin btn
+    var ab=document.getElementById('adminPanelBtn');
+    if(ab)ab.style.display=U.role==='ADMIN'?'flex':'none';
+    
+    // Actualizar logros
+    updateAchievements();
+    
+  } catch (error) {
+    ErrorHandler.handleRenderError(error, 'profile_update');
+  }
+}
+
+function updateAchievements() {
+  if (!U) return;
+  
+  try {
+    var achievementsData = AchievementSystem.renderAchievements(U);
+    var achievementsList = document.getElementById('achievementsList');
+    var achievementCount = document.getElementById('achievementCount');
+    
+    if (achievementsList) {
+      achievementsList.innerHTML = achievementsData.html;
+    }
+    
+    if (achievementCount) {
+      achievementCount.textContent = achievementsData.unlockedCount + '/' + achievementsData.totalCount;
+    }
+  } catch (error) {
+    ErrorHandler.handleRenderError(error, 'achievements_update');
+  }
+}
+
+// ===== AVATAR =====
+function changeAv(e){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    var img=new Image();img.onload=function(){
+      var c=document.createElement('canvas');var w=img.width,h=img.height;var mx=200;
+      if(w>h){if(w>mx){h=Math.round(h*mx/w);w=mx}}else{if(h>mx){w=Math.round(w*mx/h);h=mx}}
+      c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+      U.image=c.toDataURL('image/jpeg',.8);
+      try{localStorage.setItem('dforzze_user',JSON.stringify(U));syncUserList();}catch(e){}
+      updateProf();updateUI();
+    };img.src=ev.target.result;
+  };reader.readAsDataURL(file);
+}
+
+// ===== EDIT NAME =====
+function editName(){document.getElementById('nameShow').style.display='none';document.getElementById('nameEdit').style.display='flex';document.getElementById('nmInp').value=U.name;document.getElementById('nmInp').focus()}
+function saveNm(){
+  var v=document.getElementById('nmInp').value.trim();
+  if(v){U.name=v;try{localStorage.setItem('dforzze_user',JSON.stringify(U));syncUserList();}catch(e){}}
+  document.getElementById('nameShow').style.display='flex';document.getElementById('nameEdit').style.display='none';updateProf();updateUI()
+}
+function cancelNm(){document.getElementById('nameShow').style.display='flex';document.getElementById('nameEdit').style.display='none'}
+
+// Sincronizar usuario con lista global
+function syncUserList(){
+  try{
+    var list=JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+    var idx=list.findIndex(function(x){return x.email===U.email;});
+    if(idx>=0)list[idx]=U; else list.push(U);
+    localStorage.setItem('dforzze_users',JSON.stringify(list));
+  }catch(e){}
+}
+
+// ===== INVENTORY =====
+function openInv(){document.getElementById('invM').style.display='flex';renderInv()}
+function closeInv(){document.getElementById('invM').style.display='none'}
+
+function renderInv(){
+  if(!U) return;
+  var stickers = U.stickers || [];
+  var showcase = document.getElementById('stickersShowcase');
+  var countDisplay = document.getElementById('stickerCountDisplay');
+  var sub = document.getElementById('invSubtitle');
+
+  countDisplay.textContent = stickers.length;
+  sub.textContent = stickers.length + ' sticker' + (stickers.length !== 1 ? 's' : '');
+
+  if(stickers.length === 0){
+    showcase.innerHTML = '<div style="padding:40px 0;text-align:center">'
+      + '<p style="color:rgba(255,255,255,.2);font-size:13px;letter-spacing:.06em;text-transform:uppercase">Sin stickers aún</p>'
+      + '<p style="color:rgba(255,255,255,.12);font-size:11px;margin-top:6px">Canjea un código para comenzar</p>'
+      + '</div>';
+    return;
+  }
+
+  // Tipo → etiqueta
+  var typeLabel = { drop:'Drop', purchase:'Compra', code:'Código', migrated:'Migrado' };
+
+  showcase.innerHTML = stickers.slice().reverse().map(function(s){
+    var label = typeLabel[s.type] || 'Sticker';
+    var drop = s.drop || s.name || 'DFORZZE';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06)">'
+      + '<div style="display:flex;align-items:center;gap:14px">'
+        + '<div style="width:36px;height:36px;border:1px solid rgba(255,255,255,.1);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
+          + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>'
+        + '</div>'
+        + '<div>'
+          + '<p style="color:#fff;font-size:13px;font-weight:600;margin-bottom:2px">' + drop + '</p>'
+          + '<p style="color:rgba(255,255,255,.3);font-size:11px">' + label + (s.date ? ' · ' + s.date : '') + '</p>'
+        + '</div>'
+      + '</div>'
+      + '<span style="color:rgba(255,255,255,.25);font-size:11px;font-weight:600">+1</span>'
+    + '</div>';
+  }).join('');
+}
+
+function getTimeAgo(dateString) {
+  try {
+    var d = new Date(dateString.split('/').reverse().join('-'));
+    var diff = Math.ceil(Math.abs(new Date() - d) / 86400000);
+    if(diff <= 1) return 'Hoy';
+    if(diff < 7) return 'Hace ' + diff + ' días';
+    if(diff < 30) return 'Hace ' + Math.floor(diff/7) + ' sem.';
+    return 'Hace ' + Math.floor(diff/30) + ' meses';
+  } catch(e){ return dateString; }
+}
+
+// ===== SISTEMA DE ONBOARDING =====
+var OnboardingSystem = {
+  steps: [
+    {
+      id: 'welcome',
+      title: '¡Bienvenido a DFORZZE!',
+      content: 'Descubre cómo funciona nuestro sistema de membresía con stickers y rangos.',
+      icon: '👋',
+      target: null
+    },
+    {
+      id: 'stickers',
+      title: 'Gana Stickers',
+      content: 'Canjea códigos de stickers para sumar puntos y subir de status en la comunidad.',
+      icon: '🎴',
+      target: '.act-btn'
+    },
+    {
+      id: 'progress',
+      title: 'Sigue tu Progreso',
+      content: 'Observa tu avance hacia el siguiente rango con nuestra barra de progreso visual.',
+      icon: '📈',
+      target: '.progress-container'
+    },
+    {
+      id: 'ranks',
+      title: 'Sube de status',
+      content: 'Desde Sin Status hasta Inner Circle. Cada rango desbloquea nuevos beneficios.',
+      icon: '👑',
+      target: '.rank-timeline'
+    }
+  ],
+  
+  currentStep: 0,
+  
+  startOnboarding: function() {
+    if (!U || U.preferences.tutorialCompleted) return;
+    
+    this.currentStep = 0;
+    this.showStep(this.steps[0]);
+  },
+  
+  showStep: function(step) {
+    try {
+      var overlay = document.createElement('div');
+      overlay.id = 'onboardingOverlay';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);z-index:1003;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s ease';
+      
+      var modal = document.createElement('div');
+      modal.style.cssText = 'background:#fff;border-radius:16px;padding:32px;max-width:400px;width:90%;text-align:center;transform:scale(0.9);transition:transform 0.3s ease';
+      
+      modal.innerHTML = '<div style="font-size:48px;margin-bottom:16px">' + step.icon + '</div><h3 style="font-size:20px;font-weight:700;margin-bottom:12px;color:#000">' + step.title + '</h3><p style="color:#6c757d;font-size:14px;line-height:1.5;margin-bottom:24px">' + step.content + '</p><div style="display:flex;gap:12px;justify-content:center"><button onclick="OnboardingSystem.skipOnboarding()" style="background:rgba(0,0,0,0.1);color:#000;border:none;padding:12px 20px;border-radius:8px;font-weight:600;cursor:pointer">Saltar</button><button onclick="OnboardingSystem.nextStep()" style="background:#000;color:#fff;border:none;padding:12px 20px;border-radius:8px;font-weight:600;cursor:pointer">' + (this.currentStep === this.steps.length - 1 ? 'Finalizar' : 'Siguiente') + '</button></div>';
+      
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      
+      setTimeout(function() {
+        overlay.style.opacity = '1';
+        modal.style.transform = 'scale(1)';
+      }, 100);
+      
+      // Highlight target element if exists
+      if (step.target) {
+        setTimeout(function() {
+          OnboardingSystem.highlightElement(step.target);
+        }, 500);
+      }
+      
+    } catch (error) {
+      ErrorHandler.handleRenderError(error, 'onboarding');
+    }
+  },
+  
+  highlightElement: function(selector) {
+    try {
+      var element = document.querySelector(selector);
+      if (element) {
+        element.style.position = 'relative';
+        element.style.zIndex = '1004';
+        element.style.boxShadow = '0 0 0 4px rgba(255,255,255,0.3), 0 0 20px rgba(255,255,255,0.2)';
+        element.style.borderRadius = '8px';
+      }
+    } catch (error) {
+      console.warn('Could not highlight element:', selector);
+    }
+  },
+  
+  removeHighlight: function() {
+    try {
+      var elements = document.querySelectorAll('[style*="z-index: 1004"]');
+      elements.forEach(function(el) {
+        el.style.zIndex = '';
+        el.style.boxShadow = '';
+      });
+    } catch (error) {
+      console.warn('Could not remove highlights');
+    }
+  },
+  
+  nextStep: function() {
+    this.removeHighlight();
+    this.closeCurrentStep();
+    
+    this.currentStep++;
+    
+    if (this.currentStep >= this.steps.length) {
+      this.completeOnboarding();
+    } else {
+      setTimeout(function() {
+        OnboardingSystem.showStep(OnboardingSystem.steps[OnboardingSystem.currentStep]);
+      }, 300);
+    }
+  },
+  
+  skipOnboarding: function() {
+    this.removeHighlight();
+    this.closeCurrentStep();
+    this.completeOnboarding();
+  },
+  
+  closeCurrentStep: function() {
+    var overlay = document.getElementById('onboardingOverlay');
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(function() {
+        if (overlay.parentNode) {
+          document.body.removeChild(overlay);
+        }
+      }, 300);
+    }
+  },
+  
+  completeOnboarding: function() {
+    if (U) {
+      U.preferences.tutorialCompleted = true;
+      try {
+        localStorage.setItem('dforzze_user', JSON.stringify(U));
+        syncUserList();
+      } catch (error) {
+        ErrorHandler.handleStorageError(error, 'complete_onboarding');
+      }
+    }
+    
+    ErrorHandler.showUserNotification('¡Bienvenido a DFORZZE! Ya puedes comenzar a canjear stickers.', 'success');
+  }
+};
+var AchievementSystem = {
+  achievements: {
+    'first_sticker': {
+      id: 'first_sticker',
+      name: 'Primer Paso',
+      description: 'Canjeaste tu primer sticker',
+      icon: '🎯',
+      condition: function(user) { return (user.stickerCount || 0) >= 1; }
+    },
+    'initiated_rank': {
+      id: 'initiated_rank',
+      name: 'Iniciado',
+      description: 'Alcanzaste el rango Initiated',
+      icon: '🌱',
+      condition: function(user) { return user.rank === 'INITIATED' || user.rank === 'BUILDER' || user.rank === 'INNER'; }
+    },
+    'builder_rank': {
+      id: 'builder_rank',
+      name: 'Constructor',
+      description: 'Alcanzaste el rango Builder',
+      icon: '🔨',
+      condition: function(user) { return user.rank === 'BUILDER' || user.rank === 'INNER'; }
+    },
+    'inner_rank': {
+      id: 'inner_rank',
+      name: 'Círculo Interno',
+      description: 'Alcanzaste el rango Inner',
+      icon: '👑',
+      condition: function(user) { return user.rank === 'INNER'; }
+    },
+    'collector': {
+      id: 'collector',
+      name: 'Coleccionista',
+      description: 'Tienes 10 o más stickers',
+      icon: '📦',
+      condition: function(user) { return (user.stickerCount || 0) >= 10; }
+    }
+  },
+  
+  checkAndUnlockAchievements: function(user) {
+    if (!user.achievements) user.achievements = [];
+    
+    var newAchievements = [];
+    
+    for (var achievementId in this.achievements) {
+      var achievement = this.achievements[achievementId];
+      
+      // Si ya tiene el logro, continuar
+      if (user.achievements.indexOf(achievementId) !== -1) continue;
+      
+      // Verificar si cumple la condición
+      if (achievement.condition(user)) {
+        user.achievements.push(achievementId);
+        newAchievements.push(achievement);
+      }
+    }
+    
+    // Mostrar notificaciones de nuevos logros
+    if (newAchievements.length > 0) {
+      setTimeout(function() {
+        newAchievements.forEach(function(achievement, index) {
+          setTimeout(function() {
+            AchievementSystem.showAchievementNotification(achievement);
+          }, index * 1000);
+        });
+      }, 2000);
+    }
+    
+    return newAchievements;
+  },
+  
+  showAchievementNotification: function(achievement) {
+    if (!SystemConfig.gamification.achievementsEnabled) return;
+    
+    try {
+      var notification = document.createElement('div');
+      notification.className = 'achievement-notification';
+      notification.style.cssText = 'position:fixed;top:20px;right:20px;z-index:1002;background:linear-gradient(135deg,#000,#333);color:#fff;padding:16px 20px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.3);transform:translateX(100%);transition:transform 0.4s ease;max-width:300px;border:1px solid rgba(255,255,255,0.1)';
+      
+      notification.innerHTML = '<div style="display:flex;align-items:center;gap:12px"><div style="font-size:24px">' + achievement.icon + '</div><div><div style="font-weight:700;font-size:14px;margin-bottom:4px">¡Logro Desbloqueado!</div><div style="font-weight:600;font-size:13px;color:#fff;margin-bottom:2px">' + achievement.name + '</div><div style="font-size:11px;color:rgba(255,255,255,0.7)">' + achievement.description + '</div></div></div>';
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(function() {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      setTimeout(function() {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(function() {
+          if (notification.parentNode) {
+            document.body.removeChild(notification);
+          }
+        }, 400);
+      }, 4000);
+      
+    } catch (error) {
+      ErrorHandler.handleAnimationError(error);
+    }
+  },
+  
+  renderAchievements: function(user) {
+    if (!user.achievements) user.achievements = [];
+    
+    var achievementsHtml = '';
+    var unlockedCount = 0;
+    
+    for (var achievementId in this.achievements) {
+      var achievement = this.achievements[achievementId];
+      var isUnlocked = user.achievements.indexOf(achievementId) !== -1;
+      
+      if (isUnlocked) unlockedCount++;
+      
+      achievementsHtml += '<div class="achievement-item" style="display:flex;align-items:center;gap:12px;padding:12px;background:' + (isUnlocked ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)') + ';border-radius:8px;margin-bottom:8px;' + (isUnlocked ? '' : 'opacity:0.5') + '"><div style="font-size:24px;filter:' + (isUnlocked ? 'none' : 'grayscale(1)') + '">' + achievement.icon + '</div><div style="flex:1"><div style="font-weight:600;font-size:13px;color:#fff;margin-bottom:2px">' + achievement.name + '</div><div style="font-size:11px;color:rgba(255,255,255,0.6)">' + achievement.description + '</div></div>' + (isUnlocked ? '<div style="color:#10b981;font-size:16px">✓</div>' : '') + '</div>';
+    }
+    
+    return {
+      html: achievementsHtml,
+      unlockedCount: unlockedCount,
+      totalCount: Object.keys(this.achievements).length
+    };
+  }
+};
+function showStickerRedemptionAnimation(stickerData) {
+  AnimationSystem.showStickerRedemptionAnimation(stickerData);
+}
+
+function updateCelebrationProgress() {
+  AnimationSystem.updateCelebrationProgress();
+}
+
+function closeCelebration() {
+  AnimationSystem.closeCelebration();
+}
+
+// ===== CELEBRACIONES de status =====
+function showRankAdvancementCelebration(newRank) {
+  AnimationSystem.showRankAdvancementCelebration(newRank);
+}
+
+function closeRankCelebration() {
+  AnimationSystem.closeRankCelebration();
+}
+
+// ===== REDEEM MEJORADO =====
+function openRed(){
+  document.getElementById('redM').style.display='flex';
+  document.getElementById('redInp').value='';
+  document.getElementById('redErr').style.display='none';
+  document.getElementById('redOk').style.display='none';
+  document.getElementById('inputStatus').textContent='';
+  document.getElementById('inputStatus').style.color='';
+}
+function closeRed(){document.getElementById('redM').style.display='none'}
+
+// Validación en tiempo real del código
+function validateCodeInput(input) {
+  var code = input.value.trim().toUpperCase();
+  var statusEl = document.getElementById('inputStatus');
+  
+  if (!code) {
+    statusEl.textContent = '';
+    statusEl.style.color = '';
+    return;
+  }
+  
+  var validation = DataValidator.validateStickerCode(code);
+  
+  if (validation.valid) {
+    statusEl.textContent = '✓ Formato válido';
+    statusEl.style.color = '#10b981';
+    input.style.borderColor = 'rgba(16,185,129,.4)';
+  } else {
+    statusEl.textContent = '⚠ ' + validation.error;
+    statusEl.style.color = '#ef4444';
+    input.style.borderColor = 'rgba(239,68,68,.4)';
+  }
+}
+
+function doRedeemEnhanced(){
+  if(!U)return;
+  
+  var code=document.getElementById('redInp').value.trim().toUpperCase();
+  var errEl=document.getElementById('redErr');
+  var okEl=document.getElementById('redOk');
+  var buttonText=document.querySelector('.button-text');
+  var buttonLoader=document.querySelector('.button-loader');
+  var button=document.querySelector('.redeem-button');
+  
+  // Reset messages
+  errEl.style.display='none';
+  okEl.style.display='none';
+  
+  // Validación inicial
+  if(!code){
+    errEl.textContent='Por favor ingresa un código';
+    errEl.style.display='block';
+    return;
+  }
+  
+  var validation = DataValidator.validateStickerCode(code);
+  if (!validation.valid) {
+    errEl.textContent=validation.error;
+    errEl.style.display='block';
+    return;
+  }
+  
+  // Mostrar estado de carga
+  buttonText.style.display='none';
+  buttonLoader.style.display='inline';
+  button.disabled=true;
+  button.style.opacity='0.7';
+  
+  // Simular delay de procesamiento para mejor UX
+  setTimeout(function() {
+    try {
+      // Cargar códigos del admin
+      var codes=JSON.parse(localStorage.getItem('dforzze_codes')||'[]');
+      var found=null;
+      
+      for(var i=0;i<codes.length;i++){
+        if(codes[i].code===code&&codes[i].type==='sticker'&&codes[i].active){
+          found=codes[i];
+          break;
+        }
+      }
+      
+      if(!found){
+        errEl.textContent='Código inválido o ya utilizado';
+        errEl.style.display='block';
+        resetRedeemButton();
+        return;
+      }
+      
+      // Verificar si el usuario ya usó este código
+      if(U.stickers && U.stickers.some(function(s) { return s.code === code; })) {
+        errEl.textContent='Ya has canjeado este código anteriormente';
+        errEl.style.display='block';
+        resetRedeemButton();
+        return;
+      }
+      
+      // Marcar como usado
+      found.active=false;
+      found.usedBy=U.email;
+      found.usedAt=new Date().toLocaleDateString('es-PE');
+      localStorage.setItem('dforzze_codes',JSON.stringify(codes));
+      
+      // Guardar rango anterior para detectar cambios
+      var oldRank = U.rank || 'NONE';
+      
+      // Sumar sticker al usuario
+      if(!U.stickers)U.stickers=[];
+      var newSticker = {
+        name: found.stickerName || 'Sticker DFORZZE',
+        emoji: found.emoji || '🌸',
+        drop: found.drop || 'Código canjeado',
+        code: code,
+        date: new Date().toLocaleDateString('es-PE'),
+        type: 'code',
+        source: 'code_redemption'
+      };
+      
+      U.stickers.push(newSticker);
+      U.stickerCount=(U.stickerCount||0)+1;
+      U.lastActivity = new Date().toISOString();
+      
+      // Actualizar rango
+      var cnt=U.stickerCount;
+      if(cnt>=RANKS.INNER.stk)U.rank='INNER';
+      else if(cnt>=RANKS.BUILDER.stk)U.rank='BUILDER';
+      else if(cnt>=RANKS.INITIATED.stk)U.rank='INITIATED';
+      
+      // Guardar usuario
+      try{
+        localStorage.setItem('dforzze_user',JSON.stringify(U));
+        syncUserList();
+      }catch(ex){
+        ErrorHandler.handleStorageError(ex, 'save_after_redeem');
+      }
+      
+      // Verificar y desbloquear logros
+      AchievementSystem.checkAndUnlockAchievements(U);
+      
+      // Mostrar mensaje de éxito
+      okEl.innerHTML='<strong>¡Sticker canjeado!</strong><br>Ya tienes '+U.stickerCount+' sticker'+(U.stickerCount!==1?'s':'')+'. Rango: '+(RANKS[U.rank]||RANKS.NONE).l;
+      okEl.style.display='block';
+      
+      // Limpiar input
+      document.getElementById('redInp').value='';
+      document.getElementById('inputStatus').textContent='';
+      
+      // Actualizar UI
+      updateProf();
+      updateUI();
+      
+      // Mostrar celebración
+      setTimeout(function() {
+        closeRed();
+        showStickerRedemptionAnimation(newSticker);
+        
+        // Si cambió de status, mostrar celebración adicional
+        if (U.rank !== oldRank) {
+          setTimeout(function() {
+            showRankAdvancementCelebration(U.rank);
+          }, 3500);
+        }
+      }, 1500);
+      
+    } catch (error) {
+      ErrorHandler.handleRenderError(error, 'redeem_process');
+      errEl.textContent='Error al procesar el código. Inténtalo de nuevo.';
+      errEl.style.display='block';
+    }
+    
+    resetRedeemButton();
+  }, 800);
+}
+
+function resetRedeemButton() {
+  var buttonText=document.querySelector('.button-text');
+  var buttonLoader=document.querySelector('.button-loader');
+  var button=document.querySelector('.redeem-button');
+  
+  buttonText.style.display='inline';
+  buttonLoader.style.display='none';
+  button.disabled=false;
+  button.style.opacity='1';
+}
+
+// ===== LOGOUT =====
+function doLogout(){U=null;try{localStorage.removeItem('dforzze_user')}catch(e){}closeProf();updateUI()}
+
+// ===== UPDATE UI =====
+function updateUI(){
+  checkW();
+  if(U){
+    document.getElementById('ctaBtn').style.display='none';
+    document.getElementById('profBtn').style.display='flex';
+    var av=document.getElementById('profAvSm');
+    if(U.image)av.innerHTML='<img src="'+U.image+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+    else av.innerHTML=U.name.charAt(0).toUpperCase();
+    document.getElementById('profNmSm').textContent=U.name;
+  }else{
+    document.getElementById('profBtn').style.display='none';
+    document.getElementById('ctaBtn').style.display='inline-flex';
+  }
+}
+
+// ===== LOAD SAVED =====
+try{
+  var sv=localStorage.getItem('dforzze_user');
+  if(sv){
+    U=JSON.parse(sv);
+    // Verificar si fue bloqueado por admin
+    var uList=JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+    var uInList=uList.find(function(x){return x.email===U.email;});
+    if(uInList&&uInList.blocked){
+      U=null;localStorage.removeItem('dforzze_user');
+    } else if(uInList){
+      // Usar datos frescos de la lista global
+      U=uInList;localStorage.setItem('dforzze_user',JSON.stringify(U));
+    } else {
+      // Usuario viene del backend (no está en dforzze_users aún) — agregarlo
+      uList.push(U);
+      localStorage.setItem('dforzze_users',JSON.stringify(uList));
+    }
+    if(U)updateUI();
+  }
+}catch(e){}
+
+// Abrir perfil automáticamente si viene desde otra página con #perfil
+if(window.location.hash === '#perfil' && U){
+  setTimeout(function(){ openProfile(); }, 400);
+  history.replaceState(null, '', window.location.pathname);
+}
+
+// Abrir auth automáticamente si viene con ?auth=1
+try{if(new URLSearchParams(window.location.search).get('auth')==='1'&&!U){openAuth('register')}}catch(e){}
+
+// ===== SISTEMA DE PROGRESO MEJORADO =====
+var ProgressSystem = {
+  updateProgressWithAnimation: function() {
+    if (!U) return;
+    
+    try {
+      var cnt = U.stickerCount || 0;
+      var curIdx = RANK_ORDER.indexOf(U.rank || 'NONE');
+      var nextRank = RANK_ORDER[Math.min(curIdx + 1, RANK_ORDER.length - 1)];
+      var nextRkData = RANKS[nextRank];
+      
+      this.updateRankMilestones(U.rank || 'NONE');
+      
+      var currentStickersEl = document.getElementById('currentStickers');
+      var nextRankStickersEl = document.getElementById('nextRankStickers');
+      var progressPercentageEl = document.getElementById('progressPercentage');
+      var progressFillEl = document.getElementById('progressFill');
+      
+      if (currentStickersEl) currentStickersEl.textContent = cnt;
+      
+      if (U.rank === 'INNER') {
+        if (nextRankStickersEl) nextRankStickersEl.textContent = '15';
+        if (progressPercentageEl) progressPercentageEl.textContent = '100%';
+        if (progressFillEl) progressFillEl.style.width = '100%';
+      } else {
+        var needed = nextRkData.stk;
+        var pct = Math.min((cnt / needed) * 100, 100);
+        
+        if (nextRankStickersEl) nextRankStickersEl.textContent = needed;
+        if (progressPercentageEl) progressPercentageEl.textContent = Math.round(pct) + '%';
+        
+        if (progressFillEl) {
+          setTimeout(function() {
+            progressFillEl.style.width = pct + '%';
+          }, 100);
+        }
+      }
+      
+    } catch (error) {
+      ErrorHandler.handleRenderError(error, 'progress_update');
+    }
+  },
+  
+  updateRankMilestones: function(currentRank) {
+    try {
+      var milestones = document.querySelectorAll('.rank-milestone');
+      var currentIndex = RANK_ORDER.indexOf(currentRank);
+      
+      milestones.forEach(function(milestone, index) {
+        var icon = milestone.querySelector('.milestone-icon');
+        if (!icon) return;
+        
+        var rankKey = RANK_ORDER[index];
+        var rankData = RANKS[rankKey];
+        
+        if (index <= currentIndex) {
+          icon.style.borderColor = rankData.c;
+          icon.style.background = rankData.c;
+          icon.style.color = '#fff';
+          icon.style.transform = 'scale(1.1)';
+        } else {
+          icon.style.borderColor = '#e9ecef';
+          icon.style.background = '#fff';
+          icon.style.color = '#6c757d';
+          icon.style.transform = 'scale(1)';
+        }
+      });
+    } catch (error) {
+      ErrorHandler.handleAnimationError(error);
+    }
+  }
+};
+
+// ===== SISTEMA DE ANIMACIONES Y CELEBRACIONES =====
+var AnimationSystem = {
+  showStickerRedemptionAnimation: function(stickerData) {
+    if (!SystemConfig.gamification.celebrationsEnabled || !U.preferences.celebrationsEnabled) {
+      return;
+    }
+    
+    try {
+      var celebrationOverlay = document.createElement('div');
+      celebrationOverlay.className = 'celebration-overlay';
+      celebrationOverlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;transform:scale(0.9);transition:all 0.3s ease';
+      
+      celebrationOverlay.innerHTML = '<div class="celebration-content" style="background:#fff;border-radius:16px;padding:40px;text-align:center;max-width:400px;width:90%"><div class="sticker-icon-large" style="font-size:64px;margin-bottom:16px;animation:bounce 0.6s ease">◆</div><h3 style="font-size:24px;font-weight:700;margin-bottom:8px;color:#000">¡Sticker Ganado!</h3><p style="color:#6c757d;margin-bottom:24px">+1 sticker añadido a tu colección</p><div class="progress-update" style="background:#f8f9fa;border-radius:8px;padding:16px;margin-bottom:20px"><p style="font-size:12px;color:#6c757d;margin-bottom:8px">Progreso actualizado</p><div style="height:4px;background:#e9ecef;border-radius:2px;overflow:hidden"><div id="celebrationProgressBar" style="height:100%;background:linear-gradient(90deg,#34d399,#fbbf24,#c084fc);width:0;transition:width 1s ease"></div></div></div><button onclick="AnimationSystem.closeCelebration()" style="background:#000;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:600;cursor:pointer">Continuar</button></div>';
+      
+      document.body.appendChild(celebrationOverlay);
+      
+      setTimeout(function() {
+        celebrationOverlay.style.opacity = '1';
+        celebrationOverlay.style.transform = 'scale(1)';
+      }, 100);
+      
+      setTimeout(function() {
+        AnimationSystem.updateCelebrationProgress();
+      }, 800);
+      
+      setTimeout(function() {
+        AnimationSystem.closeCelebration();
+      }, 4000);
+      
+      window.currentCelebrationOverlay = celebrationOverlay;
+      
+    } catch (error) {
+      ErrorHandler.handleAnimationError(error, function() {
+        ErrorHandler.showUserNotification('¡Sticker canjeado exitosamente!', 'success');
+      });
+    }
+  },
+  
+  updateCelebrationProgress: function() {
+    if (!U) return;
+    
+    try {
+      var cnt = U.stickerCount || 0;
+      var curIdx = RANK_ORDER.indexOf(U.rank || 'NONE');
+      var nextRank = RANK_ORDER[Math.min(curIdx + 1, RANK_ORDER.length - 1)];
+      var nextRkData = RANKS[nextRank];
+      
+      var progressBar = document.getElementById('celebrationProgressBar');
+      if (progressBar) {
+        if (U.rank === 'INNER') {
+          progressBar.style.width = '100%';
+        } else {
+          var pct = Math.min((cnt / nextRkData.stk) * 100, 100);
+          progressBar.style.width = pct + '%';
+        }
+      }
+    } catch (error) {
+      ErrorHandler.handleAnimationError(error);
+    }
+  },
+  
+  closeCelebration: function() {
+    var overlay = window.currentCelebrationOverlay;
+    if (overlay) {
+      overlay.style.opacity = '0';
+      overlay.style.transform = 'scale(1.1)';
+      setTimeout(function() {
+        if (overlay.parentNode) {
+          document.body.removeChild(overlay);
+        }
+        delete window.currentCelebrationOverlay;
+      }, 300);
+    }
+  },
+  
+  showRankAdvancementCelebration: function(newRank) {
+    if (!SystemConfig.gamification.celebrationsEnabled || !U.preferences.celebrationsEnabled) {
+      return;
+    }
+    
+    try {
+      var rankData = RANKS[newRank];
+      var celebrationOverlay = document.createElement('div');
+      celebrationOverlay.className = 'rank-celebration-overlay';
+      celebrationOverlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;z-index:1001;opacity:0;transform:scale(0.8);transition:all 0.4s ease';
+      
+      celebrationOverlay.innerHTML = '<div class="rank-celebration-content" style="background:#fff;border-radius:20px;padding:50px;text-align:center;max-width:450px;width:90%;position:relative;overflow:hidden"><div class="rank-celebration-bg" style="position:absolute;top:0;left:0;right:0;height:60%;background:linear-gradient(135deg,' + rankData.c + '20,' + rankData.c + '10);z-index:0"></div><div style="position:relative;z-index:1"><div class="rank-icon-celebration" style="font-size:80px;margin-bottom:20px;animation:bounce 0.8s ease">' + rankData.icon + '</div><h2 style="font-size:28px;font-weight:800;margin-bottom:12px;color:#000">¡nuevo status!</h2><div style="background:' + rankData.bg + ';color:' + rankData.c + ';padding:8px 20px;border-radius:8px;font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px;display:inline-block">' + rankData.l + '</div><p style="color:#6c757d;font-size:16px;line-height:1.5;margin-bottom:30px">¡Felicitaciones! Has alcanzado el rango ' + rankData.l + ' en DFORZZE.</p><button onclick="AnimationSystem.closeRankCelebration()" style="background:' + rankData.c + ';color:#fff;border:none;padding:14px 28px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;text-transform:uppercase;letter-spacing:0.05em">¡Increíble!</button></div></div>';
+      
+      document.body.appendChild(celebrationOverlay);
+      
+      setTimeout(function() {
+        celebrationOverlay.style.opacity = '1';
+        celebrationOverlay.style.transform = 'scale(1)';
+      }, 100);
+      
+      setTimeout(function() {
+        AnimationSystem.closeRankCelebration();
+      }, 5000);
+      
+      window.currentRankCelebrationOverlay = celebrationOverlay;
+      
+    } catch (error) {
+      ErrorHandler.handleAnimationError(error, function() {
+        ErrorHandler.showUserNotification('¡Has alcanzado el rango ' + RANKS[newRank].l + '!', 'success');
+      });
+    }
+  },
+  
+  closeRankCelebration: function() {
+    var overlay = window.currentRankCelebrationOverlay;
+    if (overlay) {
+      overlay.style.opacity = '0';
+      overlay.style.transform = 'scale(1.2)';
+      setTimeout(function() {
+        if (overlay.parentNode) {
+          document.body.removeChild(overlay);
+        }
+        delete window.currentRankCelebrationOverlay;
+      }, 400);
+    }
+  }
+};
+
+// ===== SISTEMA DE LOGROS =====
+var AchievementSystem = {
+  achievements: {
+    'first_sticker': {
+      id: 'first_sticker',
+      name: 'Primer Paso',
+      description: 'Canjeaste tu primer sticker',
+      icon: '◆',
+      condition: function(user) { return (user.stickerCount || 0) >= 1; }
+    },
+    'initiated_rank': {
+      id: 'initiated_rank',
+      name: 'Iniciado',
+      description: 'Alcanzaste el rango Initiated',
+      icon: '▲',
+      condition: function(user) { return user.rank === 'INITIATED' || user.rank === 'BUILDER' || user.rank === 'INNER'; }
+    },
+    'builder_rank': {
+      id: 'builder_rank',
+      name: 'Constructor',
+      description: 'Alcanzaste el rango Builder',
+      icon: '■',
+      condition: function(user) { return user.rank === 'BUILDER' || user.rank === 'INNER'; }
+    },
+    'inner_rank': {
+      id: 'inner_rank',
+      name: 'Círculo Interno',
+      description: 'Alcanzaste el rango Inner',
+      icon: '●',
+      condition: function(user) { return user.rank === 'INNER'; }
+    },
+    'collector': {
+      id: 'collector',
+      name: 'Coleccionista',
+      description: 'Tienes 10 o más stickers',
+      icon: '⬢',
+      condition: function(user) { return (user.stickerCount || 0) >= 10; }
+    }
+  },
+  
+  checkAndUnlockAchievements: function(user) {
+    if (!user.achievements) user.achievements = [];
+    
+    var newAchievements = [];
+    
+    for (var achievementId in this.achievements) {
+      var achievement = this.achievements[achievementId];
+      
+      if (user.achievements.indexOf(achievementId) !== -1) continue;
+      
+      if (achievement.condition(user)) {
+        user.achievements.push(achievementId);
+        newAchievements.push(achievement);
+      }
+    }
+    
+    if (newAchievements.length > 0) {
+      setTimeout(function() {
+        newAchievements.forEach(function(achievement, index) {
+          setTimeout(function() {
+            AchievementSystem.showAchievementNotification(achievement);
+          }, index * 1000);
+        });
+      }, 2000);
+    }
+    
+    return newAchievements;
+  },
+  
+  showAchievementNotification: function(achievement) {
+    if (!SystemConfig.gamification.achievementsEnabled) return;
+    
+    try {
+      var notification = document.createElement('div');
+      notification.className = 'achievement-notification';
+      notification.style.cssText = 'position:fixed;top:20px;right:20px;z-index:1002;background:linear-gradient(135deg,#000,#333);color:#fff;padding:16px 20px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.3);transform:translateX(100%);transition:transform 0.4s ease;max-width:300px;border:1px solid rgba(255,255,255,0.1)';
+      
+      notification.innerHTML = '<div style="display:flex;align-items:center;gap:12px"><div style="font-size:24px">' + achievement.icon + '</div><div><div style="font-weight:700;font-size:14px;margin-bottom:4px">¡Logro Desbloqueado!</div><div style="font-weight:600;font-size:13px;color:#fff;margin-bottom:2px">' + achievement.name + '</div><div style="font-size:11px;color:rgba(255,255,255,0.7)">' + achievement.description + '</div></div></div>';
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(function() {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+      
+      setTimeout(function() {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(function() {
+          if (notification.parentNode) {
+            document.body.removeChild(notification);
+          }
+        }, 400);
+      }, 4000);
+      
+    } catch (error) {
+      ErrorHandler.handleAnimationError(error);
+    }
+  },
+  
+  renderAchievements: function(user) {
+    if (!user.achievements) user.achievements = [];
+    
+    var achievementsHtml = '';
+    var unlockedCount = 0;
+    
+    for (var achievementId in this.achievements) {
+      var achievement = this.achievements[achievementId];
+      var isUnlocked = user.achievements.indexOf(achievementId) !== -1;
+      
+      if (isUnlocked) unlockedCount++;
+      
+      achievementsHtml += '<div class="achievement-item" style="display:flex;align-items:center;gap:12px;padding:12px;background:' + (isUnlocked ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)') + ';border-radius:8px;margin-bottom:8px;' + (isUnlocked ? '' : 'opacity:0.5') + '"><div style="font-size:24px;filter:' + (isUnlocked ? 'none' : 'grayscale(1)') + '">' + achievement.icon + '</div><div style="flex:1"><div style="font-weight:600;font-size:13px;color:#fff;margin-bottom:2px">' + achievement.name + '</div><div style="font-size:11px;color:rgba(255,255,255,0.6)">' + achievement.description + '</div></div>' + (isUnlocked ? '<div style="color:#10b981;font-size:16px">✓</div>' : '') + '</div>';
+    }
+    
+    return {
+      html: achievementsHtml,
+      unlockedCount: unlockedCount,
+      totalCount: Object.keys(this.achievements).length
+    };
+  }
+};
+
+// ===== ACTUALIZAR LOGROS EN PERFIL =====
+function updateAchievements() {
+  if (!U) return;
+  
+  try {
+    // Siempre verificar y desbloquear logros según estado actual
+    // (por si el usuario ya tenía stickers/rango antes de que se implementara)
+    if (!U.achievements) U.achievements = [];
+    var changed = false;
+    for (var aid in AchievementSystem.achievements) {
+      var ach = AchievementSystem.achievements[aid];
+      if (U.achievements.indexOf(aid) === -1 && ach.condition(U)) {
+        U.achievements.push(aid);
+        changed = true;
+      }
+    }
+    if (changed) {
+      try { localStorage.setItem('dforzze_user', JSON.stringify(U)); syncUserList(); } catch(e) {}
+    }
+
+    var achievementsData = AchievementSystem.renderAchievements(U);
+    var achievementsList = document.getElementById('achievementsList');
+    var achievementCount = document.getElementById('achievementCount');
+    
+    if (achievementsList) {
+      achievementsList.innerHTML = achievementsData.html;
+    }
+    
+    if (achievementCount) {
+      achievementCount.textContent = achievementsData.unlockedCount + '/' + achievementsData.totalCount;
+    }
+  } catch (error) {
+    ErrorHandler.handleRenderError(error, 'achievements_update');
+  }
+}
+
+// ===== INTEGRACIÓN CON FUNCIÓN EXISTENTE updateProf =====
+var originalUpdateProf = updateProf;
+updateProf = function() {
+  originalUpdateProf.call(this);
+  ProgressSystem.updateProgressWithAnimation();
+  updateAchievements();
+};
+</script>
+</body>
+</html>
+
