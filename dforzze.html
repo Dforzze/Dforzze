@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DFORZZE - Entra al Proceso</title>
 <link id="dfz-favicon" rel="icon" type="image/png" href="images/logo.png">
+<script src="dforzze-sync.js"></script>
 <script>
 (function(){
   var img = new Image();
@@ -990,20 +991,44 @@ function doAuth(e){
       btn.textContent=aTab==='register'?'Crear cuenta':'Iniciar sesión';
     })
     .catch(function(error){
-      // Si el backend no responde, usar localStorage como fallback
-      console.warn('Backend no disponible, usando modo offline');
+      // Si el backend no responde, usar JSONBin como base de datos compartida
+      console.warn('Backend no disponible, usando JSONBin sync');
       btn.disabled=false;
       btn.textContent=aTab==='register'?'Crear cuenta':'Iniciar sesión';
-      
-      // Fallback a localStorage
-      U={name:aTab==='register'?nm:em.split('@')[0],email:em,rank:'NONE',stickerCount:0,stickers:[],image:null,role:'USER',createdAt:new Date().toLocaleDateString('es-PE'),blocked:false,preferences:{animationsEnabled:true,celebrationsEnabled:true,tutorialCompleted:false},achievements:[],lastActivity:new Date().toISOString()};
-      try{
-        var uList=JSON.parse(localStorage.getItem('dforzze_users')||'[]');
-        var existing=uList.find(function(x){return x.email===em;});
-        if(existing){U=existing;}else{uList.push(U);localStorage.setItem('dforzze_users',JSON.stringify(uList));}
-        localStorage.setItem('dforzze_user',JSON.stringify(U));
-      }catch(ex){}
-      closeAuth();updateUI();
+
+      if(typeof DforzzeSync !== 'undefined'){
+        if(aTab==='register'){
+          DforzzeSync.register(nm, em, pw, function(err, user){
+            if(err){ document.getElementById('authErr').textContent=err.error; document.getElementById('authErr').style.display='block'; return; }
+            U=user;
+            try{localStorage.setItem('dforzze_user',JSON.stringify(U));}catch(ex){}
+            closeAuth();updateUI();
+          });
+        } else {
+          DforzzeSync.login(em, pw, function(err, user){
+            if(err){
+              // Si no existe en la nube, buscar en localStorage
+              var uList=JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+              var local=uList.find(function(x){return x.email===em;});
+              if(local){ U=local; try{localStorage.setItem('dforzze_user',JSON.stringify(U));}catch(ex){} closeAuth();updateUI(); return; }
+              document.getElementById('authErr').textContent=err.error; document.getElementById('authErr').style.display='block'; return;
+            }
+            U=user;
+            try{localStorage.setItem('dforzze_user',JSON.stringify(U));}catch(ex){}
+            closeAuth();updateUI();
+          });
+        }
+      } else {
+        // Fallback total a localStorage
+        U={name:aTab==='register'?nm:em.split('@')[0],email:em,rank:'NONE',stickerCount:0,stickers:[],image:null,role:'USER',createdAt:new Date().toLocaleDateString('es-PE'),blocked:false,preferences:{animationsEnabled:true,celebrationsEnabled:true,tutorialCompleted:false},achievements:[],lastActivity:new Date().toISOString()};
+        try{
+          var uList=JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+          var existing=uList.find(function(x){return x.email===em;});
+          if(existing){U=existing;}else{uList.push(U);localStorage.setItem('dforzze_users',JSON.stringify(uList));}
+          localStorage.setItem('dforzze_user',JSON.stringify(U));
+        }catch(ex){}
+        closeAuth();updateUI();
+      }
     });
 }
 
@@ -1158,7 +1183,7 @@ function saveNm(){
 }
 function cancelNm(){document.getElementById('nameShow').style.display='flex';document.getElementById('nameEdit').style.display='none'}
 
-// Sincronizar usuario con lista global
+// Sincronizar usuario con lista global y con la nube
 function syncUserList(){
   try{
     var list=JSON.parse(localStorage.getItem('dforzze_users')||'[]');
@@ -1166,6 +1191,8 @@ function syncUserList(){
     if(idx>=0)list[idx]=U; else list.push(U);
     localStorage.setItem('dforzze_users',JSON.stringify(list));
   }catch(e){}
+  // Sync a JSONBin
+  if(typeof DforzzeSync !== 'undefined') DforzzeSync.saveUser(U, null);
 }
 
 // ===== INVENTORY =====

@@ -59,6 +59,7 @@ tr:hover td{background:rgba(255,255,255,.02)}
   .main{padding:12px}
 }
 </style>
+<script src="dforzze-sync.js"></script>
 </head>
 <body>
 
@@ -668,7 +669,7 @@ function renderDashboard(){
 
 // ── PEDIDOS ────────────────────────────────────────────────────
 function renderOrders(){
-  var orders = JSON.parse(localStorage.getItem('dforzze_orders') || '[]');
+  loadOrdersFromCloud(function(orders){
   var el = document.getElementById('ordersTable');
   if(orders.length === 0){
     el.innerHTML = '<p style="color:rgba(255,255,255,.2);font-size:13px;text-align:center;padding:32px 0">No hay pedidos registrados aún.</p>';
@@ -701,6 +702,7 @@ function renderOrders(){
         +'</tr>';
       }).join('')
     + '</tbody></table>';
+  }); // fin loadOrdersFromCloud
 }
 
 function openOrderDetail(idx){
@@ -836,8 +838,36 @@ function getAllUsers(){
   return list;
 }
 
+// Cargar usuarios desde la nube y actualizar localStorage
+function loadUsersFromCloud(cb){
+  if(typeof DforzzeSync === 'undefined'){ if(cb) cb(getAllUsers()); return; }
+  DforzzeSync.getUsers(function(cloudUsers){
+    if(cloudUsers && cloudUsers.length > 0){
+      // Mezclar: la nube tiene prioridad
+      var local = JSON.parse(localStorage.getItem('dforzze_users')||'[]');
+      cloudUsers.forEach(function(cu){
+        var idx = local.findIndex(function(u){ return u.email===cu.email; });
+        if(idx>=0) local[idx]=cu; else local.push(cu);
+      });
+      localStorage.setItem('dforzze_users', JSON.stringify(local));
+    }
+    if(cb) cb(getAllUsers());
+  });
+}
+
+// Cargar pedidos desde la nube
+function loadOrdersFromCloud(cb){
+  if(typeof DforzzeSync === 'undefined'){ if(cb) cb(JSON.parse(localStorage.getItem('dforzze_orders')||'[]')); return; }
+  DforzzeSync.getOrders(function(cloudOrders){
+    if(cloudOrders && cloudOrders.length > 0){
+      localStorage.setItem('dforzze_orders', JSON.stringify(cloudOrders));
+    }
+    if(cb) cb(JSON.parse(localStorage.getItem('dforzze_orders')||'[]'));
+  });
+}
+
 function renderUsers(){
-  var users = getAllUsers();
+  loadUsersFromCloud(function(users){
   var el = document.getElementById('usersTable');
   if(users.length === 0){
     el.innerHTML = '<p style="color:rgba(255,255,255,.2);font-size:13px;text-align:center;padding:40px 0">No hay usuarios registrados aún.</p>';
@@ -863,10 +893,11 @@ function renderUsers(){
         '<td><button class="btn btn-ghost" onclick="openEditUser(\''+u.email+'\')" style="padding:5px 12px;font-size:11px">Editar</button></td>'+
       '</tr>';
     }).join('') + '</tbody></table>';
+  }); // fin loadUsersFromCloud
 }
 
 function openEditUser(email){
-  var users = getAllUsers();
+  loadUsersFromCloud(function(users){
   var u = users.find(function(x){ return x.email === email; });
   if(!u) return;
   _editEmail = email;
@@ -891,6 +922,7 @@ function openEditUser(email){
   document.getElementById('sb-blocked').style.opacity = u.blocked  ? '1' : '0.4';
 
   document.getElementById('editUserModal').style.display = 'flex';
+  }); // fin loadUsersFromCloud
 }
 
 function closeEditUser(){
