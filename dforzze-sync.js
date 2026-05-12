@@ -16,35 +16,37 @@ var DforzzeSync = (function(){
   var BASE = 'https://api.jsonbin.io/v3/b/';
 
   function headers(write){
-    return {
-      'Content-Type': 'application/json',
+    var h = {
       'X-Master-Key': MASTER_KEY,
-      'X-Access-Key': ACCESS_KEY,
-      'X-Bin-Meta': 'false'
+      'X-Access-Key': ACCESS_KEY
     };
+    if(write) h['Content-Type'] = 'application/json';
+    return h;
   }
 
   // ── Leer bin ──────────────────────────────────────────────
   function read(bin, cb){
-    fetch(BASE + BINS[bin] + '/latest', { headers: headers() })
-      .then(function(r){ return r.json(); })
-      .then(function(d){ cb(null, d.record); })
+    fetch(BASE + BINS[bin] + '/latest', { headers: headers(false) })
+      .then(function(r){
+        if(!r.ok){ console.error('JSONBin read HTTP error:', r.status); cb(new Error(r.status), null); return; }
+        return r.json();
+      })
+      .then(function(d){ if(d) cb(null, d.record); })
       .catch(function(e){ console.error('JSONBin read error:', e); cb(e, null); });
   }
 
-  // ── Escribir bin (reemplaza todo) ─────────────────────────
+  // ── Escribir bin ──────────────────────────────────────────
   function write(bin, data, cb){
     fetch(BASE + BINS[bin], {
       method: 'PUT',
       headers: headers(true),
       body: JSON.stringify(data)
     })
-      .then(function(r){ return r.json(); })
-      .then(function(d){ 
-        if(d.message) console.error('JSONBin write error:', d.message);
-        else console.log('JSONBin write OK:', bin);
-        if(cb) cb(null, d); 
+      .then(function(r){
+        if(!r.ok){ console.error('JSONBin write HTTP error:', r.status); if(cb) cb(new Error(r.status), null); return; }
+        return r.json();
       })
+      .then(function(d){ if(d){ console.log('JSONBin write OK:', bin); if(cb) cb(null, d); } })
       .catch(function(e){ console.error('JSONBin write error:', e); if(cb) cb(e, null); });
   }
 
