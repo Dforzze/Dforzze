@@ -364,12 +364,8 @@ label{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;text-tra
 
 </main>
 
-<!-- API Client -->
-<script>
-  window.DFORZZE_API_URL = 'https://dforzze-backend-production.up.railway.app/api';
-  window.DFORZZE_WS_URL  = 'https://dforzze-backend-production.up.railway.app';
-</script>
-<script src="dforzze-backend/public/js/api.js"></script>
+<!-- API Client — deshabilitado en modo prueba -->
+<!-- <script src="dforzze-backend/public/js/api.js"></script> -->
 <script>
 // ── Cart image map ──────────────────────────────────────────────
 let cartBase = 0;
@@ -920,7 +916,7 @@ async function placeOrder(){
   // Check auth
   const localUser = (function(){ try{ return JSON.parse(localStorage.getItem('dforzze_user')); }catch(e){ return null; } })();
   const isAdmin = localUser && localUser.role === 'ADMIN';
-  const isLoggedIn = isAdmin || ((typeof DforzzeAPI !== 'undefined') && DforzzeAPI.isLoggedIn());
+  const isLoggedIn = isAdmin || !!localUser; // modo prueba: cualquier usuario local
   if(!isLoggedIn){
     openAuthModal('login');
     return;
