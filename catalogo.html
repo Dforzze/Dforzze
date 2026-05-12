@@ -70,9 +70,61 @@ button{font-family:inherit;cursor:pointer}
 .nav-link:hover,.nav-link.active{color:#000}
 
 /* CATEGORY NAV */
-.cat-btn{background:none;border:none;font-size:13px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:rgba(0,0,0,.4);padding:8px 0;cursor:pointer;transition:color .2s;border-bottom:2px solid transparent}
+.cat-btn{background:none;border:none;font-size:13px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:rgba(0,0,0,.4);padding:8px 0;cursor:pointer;transition:color .2s;border-bottom:2px solid transparent;white-space:nowrap}
 .cat-btn.active{color:#000;border-bottom-color:#000}
 .cat-btn:hover{color:#000}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media(max-width:767px){
+  /* Header simplificado */
+  header > div{padding:0 16px!important;height:52px!important}
+  header nav{display:none!important}
+  #profileBtn span[style*="max-width"]{display:none!important}
+
+  /* Ocultar botón volver en móvil, queda limpio */
+  header > div > a[href="tienda.html"]{display:none!important}
+
+  /* Search bar */
+  #searchBar{padding:10px 16px!important}
+
+  /* Main padding */
+  main{padding:24px 16px 60px!important}
+
+  /* Category tabs — scroll horizontal */
+  main > div:first-child{gap:20px!important;margin-bottom:20px!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important;padding-bottom:0!important}
+  .cat-btn{font-size:12px!important;padding:10px 0!important;flex-shrink:0}
+
+  /* Section header */
+  main > div:nth-child(2){margin-bottom:16px!important}
+  main > div:nth-child(2) h2{font-size:16px!important}
+  /* Ocultar flechas de navegación en móvil */
+  main > div:nth-child(2) > div{display:none!important}
+
+  /* Products grid — 2 columnas estilo Nike */
+  #prodGrid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:2px!important}
+  .prod-card{width:100%!important}
+  .prod-img{padding:16px!important}
+
+  /* Banner final */
+  section[style*="height:500px"]{height:360px!important}
+  section[style*="height:500px"] h2{font-size:clamp(24px,7vw,40px)!important}
+  section[style*="height:500px"] p[style*="font-size:15px"]{display:none!important}
+  section[style*="height:500px"] > div:last-child{padding:0 16px!important}
+
+  /* Modales — bottom sheet */
+  #catProfModal{align-items:flex-end!important;padding:0!important}
+  #catProfModal > div{border-radius:20px 20px 0 0!important;max-width:100%!important;max-height:92vh!important}
+  #catInvModal{align-items:flex-end!important;padding:0!important}
+  #catInvModal > div{border-radius:20px 20px 0 0!important;max-width:100%!important;max-height:92vh!important}
+  #catRedModal{align-items:flex-end!important;padding:0!important}
+  #catRedModal > div{border-radius:20px 20px 0 0!important;max-width:100%!important}
+
+  /* Rank timeline scroll */
+  .rank-timeline{overflow-x:auto!important;-webkit-overflow-scrolling:touch!important}
+  .rank-timeline > div:not([style*="absolute"]){min-width:280px!important}
+  .milestone-icon{width:32px!important;height:32px!important;font-size:14px!important}
+  .milestone-label{font-size:9px!important}
+}
 </style>
 </head>
 <body>
