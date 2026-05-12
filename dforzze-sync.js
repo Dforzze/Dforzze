@@ -6,7 +6,7 @@
 var DforzzeSync = (function(){
 
   var MASTER_KEY = '$2a$10$1WTP.tBFPh4PeC7/iUb9COVLtPfZu8/h4CDwpZqbICHAOTXnN3ng.';
-  var ACCESS_KEY = '$2a$10$Sz4NVHKK77NmJwPMbaLJ4eUyLZrumDqQK3A7C5m3nIM9cw7CTN9Jm';
+  var ACCESS_KEY = '$2a$10$SSwNie6BiAwjBY46q2LZIuFCa.wA.nmXZ8SNOPkiVnUl.po/E.sQS';
   var BINS = {
     users:    '6a028dc0adc21f119a88447f',
     orders:   '6a028dc1adc21f119a884480',
