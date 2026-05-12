@@ -938,11 +938,33 @@ function doAuth(e){
   if(!em){err.textContent='Ingresa tu email';err.style.display='block';return}
   if(pw.length<6){err.textContent='Mínimo 6 caracteres';err.style.display='block';return}
   
-  // Deshabilitar botón mientras carga
   btn.disabled=true;
   btn.textContent='Cargando...';
   err.style.display='none';
-  
+
+  // ── Usar JSONBin directamente (base de datos compartida) ──
+  if(typeof DforzzeSync !== 'undefined'){
+    if(aTab==='register'){
+      DforzzeSync.register(nm, em, pw, function(e2, user){
+        btn.disabled=false; btn.textContent='Crear cuenta';
+        if(e2){ err.textContent=e2.error; err.style.display='block'; return; }
+        U=user;
+        try{localStorage.setItem('dforzze_user',JSON.stringify(U)); var uList=JSON.parse(localStorage.getItem('dforzze_users')||'[]'); var idx=uList.findIndex(function(x){return x.email===U.email;}); if(idx>=0)uList[idx]=U; else uList.push(U); localStorage.setItem('dforzze_users',JSON.stringify(uList));}catch(ex){}
+        closeAuth();updateUI();
+      });
+    } else {
+      DforzzeSync.login(em, pw, function(e2, user){
+        btn.disabled=false; btn.textContent='Iniciar sesión';
+        if(e2){ err.textContent=e2.error; err.style.display='block'; return; }
+        U=user;
+        try{localStorage.setItem('dforzze_user',JSON.stringify(U)); var uList=JSON.parse(localStorage.getItem('dforzze_users')||'[]'); var idx=uList.findIndex(function(x){return x.email===U.email;}); if(idx>=0)uList[idx]=U; else uList.push(U); localStorage.setItem('dforzze_users',JSON.stringify(uList));}catch(ex){}
+        closeAuth();updateUI();
+      });
+    }
+    return;
+  }
+
+  // Fallback: backend Railway (si JSONBin no está disponible)
   var API='https://dforzze-backend-production.up.railway.app/api';
   var endpoint=aTab==='register'?'/auth/register':'/auth/login';
   var body=aTab==='register'?{name:nm,email:em,password:pw}:{email:em,password:pw};
