@@ -218,6 +218,24 @@ input{font-family:inherit}
 <script>
 function killSplash(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){try{s.remove()}catch(e){}},600)}}
 setTimeout(killSplash,3000);
+
+// Mantener splash hasta que el video esté listo para reproducir
+(function(){
+  var killed = false;
+  function kill(){
+    if(killed) return;
+    killed = true;
+    killSplash();
+  }
+  // Máximo 8 segundos de espera
+  setTimeout(kill, 8000);
+  // Salir cuando el video tenga suficientes datos para reproducir sin cortes
+  var vid = document.getElementById('heroVid');
+  if(vid){
+    vid.addEventListener('canplaythrough', function(){ kill(); });
+    vid.addEventListener('playing', function(){ setTimeout(kill, 800); });
+  }
+})();
 </script>
 
 <!-- SCROLL PROGRESS -->
