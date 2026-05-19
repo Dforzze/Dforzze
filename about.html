@@ -19,12 +19,11 @@ button{font-family:inherit;cursor:pointer}
 @keyframes nebulaDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(30px)}}
 @keyframes lineGrow{0%{width:0}100%{width:100%}}
 
-/* En móvil ocultar video y mostrar imagen de fondo */
+/* En móvil mostrar video comprimido, imagen como fallback si no carga */
 @media(max-width:767px){
-  .hero-video{display:none!important}
-  .hero-bg-mobile{display:block!important}
-  .hades-video{display:none!important}
-  .hades-bg-mobile{display:block!important}
+  .hero-bg-mobile{display:none!important}
+  .hades-bg-mobile{display:none!important}
+  .hero-video,.hades-video{display:block!important}
 }
 @media(min-width:768px){
   .hero-bg-mobile{display:none!important}
@@ -142,8 +141,8 @@ button{font-family:inherit;cursor:pointer}
 <!-- HERO -->
 <section style="min-height:100vh;display:flex;align-items:flex-end;position:relative;overflow:hidden;padding-top:60px">
   <!-- VIDEO BACKGROUND dforzze x 26 -->
-  <video id="vid1" autoplay loop muted playsinline class="hero-video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(.45)" poster="images/video-poster.jpg">
-    <source src="https://res.cloudinary.com/dbn4m7yet/video/upload/v1779221787/Dforzze_X_26is________fyp_parati_dios_viral_1_epls54.mp4" type="video/mp4">
+  <video preload="auto" id="vid1" autoplay loop muted playsinline class="hero-video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(.45)" poster="images/video-poster.jpg">
+    <source src="https://res.cloudinary.com/dbn4m7yet/video/upload/q_auto,w_1280/v1779221787/Dforzze_X_26is________fyp_parati_dios_viral_1_epls54.mp4" type="video/mp4">
   </video>
   <!-- Fallback imagen para móvil -->
   <div class="hero-bg-mobile" style="position:absolute;inset:0;background:url('images/video-poster.jpg') center/cover no-repeat;filter:brightness(.45)"></div>
@@ -307,8 +306,8 @@ button{font-family:inherit;cursor:pointer}
 
 <!-- VIDEO — DFORZZE x HADES -->
 <section style="position:relative;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center">
-  <video id="vid2" autoplay loop muted playsinline class="hades-video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;filter:brightness(.6)" poster="images/video-poster.jpg">
-    <source src="https://res.cloudinary.com/dbn4m7yet/video/upload/v1779221775/Dforzze_X_hades66_fyp_viral_liqu2n.mp4" type="video/mp4">
+  <video preload="auto" id="vid2" autoplay loop muted playsinline class="hades-video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;filter:brightness(.6)" poster="images/video-poster.jpg">
+    <source src="https://res.cloudinary.com/dbn4m7yet/video/upload/q_auto,w_1280/v1779221775/Dforzze_X_hades66_fyp_viral_liqu2n.mp4" type="video/mp4">
   </video>
   <!-- Fallback imagen para móvil -->
   <div class="hades-bg-mobile" style="position:absolute;inset:0;background:url('images/playa.jpg') center/cover no-repeat;filter:brightness(.6)"></div>
@@ -372,17 +371,28 @@ if(heroLine) obs.observe(heroLine);
 // Lazy load videos — cargan cuando el usuario llega a la sección
 function lazyLoadVideo(vid){
   if(!vid) return;
-  var src = vid.querySelector('source[data-src]');
-  if(!src || src.src) return; // ya cargado
-  src.src = src.getAttribute('data-src');
-  vid.load();
+  var src = vid.querySelector('source');
+  if(!src) return;
+  if(!src.src && src.dataset.src){
+    src.src = src.dataset.src;
+    vid.load();
+  }
   vid.play().catch(function(){});
+}
+
+function triggerMobileVideoPlay(){
+  lazyLoadVideo(document.getElementById('vid1'));
+  lazyLoadVideo(document.getElementById('vid2'));
 }
 
 // Video 1 — hero (carga al entrar a la página)
 window.addEventListener('load', function(){
-  lazyLoadVideo(document.getElementById('vid1'));
+  triggerMobileVideoPlay();
 });
+
+document.addEventListener('touchstart', function(){
+  triggerMobileVideoPlay();
+},{once:true});
 
 // Video 2 — hades (carga cuando el usuario llega a esa sección)
 var vid2obs = new IntersectionObserver(function(entries){
