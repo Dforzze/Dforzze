@@ -19,10 +19,10 @@ button{font-family:inherit;cursor:pointer}
 @keyframes nebulaDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(30px)}}
 @keyframes lineGrow{0%{width:0}100%{width:100%}}
 
-/* En móvil mostrar video comprimido, imagen como fallback si no carga */
+/* En móvil usar el mismo video que en desktop; fallback oculto por defecto */
 @media(max-width:767px){
-  .hero-bg-mobile{display:block!important}
-  .hades-bg-mobile{display:block!important}
+  .hero-bg-mobile{display:none!important}
+  .hades-bg-mobile{display:none!important}
   .hero-video,.hades-video{display:block!important}
 }
 @media(min-width:768px){
