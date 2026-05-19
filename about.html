@@ -21,8 +21,8 @@ button{font-family:inherit;cursor:pointer}
 
 /* En móvil mostrar video comprimido, imagen como fallback si no carga */
 @media(max-width:767px){
-  .hero-bg-mobile{display:none!important}
-  .hades-bg-mobile{display:none!important}
+  .hero-bg-mobile{display:block!important}
+  .hades-bg-mobile{display:block!important}
   .hero-video,.hades-video{display:block!important}
 }
 @media(min-width:768px){
@@ -380,9 +380,25 @@ function lazyLoadVideo(vid){
   vid.play().catch(function(){});
 }
 
+function setMobileFallback(vid, fallbackSelector){
+  if(!vid) return;
+  var fallback = document.querySelector(fallbackSelector);
+  if(!fallback) return;
+  vid.addEventListener('playing', function(){
+    fallback.style.display = 'none';
+  });
+  vid.addEventListener('error', function(){
+    fallback.style.display = 'block';
+  });
+}
+
 function triggerMobileVideoPlay(){
-  lazyLoadVideo(document.getElementById('vid1'));
-  lazyLoadVideo(document.getElementById('vid2'));
+  var vid1 = document.getElementById('vid1');
+  var vid2 = document.getElementById('vid2');
+  setMobileFallback(vid1, '.hero-bg-mobile');
+  setMobileFallback(vid2, '.hades-bg-mobile');
+  lazyLoadVideo(vid1);
+  lazyLoadVideo(vid2);
 }
 
 // Video 1 — hero (carga al entrar a la página)
