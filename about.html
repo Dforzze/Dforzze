@@ -130,8 +130,8 @@ button{font-family:inherit;cursor:pointer}
 <!-- HERO -->
 <section style="min-height:100vh;display:flex;align-items:flex-end;position:relative;overflow:hidden;padding-top:60px">
   <!-- VIDEO BACKGROUND dforzze x 26 -->
-  <video autoplay loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(.45)">
-    <source src="video/dforzze26.mp4" type="video/mp4">
+  <video id="vid1" loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(.45)" poster="images/video-poster.jpg">
+    <source data-src="video/dforzze26.mp4" type="video/mp4">
   </video>
   <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.3) 50%,rgba(0,0,0,.2) 100%)"></div>
 
@@ -293,8 +293,8 @@ button{font-family:inherit;cursor:pointer}
 
 <!-- VIDEO — DFORZZE x HADES -->
 <section style="position:relative;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center">
-  <video autoplay loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;filter:brightness(.6)">
-    <source src="video/hades.mp4" type="video/mp4">
+  <video id="vid2" loop muted playsinline style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;filter:brightness(.6)" poster="images/video-poster.jpg">
+    <source data-src="video/hades.mp4" type="video/mp4">
   </video>
   <div style="position:absolute;inset:0;background:linear-gradient(to bottom,#000 0%,transparent 15%,transparent 80%,#000 100%)"></div>
   <div style="position:relative;z-index:10;text-align:center;padding:0 24px">
@@ -342,7 +342,6 @@ const obs = new IntersectionObserver((entries)=>{
   entries.forEach(e=>{
     if(e.isIntersecting){
       e.target.classList.add('show');
-      // hero line
       if(e.target.id==='heroLine') e.target.style.width='100%';
       obs.unobserve(e.target);
     }
@@ -351,9 +350,35 @@ const obs = new IntersectionObserver((entries)=>{
 
 document.querySelectorAll('.fade-up,.fade-in').forEach(el=>obs.observe(el));
 
-// Hero line trigger
 const heroLine = document.getElementById('heroLine');
 if(heroLine) obs.observe(heroLine);
+
+// Lazy load videos — cargan cuando el usuario llega a la sección
+function lazyLoadVideo(vid){
+  if(!vid) return;
+  var src = vid.querySelector('source[data-src]');
+  if(!src || src.src) return; // ya cargado
+  src.src = src.getAttribute('data-src');
+  vid.load();
+  vid.play().catch(function(){});
+}
+
+// Video 1 — hero (carga al entrar a la página)
+window.addEventListener('load', function(){
+  lazyLoadVideo(document.getElementById('vid1'));
+});
+
+// Video 2 — hades (carga cuando el usuario llega a esa sección)
+var vid2obs = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){
+      lazyLoadVideo(document.getElementById('vid2'));
+      vid2obs.disconnect();
+    }
+  });
+}, {threshold: 0.1});
+var vid2 = document.getElementById('vid2');
+if(vid2) vid2obs.observe(vid2);
 </script>
 
 </body>
