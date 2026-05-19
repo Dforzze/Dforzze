@@ -221,28 +221,34 @@ input{font-family:inherit}
 </div>
 <script>
 function killSplash(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){try{s.remove()}catch(e){}},600)}}
-setTimeout(killSplash,3000);
 
 // Mantener splash hasta que el video esté listo para reproducir
 (function(){
   var killed = false;
+  var vid = null;
   function kill(){
     if(killed) return;
     killed = true;
     killSplash();
   }
-  // Máximo 8 segundos de espera
-  setTimeout(kill, 8000);
-  // Salir cuando el video tenga suficientes datos para reproducir sin cortes
-  var vid = document.getElementById('heroVid');
-  if(vid){
+  function setupVideo(){
+    if(vid) return;
+    vid = document.getElementById('heroVid');
+    if(!vid) return;
     vid.addEventListener('canplaythrough', function(){ kill(); });
     vid.addEventListener('playing', function(){ setTimeout(kill, 800); });
-    vid.play().catch(function(){});
   }
-  document.addEventListener('touchstart', function(){
-    if(vid) vid.play().catch(function(){});
-  }, {once:true});
+  function tryPlay(){
+    setupVideo();
+    if(!vid) return;
+    vid.play().then(function(){ kill(); }).catch(function(){});
+  }
+  // Máximo 8 segundos de espera
+  setTimeout(kill, 8000);
+  window.addEventListener('load', tryPlay);
+  document.addEventListener('touchstart', tryPlay, {once:true});
+  document.addEventListener('click', tryPlay, {once:true});
+  document.addEventListener('keydown', tryPlay, {once:true});
 })();
 </script>
 
