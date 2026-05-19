@@ -208,7 +208,11 @@ button{font-family:inherit;cursor:pointer}
   .milestone-icon{width:32px!important;height:32px!important;font-size:14px!important}
   .milestone-label{font-size:9px!important}
 }
-/* Ocultar toggle negro de Shopify completamente */
+/* Ocultar título y flechas del productSet de Shopify */
+.shopify-buy__collection-products-header,
+.shopify-buy__product-set__header,
+.shopify-buy__product-set__pager,
+.shopify-buy__product-set__title{display:none!important}
 .shopify-buy__cart-toggle{
   display:none!important;
   visibility:hidden!important;
@@ -424,34 +428,34 @@ button{font-family:inherit;cursor:pointer}
   </div>
 </div>
 
+<!-- HERO BANNER CATÁLOGO -->
+<section style="position:relative;height:60vh;min-height:320px;overflow:hidden;background:#000">
+  <img src="images/banner.png" alt="DFORZZE" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;filter:brightness(.5)">
+  <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 60%)"></div>
+  <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:40px 32px">
+    <p style="color:rgba(255,255,255,.4);font-size:10px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;margin-bottom:12px">DFORZZE STUDIO</p>
+    <h1 style="color:#fff;font-weight:900;font-size:clamp(40px,8vw,96px);letter-spacing:-.04em;line-height:.9;text-transform:uppercase;margin-bottom:16px">PIEZAS<br><span style="color:rgba(255,255,255,.3)">LIMITADAS</span></h1>
+    <p style="color:rgba(255,255,255,.5);font-size:13px;font-weight:400;letter-spacing:.02em;max-width:400px">Sin restock. Lo que llevas dice dónde estás.</p>
+  </div>
+</section>
+
 <!-- MAIN -->
-<main style="max-width:1400px;margin:0 auto;padding:40px 32px 80px">
+<main style="max-width:1400px;margin:0 auto;padding:32px 0 80px;background:#fff">
 
   <!-- Category tabs -->
-  <div style="display:flex;align-items:center;gap:32px;margin-bottom:32px;border-bottom:1px solid rgba(0,0,0,.1);padding-bottom:0;overflow-x:auto">
+  <div style="display:flex;align-items:center;gap:32px;margin-bottom:0;border-bottom:1px solid rgba(0,0,0,.1);padding:0 32px;overflow-x:auto">
     <button class="cat-btn active" onclick="filterCat('all',this)">Todo</button>
     <button class="cat-btn" onclick="filterCat('tshirts',this)">Camisetas</button>
     <button class="cat-btn" onclick="filterCat('hoodies',this)">Hoodies</button>
     <button class="cat-btn" onclick="filterCat('pants',this)">Pantalones</button>
   </div>
 
-  <!-- Section header -->
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-    <h2 style="font-weight:800;font-size:22px;letter-spacing:-.01em;text-transform:uppercase" id="catTitle">Colección 01</h2>
-    <div style="display:flex;align-items:center;gap:8px">
-      <button onclick="scrollGrid(-1)" style="width:36px;height:36px;border:1px solid rgba(0,0,0,.2);background:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#000';this.style.borderColor='#000';this.querySelector('svg').style.stroke='#fff'" onmouseout="this.style.background='none';this.style.borderColor='rgba(0,0,0,.2)';this.querySelector('svg').style.stroke='#000'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button onclick="scrollGrid(1)" style="width:36px;height:36px;border:1px solid rgba(0,0,0,.2);background:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s" onmouseover="this.style.background='#000';this.style.borderColor='#000';this.querySelector('svg').style.stroke='#fff'" onmouseout="this.style.background='none';this.style.borderColor='rgba(0,0,0,.2)';this.querySelector('svg').style.stroke='#000'">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-    </div>
-  </div>
-
-  <!-- Divider -->
-  <div style="height:1px;background:rgba(0,0,0,.1);margin-bottom:32px"></div>
-
   <!-- Products grid — Shopify Buy Button -->
+  <div style="padding:24px 0 0">
+  <div style="padding:0 32px 20px;display:flex;align-items:baseline;gap:16px">
+    <h2 style="font-weight:900;font-size:clamp(22px,3vw,32px);letter-spacing:-.02em;text-transform:uppercase;color:#000">Lo nuevo</h2>
+    <span style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.3)">Disponible ahora</span>
+  </div>
   <div id='collection-component-1779214112780'></div>
   <script type="text/javascript">/*<![CDATA[*/(function () {var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';if (window.ShopifyBuy) {if (window.ShopifyBuy.UI) {ShopifyBuyInit();} else {loadScript();}} else {loadScript();}function loadScript() {var script = document.createElement('script');script.async = true;script.src = scriptURL;(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);script.onload = ShopifyBuyInit;}function ShopifyBuyInit() {var client = ShopifyBuy.buildClient({domain: 'szs0ek-1b.myshopify.com',storefrontAccessToken: 'c2afaf3671fe2814d1fcd9dd1e3f69cb',});ShopifyBuy.UI.onReady(client).then(function (ui) {window._shopifyUI = ui; ui.createComponent('collection', {id: '468307574873',node: document.getElementById('collection-component-1779214112780'),moneyFormat: 'S%2F.%20%7B%7Bamount%7D%7D',options: {"product": {"styles": {"product": {"@media (min-width: 601px)": {"max-width": "calc(25% - 20px)","margin-left": "20px","margin-bottom": "50px","width": "calc(25% - 20px)"},"img": {"height": "calc(100% - 15px)","position": "absolute","left": "0","right": "0","top": "0"},"imgWrapper": {"padding-top": "calc(75% + 15px)","position": "relative","height": "0"}},"button": {":hover": {"background-color": "#000000"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"button": "Agregar al carrito"}},"productSet": {"styles": {"products": {"@media (min-width: 601px)": {"margin-left": "-20px"}}}},"modalProduct": {"contents": {"img": false,"imgWithCarousel": true,"button": false,"buttonWithQuantity": true},"styles": {"product": {"@media (min-width: 601px)": {"max-width": "100%","margin-left": "0px","margin-bottom": "0px"}},"button": {":hover": {"background-color": "#000000"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"button": "Agregar al carrito"}},"option": {},"cart": {"styles": {"button": {":hover": {"background-color": "#000000"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"total": "Subtotal","button": "Finalizar compra"}},"toggle": {"styles": {"toggle": {"background-color": "#000000",":hover": {"background-color": "#000000"},":focus": {"background-color": "#000000"}}}}},});});}})();/*]]>*/</script>
 
@@ -459,8 +463,62 @@ button{font-family:inherit;cursor:pointer}
   <div id="emptyState" style="display:none;text-align:center;padding:80px 0">
     <p style="color:rgba(0,0,0,.3);font-size:13px;letter-spacing:.1em;text-transform:uppercase">Próximamente</p>
   </div>
+  </div><!-- /padding wrapper -->
 
 </main>
+
+<!-- SECCIÓN INFO — envíos, piezas limitadas -->
+<section style="background:#000;padding:48px 32px;border-top:1px solid rgba(255,255,255,.06)">
+  <div style="max-width:1400px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:32px">
+    <div style="display:flex;align-items:flex-start;gap:16px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5" style="flex-shrink:0;margin-top:2px"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      <div>
+        <p style="color:#fff;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Envíos nacionales</p>
+        <p style="color:rgba(255,255,255,.35);font-size:12px;line-height:1.6">Entrega en 3-5 días hábiles a todo el Perú.</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:16px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5" style="flex-shrink:0;margin-top:2px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div>
+        <p style="color:#fff;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">Piezas sin restock</p>
+        <p style="color:rgba(255,255,255,.35);font-size:12px;line-height:1.6">Cada prenda es limitada. Cuando se acaba, no vuelve.</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:flex-start;gap:16px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5" style="flex-shrink:0;margin-top:2px"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <div>
+        <p style="color:#fff;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">10% primera compra</p>
+        <p style="color:rgba(255,255,255,.35);font-size:12px;line-height:1.6">Descuento automático en tu primer pedido.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN MEMBERSHIP — gana stickers -->
+<section style="background:#fff;padding:64px 32px">
+  <div style="max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap">
+    <div style="flex:1;min-width:260px">
+      <p style="color:rgba(0,0,0,.3);font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;margin-bottom:12px">Members Club</p>
+      <h2 style="color:#000;font-weight:900;font-size:clamp(28px,4vw,48px);letter-spacing:-.03em;line-height:1;margin-bottom:16px">Comprá.<br>Subí de rango.</h2>
+      <p style="color:rgba(0,0,0,.5);font-size:14px;line-height:1.7;margin-bottom:28px">Cada compra suma stickers a tu perfil. Acumulá y subí de Initiated a Builder a Inner — con beneficios reales en cada nivel.</p>
+      <a href="dforzze.html" style="display:inline-flex;align-items:center;gap:8px;background:#000;color:#fff;font-weight:700;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:13px 28px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">Ver membership →</a>
+    </div>
+    <div style="display:flex;gap:12px;flex-shrink:0">
+      <div style="text-align:center;padding:20px 16px;background:#f5f5f5;border-radius:8px;min-width:80px">
+        <p style="font-size:22px;margin-bottom:6px">◆</p>
+        <p style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.4)">Initiated</p>
+      </div>
+      <div style="text-align:center;padding:20px 16px;background:#f5f5f5;border-radius:8px;min-width:80px">
+        <p style="font-size:22px;margin-bottom:6px">■</p>
+        <p style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.4)">Builder</p>
+      </div>
+      <div style="text-align:center;padding:20px 16px;background:#000;border-radius:8px;min-width:80px">
+        <p style="font-size:22px;margin-bottom:6px;color:#fff">●</p>
+        <p style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5)">Inner</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- BANNER FINAL -->
 <section style="position:relative;height:500px;overflow:hidden;margin-top:2px">
