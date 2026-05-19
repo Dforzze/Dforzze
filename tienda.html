@@ -96,28 +96,41 @@ button{font-family:inherit;cursor:pointer}
 .feature-grid .card .card-copy a{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px 28px;border-radius:9999px;transition:all .3s}
 
 @media(max-width:767px){
-  header div{padding:0 16px;flex-wrap:wrap;gap:12px}
-  nav{gap:14px;flex-wrap:wrap;justify-content:center;order:3;width:100%}
-  .nav-link{font-size:11px}
-  header > div > div:last-child{flex:1 1 100%;justify-content:center}
-  header > div > a{flex:1 1 100%;justify-content:flex-start}
-  header > div > div:last-child a{padding:10px 18px;font-size:10px}
+  /* Header limpio en móvil */
+  header > div{height:52px!important;padding:0 16px!important}
+  header > div > a{flex:0 0 auto!important}
+  header > div nav{display:none!important}
+  header > div > div:last-child{flex:0 0 auto!important}
+  header > div > div:last-child a{padding:8px 16px!important;font-size:10px!important}
 
-  .hero-section{min-height:100vh}
-  .hero-copy{position:relative;width:100%;height:auto;padding:32px 20px 40px;justify-content:flex-end}
-  .hero-copy .fade-up{animation:none}
-  .hero-copy > div{max-width:100%}
-  .hero-copy p{font-size:15px;max-width:100%;}
-  .hero-copy a{width:100%;justify-content:center}
-  .hero-copy a:first-of-type{padding:14px 20px}
-  .hero-copy a:last-of-type{padding:14px 20px}
-  .hero-copy div[style*="font-weight:900"]{font-size:clamp(40px,12vw,72px);line-height:1}
+  /* Hero — full screen, texto abajo */
+  .hero-section{height:100svh!important;min-height:600px!important}
+  .hero-copy{
+    position:absolute!important;
+    bottom:0!important;top:auto!important;
+    width:100%!important;
+    height:auto!important;
+    padding:0 20px 48px!important;
+    justify-content:flex-end!important;
+  }
+  .hero-copy > div:first-child{margin-bottom:20px!important}
+  .hero-copy div[style*="font-weight:900"]{
+    font-size:clamp(48px,13vw,80px)!important;
+    line-height:.92!important;
+  }
+  .hero-copy p{font-size:13px!important;max-width:100%!important;margin-bottom:28px!important}
+  .hero-copy > div[style*="display:flex"]{flex-direction:column!important;gap:10px!important}
+  .hero-copy a{width:100%!important;justify-content:center!important;text-align:center!important}
 
-  .feature-grid{grid-template-columns:1fr;gap:12px}
-  .feature-grid .card{aspect-ratio:1.2;min-height:380px}
-  .feature-grid .card .card-copy{padding:24px 20px}
-  .feature-grid .card .card-copy p{font-size:22px;margin-bottom:18px}
-  .feature-grid .card .card-copy a{padding:12px 22px;font-size:12px}
+  /* Feature cards — 1 columna */
+  .feature-grid{grid-template-columns:1fr!important;gap:2px!important}
+  .feature-grid .card{aspect-ratio:3/4!important;min-height:0!important}
+  .feature-grid .card .card-copy{padding:24px 20px!important}
+  .feature-grid .card .card-copy p{font-size:20px!important;margin-bottom:16px!important}
+  .feature-grid .card .card-copy a{width:100%!important;justify-content:center!important;padding:12px 20px!important}
+
+  /* Footer */
+  footer > div{flex-direction:column!important;align-items:flex-start!important;gap:12px!important;padding:0 16px!important}
 }
 </style>
 </head>
