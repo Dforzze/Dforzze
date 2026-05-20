@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>Catálogo — DFORZZE</title>
 <link id="dfz-favicon" rel="icon" type="image/png" href="images/logo.png">
 <script>
@@ -232,34 +233,50 @@ button{font-family:inherit;cursor:pointer}
   padding:0!important;
   overflow:hidden!important;
 }
-/* Imagen */
-.shopify-buy__product__variant-img-wrapper,
-.shopify-buy__product-img-wrapper{
+/* Imagen — solo foto, sin carrusel ni flechas */
+.shopify-buy__product-img-wrapper,
+.shopify-buy__product__variant-img-wrapper{
   background:#f5f5f5!important;
-  padding:0!important;
-  aspect-ratio:1/1!important;
+  position:relative!important;
   overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+  width:100%!important;
 }
-.shopify-buy__product__variant-img,
-.shopify-buy__product__img{
+.shopify-buy__product__img,
+.shopify-buy__product__variant-img{
+  position:absolute!important;
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  height:100%!important;
   object-fit:contain!important;
   padding:12px!important;
+  margin:0!important;
   transition:transform .4s ease!important;
 }
-.shopify-buy__product:hover .shopify-buy__product__variant-img,
-.shopify-buy__product:hover .shopify-buy__product__img{
+.shopify-buy__product:hover .shopify-buy__product__img,
+.shopify-buy__product:hover .shopify-buy__product__variant-img{
   transform:scale(1.04)!important;
 }
-/* Sin carrusel / flechas de cambio de imagen en el grid */
+/* Ocultar y eliminar bloque carrusel si Shopify lo inyecta */
 .main-image-wrapper,
 .shopify-buy__carousel,
 .carousel-button,
+.carousel-button--previous,
+.carousel-button--next,
 .shopify-buy__carousel-item{
   display:none!important;
+  visibility:hidden!important;
   height:0!important;
+  max-height:0!important;
   margin:0!important;
   padding:0!important;
   overflow:hidden!important;
+  pointer-events:none!important;
+  border:none!important;
 }
 /* Info */
 .shopify-buy__product__title{
@@ -463,7 +480,7 @@ button{font-family:inherit;cursor:pointer}
     <span style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.3)">Disponible ahora</span>
   </div>
   <div id='collection-component-1779214112780'></div>
-  <script type="text/javascript">/*<![CDATA[*/(function () {var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';if (window.ShopifyBuy) {if (window.ShopifyBuy.UI) {ShopifyBuyInit();} else {loadScript();}} else {loadScript();}function loadScript() {var script = document.createElement('script');script.async = true;script.src = scriptURL;(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);script.onload = ShopifyBuyInit;}function ShopifyBuyInit() {var client = ShopifyBuy.buildClient({domain: 'szs0ek-1b.myshopify.com',storefrontAccessToken: 'c2afaf3671fe2814d1fcd9dd1e3f69cb',});ShopifyBuy.UI.onReady(client).then(function (ui) {window._shopifyUI = ui; ui.createComponent('collection', {id: '468307574873',node: document.getElementById('collection-component-1779214112780'),moneyFormat: 'S%2F.%20%7B%7Bamount%7D%7D',options: {"product": {"contents": {"img": true,"imgWithCarousel": false,"button": true,"title": true,"price": true},"styles": {"product": {"@media (min-width: 601px)": {"max-width": "calc(33.333% - 0px)","margin-left": "0","margin-bottom": "0","margin-top": "0","margin-right": "0","width": "calc(33.333% - 0px)"},"img": {"height": "calc(100% - 0px)","position": "absolute","left": "0","right": "0","top": "0","object-fit": "cover"},"imgWrapper": {"padding-top": "100%","position": "relative","height": "0","overflow": "hidden","background": "#f0f0f0"}},"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"},"border-radius": "0","font-size": "11px","font-weight": "700","letter-spacing": ".08em","padding": "12px","width": "calc(100% - 24px)","margin": "0 12px 12px"}},"text": {"button": "Agregar al carrito"}},"productSet": {"styles": {"products": {"@media (min-width: 601px)": {"margin-left": "0","margin-top": "0","margin-bottom": "0","margin-right": "0","display": "flex","flex-wrap": "wrap","gap": "0","background": "#e5e5e5"}}}},"modalProduct": {"contents": {"img": true,"imgWithCarousel": true,"button": false,"buttonWithQuantity": true},"styles": {"product": {"@media (min-width: 601px)": {"max-width": "100%","margin-left": "0px","margin-bottom": "0px"}},"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"button": "Agregar al carrito"}},"option": {},"cart": {"styles": {"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"total": "Subtotal","button": "Finalizar compra"}},"toggle": {"styles": {"toggle": {"background-color": "#000000",":hover": {"background-color": "#000000"},":focus": {"background-color": "#000000"}}}}},});});}})();/*]]>*/</script>
+  <script type="text/javascript">/*<![CDATA[*/(function () {var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';if (window.ShopifyBuy) {if (window.ShopifyBuy.UI) {ShopifyBuyInit();} else {loadScript();}} else {loadScript();}function loadScript() {var script = document.createElement('script');script.async = true;script.src = scriptURL;(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);script.onload = ShopifyBuyInit;}function ShopifyBuyInit() {var client = ShopifyBuy.buildClient({domain: 'szs0ek-1b.myshopify.com',storefrontAccessToken: 'c2afaf3671fe2814d1fcd9dd1e3f69cb',});ShopifyBuy.UI.onReady(client).then(function (ui) {window._shopifyUI = ui; ui.createComponent('collection', {id: '468307574873',node: document.getElementById('collection-component-1779214112780'),moneyFormat: 'S%2F.%20%7B%7Bamount%7D%7D',options: {"product": {"order": ["img","title","price","options","button"],"contents": {"img": true,"imgWithCarousel": false,"title": true,"price": true,"options": true,"button": true},"styles": {"product": {"@media (min-width: 601px)": {"max-width": "calc(33.333% - 0px)","margin-left": "0","margin-bottom": "0","margin-top": "0","margin-right": "0","width": "calc(33.333% - 0px)"},"img": {"height": "calc(100% - 0px)","position": "absolute","left": "0","right": "0","top": "0","object-fit": "contain","padding": "12px"},"imgWrapper": {"padding-top": "100%","position": "relative","height": "0","overflow": "hidden","background": "#f5f5f5","margin": "0"}},"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"},"border-radius": "0","font-size": "11px","font-weight": "700","letter-spacing": ".08em","padding": "12px","width": "calc(100% - 24px)","margin": "0 12px 12px"}},"text": {"button": "Agregar al carrito"}},"productSet": {"styles": {"products": {"@media (min-width: 601px)": {"margin-left": "0","margin-top": "0","margin-bottom": "0","margin-right": "0","display": "flex","flex-wrap": "wrap","gap": "0","background": "#e5e5e5"}}}},"modalProduct": {"contents": {"img": true,"imgWithCarousel": true,"button": false,"buttonWithQuantity": true},"styles": {"product": {"@media (min-width: 601px)": {"max-width": "100%","margin-left": "0px","margin-bottom": "0px"}},"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"button": "Agregar al carrito"}},"option": {},"cart": {"styles": {"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"total": "Subtotal","button": "Finalizar compra"}},"toggle": {"styles": {"toggle": {"background-color": "#000000",":hover": {"background-color": "#000000"},":focus": {"background-color": "#000000"}}}}},});});}})();/*]]>*/</script>
 
   <!-- Empty state (oculto cuando Shopify carga) -->
   <div id="emptyState" style="display:none;text-align:center;padding:80px 0">
@@ -1532,6 +1549,25 @@ var hideToggleObs = new MutationObserver(function(){
   }
 });
 hideToggleObs.observe(document.body, {childList:true, subtree:true});
+
+// Quitar carrusel/flechas de imagen del DOM (Shopify a veces los inyecta igual)
+function removeShopifyCarousel(){
+  var sel = '.main-image-wrapper,.shopify-buy__carousel,.carousel-button,.carousel-button--previous,.carousel-button--next,.shopify-buy__carousel-item';
+  document.querySelectorAll(sel).forEach(function(el){ el.remove(); });
+}
+var carouselRemoverObs = new MutationObserver(function(){
+  if(document.querySelector('.shopify-buy__product')){
+    removeShopifyCarousel();
+  }
+});
+var shopifyRoot = document.getElementById('collection-component-1779214112780');
+if(shopifyRoot){
+  carouselRemoverObs.observe(shopifyRoot, {childList:true, subtree:true});
+}
+carouselRemoverObs.observe(document.body, {childList:true, subtree:true});
+setTimeout(removeShopifyCarousel, 500);
+setTimeout(removeShopifyCarousel, 1500);
+setTimeout(removeShopifyCarousel, 3000);
 
 var cartObserver = new MutationObserver(function(){
   var badge = document.querySelector('.shopify-buy__cart-toggle__count');
