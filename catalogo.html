@@ -305,19 +305,26 @@ button{font-family:inherit;cursor:pointer}
 /* ── Rediseño cards Shopify estilo Nike ── */
 .shopify-buy__product{
   background:#fff!important;
-  border-radius:0!important;
+  border-radius:20px!important;
   padding:0!important;
   overflow:hidden!important;
+  box-shadow:0 20px 50px rgba(0,0,0,.08)!important;
+  transition:transform .25s ease,box-shadow .25s ease!important;
+}
+.shopify-buy__product:hover{
+  transform:translateY(-4px)!important;
+  box-shadow:0 24px 64px rgba(0,0,0,.12)!important;
 }
 /* Imagen — solo foto, sin carrusel ni flechas */
 .shopify-buy__product-img-wrapper,
 .shopify-buy__product__variant-img-wrapper{
-  background:#f5f5f5!important;
+  background:#f7f7f7!important;
   position:relative!important;
   overflow:hidden!important;
   margin:0!important;
   padding:0!important;
   width:100%!important;
+  min-height:320px!important;
 }
 .shopify-buy__product__img,
 .shopify-buy__product__variant-img{
@@ -329,13 +336,13 @@ button{font-family:inherit;cursor:pointer}
   width:100%!important;
   height:100%!important;
   object-fit:contain!important;
-  padding:12px!important;
+  padding:18px!important;
   margin:0!important;
   transition:transform .4s ease!important;
 }
 .shopify-buy__product:hover .shopify-buy__product__img,
 .shopify-buy__product:hover .shopify-buy__product__variant-img{
-  transform:scale(1.04)!important;
+  transform:scale(1.06)!important;
 }
 /* Ocultar y eliminar bloque carrusel si Shopify lo inyecta */
 .main-image-wrapper,
@@ -356,36 +363,36 @@ button{font-family:inherit;cursor:pointer}
 }
 /* Info */
 .shopify-buy__product__title{
-  font-size:11px!important;
+  font-size:13px!important;
   font-weight:700!important;
   letter-spacing:.04em!important;
   text-transform:uppercase!important;
   color:#000!important;
-  margin:10px 10px 3px!important;
-  line-height:1.3!important;
+  margin:14px 14px 6px!important;
+  line-height:1.35!important;
 }
 .shopify-buy__product__actual-price{
-  font-size:12px!important;
+  font-size:13px!important;
   font-weight:700!important;
   color:#000!important;
-  margin:0 10px 3px!important;
+  margin:0 14px 6px!important;
 }
 .shopify-buy__product__compare-price{
   font-size:10px!important;
   color:rgba(0,0,0,.4)!important;
   text-decoration:line-through!important;
-  margin:0 10px 6px!important;
+  margin:0 12px 8px!important;
 }
 /* Selector de talla */
 .shopify-buy__option-select-wrapper{
-  margin:0 10px 6px!important;
+  margin:0 12px 10px!important;
   border:1px solid #e5e5e5!important;
-  border-radius:2px!important;
+  border-radius:12px!important;
   background:#fff!important;
 }
 .shopify-buy__option-select{
-  font-size:11px!important;
-  padding:6px 8px!important;
+  font-size:12px!important;
+  padding:10px 12px!important;
   border:none!important;
   background:transparent!important;
   width:100%!important;
@@ -394,14 +401,14 @@ button{font-family:inherit;cursor:pointer}
 .shopify-buy__btn{
   background:#000!important;
   color:#fff!important;
-  border-radius:0!important;
-  font-size:10px!important;
+  border-radius:12px!important;
+  font-size:12px!important;
   font-weight:700!important;
   letter-spacing:.08em!important;
   text-transform:uppercase!important;
-  padding:10px!important;
-  width:calc(100% - 20px)!important;
-  margin:0 10px 12px!important;
+  padding:14px!important;
+  width:calc(100% - 24px)!important;
+  margin:0 12px 18px!important;
   transition:background .2s!important;
 }
 .shopify-buy__btn:hover{
@@ -411,11 +418,43 @@ button{font-family:inherit;cursor:pointer}
 .shopify-buy__collection{
   display:grid!important;
   grid-template-columns:repeat(auto-fill,minmax(min(320px,50vw),1fr))!important;
-  gap:1px!important;
-  background:#e5e5e5!important;
+  gap:16px!important;
+  background:transparent!important;
+  padding:8px!important;
 }
 .shopify-buy__product-set__products{
   display:contents!important;
+}
+/* Header */
+.header-icon{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:44px!important;
+  height:44px!important;
+  border-radius:9999px!important;
+  background:#fff!important;
+  border:1px solid rgba(0,0,0,.08)!important;
+  transition:all .2s ease!important;
+}
+.header-icon:hover{
+  background:#000!important;
+}
+.header-icon:hover svg{stroke:#fff!important;}
+.header-badge{
+  position:absolute!important;
+  top:-4px!important;
+  right:-4px!important;
+  width:18px!important;
+  height:18px!important;
+  border-radius:50%!important;
+  background:#000!important;
+  color:#fff!important;
+  font-size:10px!important;
+  font-weight:700!important;
+  display:none!important;
+  align-items:center!important;
+  justify-content:center!important;
 }
 /* Carrito */
 .shopify-buy__cart{
@@ -438,19 +477,23 @@ button{font-family:inherit;cursor:pointer}
 
 @media(max-width:600px){
   .shopify-buy__collection{
-    grid-template-columns:1fr 1fr!important;
-    gap:1px!important;
+    grid-template-columns:1fr!important;
+    gap:14px!important;
+    padding:12px!important;
   }
-  .shopify-buy__product__title{font-size:10px!important;margin:8px 8px 2px!important}
-  .shopify-buy__product__actual-price{font-size:11px!important;margin:0 8px 2px!important}
+  .shopify-buy__product{
+    border-radius:18px!important;
+  }
+  .shopify-buy__product__title{font-size:12px!important;margin:12px 14px 6px!important}
+  .shopify-buy__product__actual-price{font-size:12px!important;margin:0 14px 8px!important}
   .shopify-buy__btn{
-    width:calc(100% - 16px)!important;
-    margin:0 8px 10px!important;
-    font-size:9px!important;
-    padding:9px!important;
+    width:calc(100% - 28px)!important;
+    margin:0 14px 16px!important;
+    font-size:11px!important;
+    padding:14px!important;
   }
-  .shopify-buy__option-select-wrapper{margin:0 8px 5px!important}
-  .shopify-buy__option-select{font-size:10px!important;padding:5px 6px!important}
+  .shopify-buy__option-select-wrapper{margin:0 14px 10px!important}
+  .shopify-buy__option-select{font-size:11px!important;padding:10px 12px!important}
 }
 </style>
 <script src="dforzze-sync.js?v=3"></script>
@@ -477,8 +520,8 @@ button{font-family:inherit;cursor:pointer}
 </script>
 
 <!-- HEADER -->
-<header style="background:#f0f0f0;border-bottom:1px solid rgba(0,0,0,.08);position:sticky;top:0;z-index:50">
-  <div style="max-width:1400px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px">
+<header style="background:#fff;box-shadow:0 1px 10px rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.08);position:sticky;top:0;z-index:50">
+  <div style="max-width:1400px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px">
     <a href="tienda.html" style="display:flex;align-items:center;gap:6px">
       <img src="images/logo.png" alt="DFORZZE" style="height:32px;width:auto">
       <span style="font-weight:800;font-size:11px;letter-spacing:.2em;text-transform:uppercase">DFORZZE</span>
@@ -491,13 +534,13 @@ button{font-family:inherit;cursor:pointer}
     <a href="tienda.html" style="color:rgba(0,0,0,.5);font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:color .3s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.5)'">← Volver</a>
     <div style="display:flex;align-items:center;gap:16px">
       <!-- Búsqueda -->
-      <button onclick="toggleSearch()" style="background:none;border:none;cursor:pointer;padding:4px;transition:opacity .2s" onmouseover="this.style.opacity='.6'" onmouseout="this.style.opacity='1'">
+      <button onclick="toggleSearch()" class="header-icon" aria-label="Buscar">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
       <!-- Carrito Shopify -->
-      <button onclick="openShopifyCart()" style="background:none;border:none;cursor:pointer;padding:4px;position:relative;transition:opacity .2s" onmouseover="this.style.opacity='.6'" onmouseout="this.style.opacity='1'">
+      <button onclick="openShopifyCart()" class="header-icon" aria-label="Ver carrito">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span id="shopifyCartCount" style="position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:#000;color:#fff;font-size:9px;font-weight:700;display:none;align-items:center;justify-content:center">0</span>
+        <span id="shopifyCartCount" class="header-badge">0</span>
       </button>
     </div>
   </div>
