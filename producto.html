@@ -22,6 +22,21 @@ button{font-family:inherit;cursor:pointer}
 .thumb{width:80px;height:80px;object-fit:cover;cursor:pointer;border:2px solid transparent;transition:border-color .2s}
 .thumb.active{border-color:#000}
 .thumb:hover{border-color:rgba(0,0,0,.4)}
+
+@media (max-width:900px) {
+  body{overflow-x:hidden}
+  header > div, footer > div, main{padding:0 16px!important}
+  header > div{flex-wrap:wrap;justify-content:space-between;height:auto;gap:12px}
+  header nav{display:none}
+  header > div > a[href="tienda.html"]{order:3;width:100%;text-align:center}
+  main{padding:0 16px 80px!important}
+  main > div{grid-template-columns:1fr!important;gap:32px!important}
+  main > div > div{width:100%!important}
+  .thumb{width:72px;height:72px}
+  .shopify-buy__product__img, .shopify-buy__product__variant-img{padding:16px!important}
+  .size-btn{min-width:48px}
+  .size-btn, .shopify-buy__btn{width:100%!important}
+}
 </style>
 </head>
 <body>
