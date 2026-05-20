@@ -303,7 +303,7 @@ button{font-family:inherit;cursor:pointer}
 /* Grid de productos — 2 columnas */
 .shopify-buy__collection{
   display:grid!important;
-  grid-template-columns:repeat(auto-fill,minmax(min(240px,45vw),1fr))!important;
+  grid-template-columns:repeat(auto-fill,minmax(min(320px,50vw),1fr))!important;
   gap:1px!important;
   background:#e5e5e5!important;
 }
@@ -442,14 +442,6 @@ button{font-family:inherit;cursor:pointer}
 <!-- MAIN -->
 <main style="max-width:1400px;margin:0 auto;padding:32px 0 80px;background:#fff">
 
-  <!-- Category tabs -->
-  <div style="display:flex;align-items:center;gap:32px;margin-bottom:0;border-bottom:1px solid rgba(0,0,0,.1);padding:0 32px;overflow-x:auto">
-    <button class="cat-btn active" onclick="filterCat('all',this)">Todo</button>
-    <button class="cat-btn" onclick="filterCat('tshirts',this)">Camisetas</button>
-    <button class="cat-btn" onclick="filterCat('hoodies',this)">Hoodies</button>
-    <button class="cat-btn" onclick="filterCat('pants',this)">Pantalones</button>
-  </div>
-
   <!-- Products grid — Shopify Buy Button -->
   <div style="padding:24px 0 0">
   <div style="padding:0 32px 20px;display:flex;align-items:baseline;gap:16px">
@@ -457,7 +449,7 @@ button{font-family:inherit;cursor:pointer}
     <span style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.3)">Disponible ahora</span>
   </div>
   <div id='collection-component-1779214112780'></div>
-  <script type="text/javascript">/*<![CDATA[*/(function () {var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';if (window.ShopifyBuy) {if (window.ShopifyBuy.UI) {ShopifyBuyInit();} else {loadScript();}} else {loadScript();}function loadScript() {var script = document.createElement('script');script.async = true;script.src = scriptURL;(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);script.onload = ShopifyBuyInit;}function ShopifyBuyInit() {var client = ShopifyBuy.buildClient({domain: 'szs0ek-1b.myshopify.com',storefrontAccessToken: 'c2afaf3671fe2814d1fcd9dd1e3f69cb',});ShopifyBuy.UI.onReady(client).then(function (ui) {window._shopifyUI = ui; ui.createComponent('collection', {id: '468307574873',node: document.getElementById('collection-component-1779214112780'),moneyFormat: 'S%2F.%20%7B%7Bamount%7D%7D',options: {"product": {"styles": {"product": {"@media (min-width: 601px)": {"max-width": "calc(25% - 20px)","margin-left": "20px","margin-bottom": "50px","width": "calc(25% - 20px)"},"img": {"height": "calc(100% - 15px)","position": "absolute","left": "0","right": "0","top": "0"},"imgWrapper": {"padding-top": "calc(75% + 15px)","position": "relative","height": "0"}},"button": {":hover": {"background-color": "#000000"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"button": "Agregar al carrito"}},"productSet": {"styles": {"products": {"@media (min-width: 601px)": {"margin-left": "-20px"}}}},"modalProduct": {"contents": {"img": false,"imgWithCarousel": true,"button": false,"buttonWithQuantity": true},"styles": {"product": {"@media (min-width: 601px)": {"max-width": "100%","margin-left": "0px","margin-bottom": "0px"}},"button": {":hover": {"background-color": "#000000"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"button": "Agregar al carrito"}},"option": {},"cart": {"styles": {"button": {":hover": {"background-color": "#000000"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"total": "Subtotal","button": "Finalizar compra"}},"toggle": {"styles": {"toggle": {"background-color": "#000000",":hover": {"background-color": "#000000"},":focus": {"background-color": "#000000"}}}}},});});}})();/*]]>*/</script>
+  <script type="text/javascript">/*<![CDATA[*/(function () {var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';if (window.ShopifyBuy) {if (window.ShopifyBuy.UI) {ShopifyBuyInit();} else {loadScript();}} else {loadScript();}function loadScript() {var script = document.createElement('script');script.async = true;script.src = scriptURL;(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);script.onload = ShopifyBuyInit;}function ShopifyBuyInit() {var client = ShopifyBuy.buildClient({domain: 'szs0ek-1b.myshopify.com',storefrontAccessToken: 'c2afaf3671fe2814d1fcd9dd1e3f69cb',});ShopifyBuy.UI.onReady(client).then(function (ui) {window._shopifyUI = ui; ui.createComponent('collection', {id: '468307574873',node: document.getElementById('collection-component-1779214112780'),moneyFormat: 'S%2F.%20%7B%7Bamount%7D%7D',options: {"product": {"styles": {"product": {"@media (min-width: 601px)": {"max-width": "calc(50% - 1px)","margin-left": "0","margin-bottom": "1px","width": "calc(50% - 1px)"},"img": {"height": "calc(100% - 0px)","position": "absolute","left": "0","right": "0","top": "0","object-fit": "cover"},"imgWrapper": {"padding-top": "125%","position": "relative","height": "0","overflow": "hidden","background": "#f5f5f5"}},"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"},"border-radius": "0","font-size": "11px","font-weight": "700","letter-spacing": ".08em","padding": "12px","width": "calc(100% - 24px)","margin": "0 12px 16px"}},"text": {"button": "Agregar al carrito"}},"productSet": {"styles": {"products": {"@media (min-width: 601px)": {"margin-left": "0","display": "flex","flex-wrap": "wrap","gap": "1px","background": "#e5e5e5"}}}},"modalProduct": {"contents": {"img": false,"imgWithCarousel": true,"button": false,"buttonWithQuantity": true},"styles": {"product": {"@media (min-width: 601px)": {"max-width": "100%","margin-left": "0px","margin-bottom": "0px"}},"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"button": "Agregar al carrito"}},"option": {},"cart": {"styles": {"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"total": "Subtotal","button": "Finalizar compra"}},"toggle": {"styles": {"toggle": {"background-color": "#000000",":hover": {"background-color": "#000000"},":focus": {"background-color": "#000000"}}}}},});});}})();/*]]>*/</script>
 
   <!-- Empty state (oculto cuando Shopify carga) -->
   <div id="emptyState" style="display:none;text-align:center;padding:80px 0">
@@ -892,7 +884,7 @@ function renderCatalogo(catFilter){
 
   // Bloque de disponibles — grid 2 columnas (cards grandes)
   if(available.length > 0){
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,45vw),1fr));gap:2px;margin-bottom:2px">';    available.forEach(function(p){
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(320px,48vw),1fr));gap:2px;margin-bottom:2px">';    available.forEach(function(p){
       var totalStock = getTotalStockCat(p);
       var isLow = totalStock <= (p.lowStockThreshold||5) && totalStock > 0;
       var catKey = CAT_MAP[p.category] || p.category.toLowerCase();
@@ -936,7 +928,7 @@ function renderCatalogo(catFilter){
 
   // Bloque de agotados — grid 4 columnas (cards pequeñas)
   if(outOfStock.length > 0){
-    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(180px,42vw),1fr));gap:2px;margin-bottom:2px">';    outOfStock.forEach(function(p){
+    html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,48vw),1fr));gap:2px;margin-bottom:2px">';    outOfStock.forEach(function(p){
       var catKey = CAT_MAP[p.category] || p.category.toLowerCase();
       html += '<div class="prod-card" data-cat="'+catKey+'" data-id="'+p.id+'">'
         +'<div class="prod-img-placeholder" style="aspect-ratio:3/4;background:#e4e4e4;overflow:hidden">'
