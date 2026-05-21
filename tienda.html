@@ -103,11 +103,17 @@ button{font-family:inherit;cursor:pointer}
   header > div > div:last-child{flex:0 0 auto!important}
   header > div > div:last-child a{display:none!important}
   #mobMenuBtn{display:flex!important}
+  .hero-img-desktop{display:none!important}
+  .hero-img-mobile{display:block!important}
 
 /* Menú móvil — oculto por defecto en todos los tamaños */
-#mobMenuPanel{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.97);flex-direction:column;align-items:center;justify-content:center;gap:0}
+#mobMenuPanel{display:none!important;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.97);flex-direction:column;align-items:center;justify-content:center;gap:0}
 #mobMenuPanel.open{display:flex!important}
-#mobMenuBtn{display:none}
+#mobMenuBtn{display:none!important}
+
+/* Imágenes hero según dispositivo */
+.hero-img-desktop{display:block}
+.hero-img-mobile{display:none}
 
   /* Hero — full screen, texto abajo */
   .hero-section{height:100svh!important;min-height:600px!important}
@@ -226,8 +232,9 @@ function toggleMobMenu(){
 <!-- HERO -->
 <section class="hero-section" style="height:100vh;min-height:700px;position:relative;background:#000;overflow:hidden">
 
-  <!-- Image full background -->
-  <img src="images/carriti.jpg" alt="DFORZZE Studio" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center">
+  <!-- Image full background — desktop: benefit-comunidad, móvil: carriti -->
+  <img src="images/benefit-comunidad.jpg" alt="DFORZZE Studio" class="hero-img-desktop" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center">
+  <img src="images/carriti.jpg" alt="DFORZZE Studio" class="hero-img-mobile" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:none">
   <div style="position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to top,rgba(0,0,0,.5) 0%,transparent 100%)"></div>
 
   <!-- Text — left side -->
