@@ -632,11 +632,22 @@ button{font-family:inherit;cursor:pointer}
     .dfz-grid {
       display:grid;
       grid-template-columns:repeat(3,1fr);
-      gap:2px;
-      background:#e5e5e5;
+      gap:16px;
+      background:transparent;
+      padding:0 32px;
     }
-    @media(max-width:767px){ .dfz-grid { grid-template-columns:1fr; } }
-    .dfz-card { background:#fff; }
+    @media(max-width:767px){ .dfz-grid { grid-template-columns:1fr; gap:12px; padding:0 16px; } }
+    .dfz-card {
+      background:#fff;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 2px 12px rgba(0,0,0,.07);
+      transition:transform .25s ease, box-shadow .25s ease;
+    }
+    .dfz-card:hover {
+      transform:translateY(-4px);
+      box-shadow:0 8px 32px rgba(0,0,0,.13);
+    }
     .dfz-img-wrap {
       position:relative;
       width:100%;
@@ -662,12 +673,17 @@ button{font-family:inherit;cursor:pointer}
       font-weight:700;
       letter-spacing:.06em;
       text-transform:uppercase;
-      padding:14px 12px 0;
+      padding:16px 16px 4px;
       color:#000;
     }
     .shopify-buy__product__title { display:none!important; }
-    .shopify-buy__product { background:#fff!important; padding:0!important; }
+    .shopify-buy__product { background:#fff!important; padding:0!important; border-radius:0!important; box-shadow:none!important; }
+    .shopify-buy__product:hover { transform:none!important; box-shadow:none!important; }
     .shopify-buy__product-set .shopify-buy__product { max-width:100%!important; width:100%!important; margin:0!important; }
+    .shopify-buy__option-select-wrapper { margin:0 16px 10px!important; border:1px solid #e5e5e5!important; border-radius:8px!important; }
+    .shopify-buy__option-select { font-size:12px!important; padding:10px 12px!important; }
+    .shopify-buy__btn { border-radius:8px!important; margin:0 16px 16px!important; width:calc(100% - 32px)!important; font-size:12px!important; font-weight:700!important; letter-spacing:.06em!important; padding:13px!important; }
+    .shopify-buy__product__actual-price { font-size:14px!important; font-weight:700!important; color:#000!important; margin:4px 16px 8px!important; }
     .dfz-shopify-slot { width:100%; }
   </style>
 
