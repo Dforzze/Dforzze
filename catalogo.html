@@ -2358,20 +2358,20 @@ initProfileBtn();</script>
     syncCheckout(function(){ renderDrawer(); });
   };
 
-  // ── Checkout ─────────────────────────────────────────────
+  // ── Checkout via Cart API (Shopify 2024) ─────────────────
   function syncCheckout(cb) {
     var lineItems = _items.map(function(i){ return { variantId: i.variantId, quantity: i.qty }; });
     if (lineItems.length === 0) { _checkout = null; if(cb) cb(); return; }
 
-    var DOMAIN = 'szs0ek-1b.myshopify.com';
-    var TOKEN  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
+    var DOMAIN  = 'szs0ek-1b.myshopify.com';
+    var TOKEN   = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
     var API_URL = 'https://' + DOMAIN + '/api/2024-01/graphql.json';
 
-    var lineItemsGql = lineItems.map(function(i){
-      return '{ variantId: "' + i.variantId + '", quantity: ' + i.quantity + ' }';
+    var linesGql = lineItems.map(function(i){
+      return '{ merchandiseId: "' + i.variantId + '", quantity: ' + i.qty + ' }';
     }).join(',');
 
-    var mutation = 'mutation { checkoutCreate(input: { lineItems: [' + lineItemsGql + '] }) { checkout { webUrl } checkoutUserErrors { message } } }';
+    var mutation = 'mutation { cartCreate(input: { lines: [' + linesGql + '] }) { cart { checkoutUrl } userErrors { message } } }';
 
     fetch(API_URL, {
       method: 'POST',
@@ -2383,33 +2383,31 @@ initProfileBtn();</script>
     })
     .then(function(r){ return r.json(); })
     .then(function(res){
-      var co = res && res.data && res.data.checkoutCreate && res.data.checkoutCreate.checkout;
-      if (co) {
-        _checkout = co;
-        window._dfzCheckoutUrl = co.webUrl;
+      var cart = res && res.data && res.data.cartCreate && res.data.cartCreate.cart;
+      if (cart && cart.checkoutUrl) {
+        _checkout = cart;
+        window._dfzCheckoutUrl = cart.checkoutUrl;
       }
       if(cb) cb();
     })
-    .catch(function(e){ console.error('checkout error:', e); if(cb) cb(); });
+    .catch(function(e){ console.error('cart error:', e); if(cb) cb(); });
   }
 
   window.dfzGoCheckout = function() {
     var btn = document.getElementById('dfz-checkout-btn');
-    var url = _checkout ? _checkout.webUrl : window._dfzCheckoutUrl;
+    var url = (_checkout && _checkout.checkoutUrl) ? _checkout.checkoutUrl : window._dfzCheckoutUrl;
 
     if (url) {
-      // URL lista — redirigir al checkout de Shopify
       if (btn) { btn.disabled = true; btn.innerHTML = 'Redirigiendo a Shopify...'; }
       window.location.href = url;
     } else if (_items.length > 0) {
-      // Checkout aún sincronizando — esperar y reintentar
       if (btn) { btn.disabled = true; btn.innerHTML = 'Preparando checkout...'; }
       syncCheckout(function() {
-        var freshUrl = _checkout ? _checkout.webUrl : window._dfzCheckoutUrl;
+        var freshUrl = (_checkout && _checkout.checkoutUrl) ? _checkout.checkoutUrl : window._dfzCheckoutUrl;
         if (freshUrl) {
           window.location.href = freshUrl;
         } else {
-          if (btn) { btn.disabled = false; btn.innerHTML = 'Finalizar compra'; }
+          if (btn) { btn.disabled = false; btn.innerHTML = 'Finalizar compra en Shopify'; }
           alert('No se pudo conectar con Shopify. Intenta de nuevo.');
         }
       });
