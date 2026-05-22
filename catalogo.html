@@ -1024,7 +1024,12 @@ button{font-family:inherit;cursor:pointer}
       var sizeBtn = body.querySelector('.dfz-size-btn.selected');
       var sizeName = sizeBtn ? sizeBtn.textContent.trim() : '';
       var priceEl = body.querySelector('.dfz-prod-price');
-      var price = priceEl ? priceEl.textContent : '';
+      var priceNum = priceEl ? parseFloat(priceEl.textContent.replace('S/. ','')) || 0 : 0;
+      // Imagen del producto — tomar la imagen frontal de la card
+      var card = body.closest('.dfz-card');
+      var imgSrc = card ? (card.querySelector('.dfz-img-front') || {src:''}).src : '';
+
+      var qty = 1;
 
       var drawer = document.getElementById('dfz-simple-drawer');
       if (!drawer) {
@@ -1039,28 +1044,85 @@ button{font-family:inherit;cursor:pointer}
         document.body.appendChild(overlay);
       }
 
-      drawer.innerHTML =
-        '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #f0f0f0">' +
-          '<h3 style="font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase">Tu carrito</h3>' +
-          '<button onclick="closeDfzDrawer()" style="background:none;border:none;cursor:pointer;font-size:22px;color:#999;line-height:1">×</button>' +
-        '</div>' +
-        '<div style="flex:1;padding:24px;overflow-y:auto">' +
-          '<div style="display:flex;gap:16px;align-items:flex-start">' +
-            '<div style="width:80px;height:96px;background:#f5f5f5;border-radius:8px;flex-shrink:0"></div>' +
-            '<div style="flex:1">' +
-              '<p style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px">' + productTitle + '</p>' +
-              (sizeName ? '<p style="font-size:11px;color:rgba(0,0,0,.4);margin-bottom:8px">Talla: ' + sizeName + '</p>' : '') +
-              '<p style="font-size:15px;font-weight:800">' + price + '</p>' +
+      function renderDrawerContent() {
+        var total = 'S/. ' + (priceNum * qty).toFixed(2);
+        drawer.innerHTML =
+          '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #f0f0f0">' +
+            '<h3 style="font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase">Tu carrito</h3>' +
+            '<button onclick="closeDfzDrawer()" style="background:none;border:none;cursor:pointer;font-size:22px;color:#999;line-height:1;padding:0 4px">×</button>' +
+          '</div>' +
+          '<div style="flex:1;padding:24px;overflow-y:auto">' +
+            '<div style="display:flex;gap:16px;align-items:flex-start">' +
+              '<img src="' + imgSrc + '" style="width:88px;height:108px;object-fit:cover;border-radius:10px;background:#f5f5f5;flex-shrink:0" onerror="this.style.background=\'#f5f5f5\';this.style.display=\'block\'">' +
+              '<div style="flex:1">' +
+                '<p style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px">' + productTitle + '</p>' +
+                (sizeName ? '<p style="font-size:11px;color:rgba(0,0,0,.4);margin-bottom:12px">Talla: ' + sizeName + '</p>' : '') +
+                '<p style="font-size:15px;font-weight:800;margin-bottom:16px">' + total + '</p>' +
+                '<div style="display:flex;align-items:center;gap:0;border:1.5px solid #e5e5e5;border-radius:8px;width:fit-content;overflow:hidden">' +
+                  '<button id="dfz-qty-minus" style="width:36px;height:36px;border:none;background:#fff;cursor:pointer;font-size:18px;font-weight:300;color:#000;display:flex;align-items:center;justify-content:center">−</button>' +
+                  '<span id="dfz-qty-num" style="width:36px;text-align:center;font-size:13px;font-weight:700;border-left:1.5px solid #e5e5e5;border-right:1.5px solid #e5e5e5;height:36px;display:flex;align-items:center;justify-content:center">' + qty + '</span>' +
+                  '<button id="dfz-qty-plus" style="width:36px;height:36px;border:none;background:#fff;cursor:pointer;font-size:18px;font-weight:300;color:#000;display:flex;align-items:center;justify-content:center">+</button>' +
+                '</div>' +
+              '</div>' +
             '</div>' +
           '</div>' +
-        '</div>' +
-        '<div style="padding:20px 24px;border-top:1px solid #f0f0f0">' +
-          '<a href="' + checkoutUrl + '" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#000;color:#fff;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:17px;border-radius:12px;text-decoration:none;transition:background .2s" onmouseover="this.style.background=\'#222\'" onmouseout="this.style.background=\'#000\'">' +
-            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
-            'Finalizar compra en Shopify' +
-          '</a>' +
-          '<p style="text-align:center;font-size:10px;color:rgba(0,0,0,.3);margin-top:10px;letter-spacing:.03em">Pago seguro · Mercado Pago · Powered by Shopify</p>' +
-        '</div>';
+          '<div style="padding:20px 24px;border-top:1px solid #f0f0f0">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">' +
+              '<span style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.4)">Subtotal</span>' +
+              '<span id="dfz-drawer-total" style="font-size:16px;font-weight:800">' + total + '</span>' +
+            '</div>' +
+            '<a id="dfz-checkout-link" href="' + checkoutUrl + '" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#000;color:#fff;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:17px;border-radius:12px;text-decoration:none">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
+              'Finalizar compra en Shopify' +
+            '</a>' +
+            '<p style="text-align:center;font-size:10px;color:rgba(0,0,0,.3);margin-top:10px;letter-spacing:.03em">Pago seguro · Mercado Pago · Powered by Shopify</p>' +
+          '</div>';
+
+        // Botones cantidad
+        document.getElementById('dfz-qty-minus').onclick = function() {
+          if (qty <= 1) return;
+          qty--;
+          updateQty();
+        };
+        document.getElementById('dfz-qty-plus').onclick = function() {
+          qty++;
+          updateQty();
+        };
+      }
+
+      function updateQty() {
+        var total = 'S/. ' + (priceNum * qty).toFixed(2);
+        var numEl = document.getElementById('dfz-qty-num');
+        var totEl = document.getElementById('dfz-drawer-total');
+        if (numEl) numEl.textContent = qty;
+        if (totEl) totEl.textContent = total;
+        // Actualizar checkout URL con nueva cantidad
+        var DOMAIN = 'szs0ek-1b.myshopify.com';
+        var TOKEN  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
+        var mutation = '{"query":"mutation{cartCreate(input:{lines:[{merchandiseId:\\"' + variantId + '\\",quantity:' + qty + '}]}){cart{checkoutUrl}userErrors{message}}}"}';
+        fetch('https://' + DOMAIN + '/api/2024-01/graphql.json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': TOKEN },
+          body: mutation
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+          var cart = res && res.data && res.data.cartCreate && res.data.cartCreate.cart;
+          if (cart && cart.checkoutUrl) {
+            var link = document.getElementById('dfz-checkout-link');
+            if (link) link.href = cart.checkoutUrl;
+          }
+        });
+      }
+
+      renderDrawerContent();
+
+      setTimeout(function(){
+        drawer.style.transform = 'translateX(0)';
+        var ov = document.getElementById('dfz-simple-overlay');
+        if (ov) { ov.style.opacity = '1'; ov.style.pointerEvents = 'auto'; }
+      }, 10);
+    }
 
       setTimeout(function(){
         drawer.style.transform = 'translateX(0)';
