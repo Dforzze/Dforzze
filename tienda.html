@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DFORZZE â€” Tienda</title>
+<title>DFORZZE — Tienda</title>
 <link id="dfz-favicon" rel="icon" type="image/png" href="images/logo.png">
 <script>
 (function(){
@@ -12,18 +12,18 @@
     var c = document.createElement('canvas');
     c.width = 64; c.height = 64;
     var ctx = c.getContext('2d');
-    // CÃ­rculo negro
+    // Círculo negro
     ctx.beginPath();
     ctx.arc(32,32,32,0,Math.PI*2);
     ctx.fillStyle='#000';
     ctx.fill();
     // Logo encima
     ctx.drawImage(img,8,8,48,48);
-    // TeÃ±ir logo de blanco (source-atop pinta solo donde hay pÃ­xeles del logo)
+    // Teñir logo de blanco (source-atop pinta solo donde hay píxeles del logo)
     ctx.globalCompositeOperation='source-atop';
     ctx.fillStyle='#fff';
     ctx.fillRect(0,0,64,64);
-    // CÃ­rculo negro de fondo (destination-over pone detrÃ¡s)
+    // Círculo negro de fondo (destination-over pone detrás)
     ctx.globalCompositeOperation='destination-over';
     ctx.beginPath();
     ctx.arc(32,32,32,0,Math.PI*2);
@@ -95,7 +95,7 @@ button{font-family:inherit;cursor:pointer}
 .feature-grid .card .card-copy p{color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;line-height:1.2;margin-bottom:24px}
 .feature-grid .card .card-copy a{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px 28px;border-radius:9999px;transition:all .3s}
 
-/* MenÃº mÃ³vil â€” oculto por defecto en PC */
+/* Menú móvil — oculto por defecto en PC */
 #mobMenuBtn{display:none}
 #mobMenuPanel{
   display:none;
@@ -118,12 +118,12 @@ button{font-family:inherit;cursor:pointer}
   pointer-events:auto;
 }
 
-/* ImÃ¡genes hero segÃºn dispositivo */
+/* Imágenes hero según dispositivo */
 .hero-img-desktop{display:block}
 .hero-img-mobile{display:none}
 
 @media(max-width:767px){
-  /* Header limpio en mÃ³vil */
+  /* Header limpio en móvil */
   header > div{height:52px!important;padding:0 16px!important}
   header > div > a{flex:0 0 auto!important}
   header > div nav{display:none!important}
@@ -133,7 +133,7 @@ button{font-family:inherit;cursor:pointer}
   .hero-img-desktop{display:none!important}
   .hero-img-mobile{display:block!important}
 
-  /* Hero â€” full screen, texto abajo */
+  /* Hero — full screen, texto abajo */
   .hero-section{height:100svh!important;min-height:600px!important}
   .hero-copy{
     position:absolute!important;
@@ -152,7 +152,7 @@ button{font-family:inherit;cursor:pointer}
   .hero-copy > div[style*="display:flex"]{flex-direction:column!important;gap:10px!important}
   .hero-copy a{width:100%!important;justify-content:center!important;text-align:center!important}
 
-  /* Feature cards â€” 1 columna */
+  /* Feature cards — 1 columna */
   .feature-grid{grid-template-columns:1fr!important;gap:2px!important}
   .feature-grid .card{aspect-ratio:3/4!important;min-height:0!important}
   .feature-grid .card .card-copy{padding:24px 20px!important}
@@ -185,16 +185,16 @@ setTimeout(killSplash,3000);
 <div style="background:#fff;overflow:hidden;height:36px;display:flex;align-items:center;position:relative;z-index:60">
   <div class="ticker-track">
     <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">10% OFF EN TU PRIMERA COMPRA</span>
-    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">ENVÃOS NACIONALES ACTIVOS</span>
-    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">SOLO AQUÃ</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">ENVÍOS NACIONALES ACTIVOS</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">SOLO AQUÍ</span>
     <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">DROPS LIMITADOS</span>
-    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">PIEZAS ÃšNICAS SIN RESTOCK</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">PIEZAS ÚNICAS SIN RESTOCK</span>
     <!-- repeat for seamless loop -->
     <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">10% OFF EN TU PRIMERA COMPRA</span>
-    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">ENVÃOS NACIONALES ACTIVOS</span>
-    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">SOLO AQUÃ</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">ENVÍOS NACIONALES ACTIVOS</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">SOLO AQUÍ</span>
     <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">DROPS LIMITADOS</span>
-    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">PIEZAS ÃšNICAS SIN RESTOCK</span>
+    <span style="color:#000;font-size:12px;font-weight:400;letter-spacing:.08em;text-transform:uppercase;padding:0 80px;white-space:nowrap">PIEZAS ÚNICAS SIN RESTOCK</span>
   </div>
 </div>
 
@@ -217,8 +217,8 @@ setTimeout(killSplash,3000);
 
     <!-- CTA -->
     <div style="flex:1;display:flex;justify-content:flex-end;align-items:center;gap:12px">
-      <a href="catalogo.html" style="background:#fff;color:#000;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 22px;border-radius:9999px;border:none;transition:all .2s;text-decoration:none" onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">Explorar â†’</a>
-      <!-- Hamburguesa solo en mÃ³vil -->
+      <a href="catalogo.html" style="background:#fff;color:#000;font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 22px;border-radius:9999px;border:none;transition:all .2s;text-decoration:none" onmouseover="this.style.background='rgba(255,255,255,.85)'" onmouseout="this.style.background='#fff'">Explorar →</a>
+      <!-- Hamburguesa solo en móvil -->
       <button id="mobMenuBtn" onclick="toggleMobMenu()" style="display:none;background:none;border:none;cursor:pointer;padding:4px;flex-direction:column;gap:5px;align-items:center;justify-content:center">
         <span style="display:block;width:22px;height:2px;background:#fff;border-radius:2px"></span>
         <span style="display:block;width:22px;height:2px;background:#fff;border-radius:2px"></span>
@@ -229,12 +229,12 @@ setTimeout(killSplash,3000);
   </div>
 </header>
 
-<!-- MENÃš MÃ“VIL -->
+<!-- MENÚ MÓVIL -->
 <div id="mobMenuPanel">
-  <button onclick="toggleMobMenu()" style="position:absolute;top:20px;right:20px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1">âœ•</button>
+  <button onclick="toggleMobMenu()" style="position:absolute;top:20px;right:20px;background:none;border:none;color:#fff;font-size:28px;cursor:pointer;line-height:1">✕</button>
   <img src="images/logo.png" alt="DFORZZE" style="height:48px;width:auto;filter:brightness(0) invert(1);margin-bottom:48px;opacity:.6">
   <a href="tienda.html" onclick="toggleMobMenu()" style="color:#fff;font-weight:800;font-size:32px;letter-spacing:-.02em;text-transform:uppercase;text-decoration:none;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.08);width:80%;text-align:center">Tienda</a>
-  <a href="catalogo.html" onclick="toggleMobMenu()" style="color:rgba(255,255,255,.7);font-weight:700;font-size:28px;letter-spacing:-.02em;text-transform:uppercase;text-decoration:none;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.08);width:80%;text-align:center">CatÃ¡logo</a>
+  <a href="catalogo.html" onclick="toggleMobMenu()" style="color:rgba(255,255,255,.7);font-weight:700;font-size:28px;letter-spacing:-.02em;text-transform:uppercase;text-decoration:none;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.08);width:80%;text-align:center">Catálogo</a>
   <a href="dforzze.html" onclick="toggleMobMenu()" style="color:rgba(255,255,255,.7);font-weight:700;font-size:28px;letter-spacing:-.02em;text-transform:uppercase;text-decoration:none;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.08);width:80%;text-align:center">Membership</a>
   <a href="about.html" onclick="toggleMobMenu()" style="color:rgba(255,255,255,.7);font-weight:700;font-size:28px;letter-spacing:-.02em;text-transform:uppercase;text-decoration:none;padding:16px 0;width:80%;text-align:center">About</a>
 </div>
@@ -250,12 +250,12 @@ function toggleMobMenu(){
 <!-- HERO -->
 <section class="hero-section" style="height:100vh;min-height:700px;position:relative;background:#000;overflow:hidden">
 
-  <!-- Image full background â€” desktop: banner, mÃ³vil: carriti -->
+  <!-- Image full background — desktop: banner, móvil: carriti -->
   <img src="images/banner.png" alt="DFORZZE Studio" class="hero-img-desktop" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center">
   <img src="images/carriti.jpg" alt="DFORZZE Studio" class="hero-img-mobile" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:none">
   <div style="position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to top,rgba(0,0,0,.5) 0%,transparent 100%)"></div>
 
-  <!-- Text â€” left side -->
+  <!-- Text — left side -->
   <div class="hero-copy" style="position:absolute;top:0;left:0;width:58%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:60px 48px 60px 72px">
 
     <!-- Top label with line -->
@@ -273,14 +273,14 @@ function toggleMobMenu(){
     <!-- Divider -->
     <div class="fade-up" style="width:48px;height:1px;background:rgba(255,255,255,.25);margin-bottom:24px;animation-delay:.4s"></div>
 
-    <p class="fade-up" style="color:rgba(255,255,255,.55);font-size:14px;line-height:1.75;max-width:300px;margin-bottom:40px;animation-delay:.5s;font-weight:400;letter-spacing:.01em">Piezas que no se repiten.<br>Acceso limitado.<br>Lo que llevas dice dÃ³nde estÃ¡s.</p>
+    <p class="fade-up" style="color:rgba(255,255,255,.55);font-size:14px;line-height:1.75;max-width:300px;margin-bottom:40px;animation-delay:.5s;font-weight:400;letter-spacing:.01em">Piezas que no se repiten.<br>Acceso limitado.<br>Lo que llevas dice dónde estás.</p>
 
     <div class="fade-up" style="display:flex;flex-wrap:wrap;gap:12px;animation-delay:.65s">
       <a href="catalogo.html" style="display:inline-flex;align-items:center;gap:10px;background:#fff;color:#000;font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:14px 32px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.88)';this.style.gap='14px'" onmouseout="this.style.background='#fff';this.style.gap='10px'">
         Explorar tienda
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </a>
-      <a href="dforzze.html" style="display:inline-flex;align-items:center;color:rgba(255,255,255,.35);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:14px 16px;transition:color .3s;border:1px solid rgba(255,255,255,.12);border-radius:9999px;padding:14px 24px" onmouseover="this.style.color='rgba(255,255,255,.8)';this.style.borderColor='rgba(255,255,255,.3)'" onmouseout="this.style.color='rgba(255,255,255,.35)';this.style.borderColor='rgba(255,255,255,.12)'">Members Club â†’</a>
+      <a href="dforzze.html" style="display:inline-flex;align-items:center;color:rgba(255,255,255,.35);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:14px 16px;transition:color .3s;border:1px solid rgba(255,255,255,.12);border-radius:9999px;padding:14px 24px" onmouseover="this.style.color='rgba(255,255,255,.8)';this.style.borderColor='rgba(255,255,255,.3)'" onmouseout="this.style.color='rgba(255,255,255,.35)';this.style.borderColor='rgba(255,255,255,.12)'">Members Club →</a>
     </div>
 
     </div>
@@ -289,26 +289,26 @@ function toggleMobMenu(){
 
 </section>
 
-<!-- FEATURE CARDS â€” justo debajo del hero -->
+<!-- FEATURE CARDS — justo debajo del hero -->
 <!-- 2 CARDS GRANDES -->
 <div class="feature-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#111;margin:0;padding:0">
 
-  <!-- Card 1 â€” Motora -->
+  <!-- Card 1 — Motora -->
   <div class="card" style="position:relative;overflow:hidden;aspect-ratio:4/5;cursor:pointer">
     <img src="images/motora.jpg" alt="DFORZZE" style="width:100%;height:100%;object-fit:cover;object-position:center 60%;transition:transform .8s cubic-bezier(.16,1,.3,1)">
     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%)"></div>
     <div class="card-copy" style="position:absolute;bottom:0;left:0;right:0;padding:40px 48px">
-      <p style="color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;line-height:1.2;margin-bottom:24px">No es moda.<br>Es posiciÃ³n.</p>
-      <a href="catalogo.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px 28px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.88)'" onmouseout="this.style.background='#fff'">Ver colecciÃ³n</a>
+      <p style="color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;line-height:1.2;margin-bottom:24px">No es moda.<br>Es posición.</p>
+      <a href="catalogo.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px 28px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.88)'" onmouseout="this.style.background='#fff'">Ver colección</a>
     </div>
   </div>
 
-  <!-- Card 2 â€” Verano -->
+  <!-- Card 2 — Verano -->
   <div class="card" style="position:relative;overflow:hidden;aspect-ratio:4/5;cursor:pointer">
     <img src="images/verano.jpg" alt="DFORZZE" style="width:100%;height:100%;object-fit:cover;object-position:center 60%;transition:transform .8s cubic-bezier(.16,1,.3,1)">
     <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%)"></div>
     <div class="card-copy" style="position:absolute;bottom:0;left:0;right:0;padding:40px 48px">
-      <p style="color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;line-height:1.2;margin-bottom:24px">Lo que llevas<br>dice quiÃ©n eres.</p>
+      <p style="color:#fff;font-weight:800;font-size:28px;letter-spacing:-.02em;line-height:1.2;margin-bottom:24px">Lo que llevas<br>dice quién eres.</p>
       <a href="catalogo.html" style="display:inline-flex;align-items:center;gap:8px;background:#fff;color:#000;font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:13px 28px;border-radius:9999px;transition:all .3s" onmouseover="this.style.background='rgba(255,255,255,.88)'" onmouseout="this.style.background='#fff'">Explorar</a>
     </div>
   </div>
@@ -324,18 +324,18 @@ function toggleMobMenu(){
     <span style="color:rgba(255,255,255,.2);font-weight:700;font-size:8px;letter-spacing:.3em;text-transform:uppercase">DFORZZE</span>
   </div>
   <div style="display:flex;gap:20px;flex-wrap:wrap">
-    <a href="terminos.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">TÃ©rminos</a>
-    <a href="envios.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">EnvÃ­os</a>
+    <a href="terminos.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Términos</a>
+    <a href="envios.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Envíos</a>
     <a href="privacidad.html" style="color:rgba(255,255,255,.2);font-size:11px;letter-spacing:.03em;transition:color .3s" onmouseover="this.style.color='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.2)'">Privacidad</a>
   </div>
-  <p style="color:rgba(255,255,255,.12);font-size:10px;letter-spacing:.05em">Â© 2025 DFORZZE.</p>
+  <p style="color:rgba(255,255,255,.12);font-size:10px;letter-spacing:.05em">© 2025 DFORZZE.</p>
 </div>
 </footer>
 
 <!-- MODAL AUTH TIENDA -->
 <div id="tiendaAuthM" onclick="if(event.target===this)closeTiendaAuth()" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:16px">
   <div onclick="event.stopPropagation()" style="background:#fff;border-radius:4px;width:100%;max-width:420px;position:relative;animation:tAuthIn .25s ease-out">
-    <button onclick="closeTiendaAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(0,0,0,.3);cursor:pointer;font-size:20px;padding:4px;transition:color .2s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.3)'">âœ•</button>
+    <button onclick="closeTiendaAuth()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(0,0,0,.3);cursor:pointer;font-size:20px;padding:4px;transition:color .2s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.3)'">✕</button>
     <div style="padding:40px 36px 32px">
       <div style="display:flex;align-items:center;gap:6px;margin-bottom:32px">
         <img src="images/logo.png" alt="DFORZZE" style="height:28px;width:auto;object-fit:contain">
@@ -343,7 +343,7 @@ function toggleMobMenu(){
       </div>
       <div style="display:flex;gap:0;margin-bottom:28px;border-bottom:2px solid #f0f0f0">
         <button id="taTReg" onclick="tiendaAuthTab('register')" style="flex:1;padding:10px 0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;background:none;cursor:pointer;color:#000;border-bottom:2px solid #000;margin-bottom:-2px;font-family:inherit">Crear cuenta</button>
-        <button id="taTLog" onclick="tiendaAuthTab('login')" style="flex:1;padding:10px 0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;background:none;cursor:pointer;color:rgba(0,0,0,.3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit">Iniciar sesiÃ³n</button>
+        <button id="taTLog" onclick="tiendaAuthTab('login')" style="flex:1;padding:10px 0;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border:none;background:none;cursor:pointer;color:rgba(0,0,0,.3);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit">Iniciar sesión</button>
       </div>
       <div id="taErr" style="display:none;margin-bottom:16px;padding:12px;background:#fff0f0;border-left:3px solid #e00;font-size:12px;color:#c00;font-weight:500"></div>
       <form onsubmit="doTiendaAuth(event)" style="display:flex;flex-direction:column;gap:14px">
@@ -356,8 +356,8 @@ function toggleMobMenu(){
           <input type="email" id="taEm" required placeholder="tu@email.com" style="width:100%;border:1.5px solid #e0e0e0;border-radius:2px;padding:12px 14px;font-size:14px;color:#000;outline:none;font-family:inherit" onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#e0e0e0'">
         </div>
         <div>
-          <label style="display:block;color:#000;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">ContraseÃ±a</label>
-          <input type="password" id="taPw" required minlength="6" placeholder="MÃ­nimo 6 caracteres" style="width:100%;border:1.5px solid #e0e0e0;border-radius:2px;padding:12px 14px;font-size:14px;color:#000;outline:none;font-family:inherit" onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#e0e0e0'">
+          <label style="display:block;color:#000;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Contraseña</label>
+          <input type="password" id="taPw" required minlength="6" placeholder="Mínimo 6 caracteres" style="width:100%;border:1.5px solid #e0e0e0;border-radius:2px;padding:12px 14px;font-size:14px;color:#000;outline:none;font-family:inherit" onfocus="this.style.borderColor='#000'" onblur="this.style.borderColor='#e0e0e0'">
         </div>
         <button type="submit" id="taSub" style="width:100%;background:#000;color:#fff;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;padding:15px;border:none;border-radius:2px;cursor:pointer;margin-top:4px;font-family:inherit" onmouseover="this.style.background='#222'" onmouseout="this.style.background='#000'">Crear cuenta</button>
       </form>
@@ -368,7 +368,7 @@ function toggleMobMenu(){
 <!-- MODAL PERFIL TIENDA -->
 <div id="tiendaProfM" onclick="if(event.target===this)closeTiendaProfile()" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px">
   <div onclick="event.stopPropagation()" style="background:#fff;border-radius:4px;width:100%;max-width:400px;position:relative;animation:tAuthIn .25s ease-out;overflow:hidden;max-height:90vh;overflow-y:auto">
-    <button onclick="closeTiendaProfile()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:20px;z-index:2;padding:4px;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'">âœ•</button>
+    <button onclick="closeTiendaProfile()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:20px;z-index:2;padding:4px;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.4)'">✕</button>
     <div style="background:#000;padding:28px 28px 24px;display:flex;flex-direction:column;align-items:center">
       <div id="tpAv" style="width:80px;height:80px;border-radius:50%;background:#222;border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:28px;font-weight:800;color:#fff;text-transform:uppercase;margin-bottom:14px"></div>
       <p id="tpNm" style="color:#fff;font-weight:800;font-size:18px;margin-bottom:2px"></p>
@@ -407,7 +407,7 @@ function toggleMobMenu(){
         <div style="width:36px;height:36px;background:#fee2e2;border-radius:2px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </div>
-        <span style="font-weight:700;font-size:13px;color:#ef4444">Cerrar sesiÃ³n</span>
+        <span style="font-weight:700;font-size:13px;color:#ef4444">Cerrar sesión</span>
       </button>
     </div>
   </div>
@@ -415,7 +415,7 @@ function toggleMobMenu(){
 <style>@keyframes tAuthIn{0%{opacity:0;transform:scale(.96) translateY(8px)}100%{opacity:1;transform:scale(1) translateY(0)}}</style>
 
 <script>
-// â”€â”€ AUTH TIENDA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── AUTH TIENDA ────────────────────────────────────────────────
 var _tTab = 'register';
 
 function getUser(){ try{ return JSON.parse(localStorage.getItem('dforzze_user')); }catch(e){ return null; } }
@@ -454,7 +454,7 @@ function tiendaAuthTab(t){
   document.getElementById('taTLog').style.color = t==='login'?'#000':'rgba(0,0,0,.3)';
   document.getElementById('taTLog').style.borderBottomColor = t==='login'?'#000':'transparent';
   document.getElementById('taNmF').style.display = t==='register'?'block':'none';
-  document.getElementById('taSub').textContent = t==='register'?'Crear cuenta':'Iniciar sesiÃ³n';
+  document.getElementById('taSub').textContent = t==='register'?'Crear cuenta':'Iniciar sesión';
   document.getElementById('taErr').style.display = 'none';
 }
 function doTiendaAuth(e){
@@ -465,7 +465,7 @@ function doTiendaAuth(e){
   var err = document.getElementById('taErr');
   if(_tTab==='register'&&!nm){ err.textContent='Ingresa un nombre'; err.style.display='block'; return; }
   if(!em){ err.textContent='Ingresa tu email'; err.style.display='block'; return; }
-  if(pw.length<6){ err.textContent='MÃ­nimo 6 caracteres'; err.style.display='block'; return; }
+  if(pw.length<6){ err.textContent='Mínimo 6 caracteres'; err.style.display='block'; return; }
   if(em==='admin@dforzze.com'&&pw==='dforzze2025'){
     var U={name:'Admin',email:em,rank:'INNER',stickerCount:0,stickers:[],image:null,role:'ADMIN',createdAt:new Date().toLocaleDateString('es-PE'),blocked:false};
     try{ localStorage.setItem('dforzze_user',JSON.stringify(U)); var l=JSON.parse(localStorage.getItem('dforzze_users')||'[]'); var ix=l.findIndex(function(x){return x.email===em;}); if(ix>=0)l[ix]=U; else l.push(U); localStorage.setItem('dforzze_users',JSON.stringify(l)); }catch(ex){}
@@ -496,9 +496,9 @@ function openTiendaProfile(){
   var curIdx=RANK_ORDER.indexOf(u.rank||'NONE');
   var nextRank=RANK_ORDER[Math.min(curIdx+1,3)];
   if(u.rank==='INNER'){
-    document.getElementById('tpProgTxt').textContent='Rango mÃ¡ximo';
+    document.getElementById('tpProgTxt').textContent='Rango máximo';
     document.getElementById('tpProgBar').style.width='100%';
-    document.getElementById('tpProgHint').textContent='Â¡Eres Inner Circle!';
+    document.getElementById('tpProgHint').textContent='¡Eres Inner Circle!';
   } else {
     var needed=RANK_STK[nextRank];
     document.getElementById('tpProgTxt').textContent=cnt+' / '+needed+' stickers';
@@ -570,7 +570,7 @@ document.querySelectorAll('.fade-up,.fade-in').forEach(el=>{
     setTimeout(()=>el.remove(),(fallDur+delay+0.5)*1000);
   }
 
-  // Initial burst â€” 60 petals over 3 seconds
+  // Initial burst — 60 petals over 3 seconds
   let spawned = 0;
   const burst = setInterval(()=>{
     spawnPetal();
