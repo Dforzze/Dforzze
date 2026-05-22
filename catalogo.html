@@ -881,24 +881,13 @@ button{font-family:inherit;cursor:pointer}
 
   <div id="dfz-toast">✓ Agregado al carrito</div>
 
-  <!-- Shopify Storefront SDK — carga productos y conecta con checkout real -->
+  <!-- Shopify Storefront API — fetch directo, sin SDK externo -->
   <script>
   (function() {
-    var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
-
-    function loadSDK(cb) {
-      if (window.ShopifyBuy) { cb(); return; }
-      var s = document.createElement('script');
-      s.async = true;
-      s.src = scriptURL;
-      s.onload = cb;
-      document.head.appendChild(s);
-    }
-
     var DOMAIN = 'szs0ek-1b.myshopify.com';
     var TOKEN  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
+    var API_URL = 'https://' + DOMAIN + '/api/2024-01/graphql.json';
 
-    // Product IDs de Shopify — Naranja, Rosa, Roja
     var PRODUCTS = [
       { productId: '8223930351705', bodyId: 'dfz-body-0' },
       { productId: '8223833751641', bodyId: 'dfz-body-1' },
@@ -908,6 +897,17 @@ button{font-family:inherit;cursor:pointer}
     var SVG_CART = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>';
     var SVG_SPIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
     var SVG_OK   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    function gql(query, variables) {
+      return fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Storefront-Access-Token': TOKEN
+        },
+        body: JSON.stringify({ query: query, variables: variables || {} })
+      }).then(function(r) { return r.json(); });
+    }
 
     function formatPrice(val) {
       return 'S/. ' + parseFloat(val).toFixed(2);
@@ -920,7 +920,6 @@ button{font-family:inherit;cursor:pointer}
       var variants = product.variants;
       var selected = variants[0];
 
-      // Selector de tallas
       var sizeHTML = '';
       if (variants.length > 1) {
         sizeHTML = '<span class="dfz-size-label">Talla</span><div class="dfz-size-options">';
@@ -942,7 +941,6 @@ button{font-family:inherit;cursor:pointer}
       var sizeBtns = body.querySelectorAll('.dfz-size-btn');
       var addBtn   = document.getElementById('btn-' + p.bodyId);
 
-      // Cambio de talla
       sizeBtns.forEach(function(btn) {
         btn.addEventListener('click', function() {
           if (btn.classList.contains('unavailable')) return;
@@ -955,7 +953,6 @@ button{font-family:inherit;cursor:pointer}
         });
       });
 
-      // Agregar al carrito
       addBtn.addEventListener('click', function() {
         var variantId = addBtn.getAttribute('data-variant-id');
         var card      = addBtn.closest('.dfz-card');
@@ -965,70 +962,45 @@ button{font-family:inherit;cursor:pointer}
         var priceEl   = document.getElementById('price-' + p.bodyId);
         var priceNum  = priceEl ? parseFloat(priceEl.textContent.replace('S/. ', '')) || 0 : 0;
 
-        // Estado visual: cargando
         addBtn.disabled = true;
         addBtn.classList.add('loading');
         addBtn.innerHTML = SVG_SPIN + ' Agregando...';
 
-        function doAdd() {
-          window.dfzAddToCart(variantId, product.title, sizeName, priceNum, imgSrc, function() {
-            addBtn.classList.remove('loading');
-            addBtn.classList.add('success');
-            addBtn.innerHTML = SVG_OK + ' Agregado';
-            if (window.openDfzCart) window.openDfzCart();
-            setTimeout(function() {
-              addBtn.disabled = false;
-              addBtn.classList.remove('success');
-              addBtn.innerHTML = SVG_CART + ' Agregar al carrito';
-            }, 2000);
-          });
-        }
-
-        // Si el drawer ya está listo, agregar directo
-        if (window.dfzAddToCart) {
-          doAdd();
-          return;
-        }
-
-        // Si no, esperar hasta 5s a que cargue
-        var tries = 0;
-        var wait = setInterval(function() {
-          tries++;
-          if (window.dfzAddToCart) {
-            clearInterval(wait);
-            doAdd();
-          } else if (tries > 50) {
-            // Timeout — restaurar botón
-            clearInterval(wait);
+        window.dfzAddToCart(variantId, product.title, sizeName, priceNum, imgSrc, function() {
+          addBtn.classList.remove('loading');
+          addBtn.classList.add('success');
+          addBtn.innerHTML = SVG_OK + ' Agregado';
+          if (window.openDfzCart) window.openDfzCart();
+          setTimeout(function() {
             addBtn.disabled = false;
-            addBtn.classList.remove('loading');
+            addBtn.classList.remove('success');
             addBtn.innerHTML = SVG_CART + ' Agregar al carrito';
-          }
-        }, 100);
+          }, 2000);
+        });
       });
     }
 
-    loadSDK(function() {
-      var client = ShopifyBuy.buildClient({ domain: DOMAIN, storefrontAccessToken: TOKEN });
-      // Exponer cliente para que el drawer pueda crear el checkout
-      window._dfzShopifyClient = client;
-
-      PRODUCTS.forEach(function(p) {
-        client.product.fetch('gid://shopify/Product/' + p.productId)
-          .then(function(product) {
-            if (!product) return;
-            var variants = product.variants.map(function(v) {
-              return {
-                id:        v.id,
-                title:     v.title,
-                available: v.available,
-                price:     v.price.amount !== undefined ? v.price.amount : v.price
-              };
-            });
-            renderCard(p, { title: product.title, variants: variants });
-          })
-          .catch(function(e) { console.warn('Error cargando producto ' + p.productId, e); });
-      });
+    // Cargar cada producto via Storefront GraphQL
+    PRODUCTS.forEach(function(p) {
+      var gid = 'gid://shopify/Product/' + p.productId;
+      var query = 'query($id:ID!){product(id:$id){title variants(first:10){edges{node{id title availableForSale priceV2{amount}}}}}}';
+      gql(query, { id: gid })
+        .then(function(res) {
+          var prod = res && res.data && res.data.product;
+          if (!prod) return;
+          var variants = prod.variants.edges.map(function(e) {
+            return {
+              id:        e.node.id,
+              title:     e.node.title,
+              available: e.node.availableForSale,
+              price:     e.node.priceV2.amount
+            };
+          });
+          renderCard(p, { title: prod.title, variants: variants });
+          // Exponer cliente simulado para syncCheckout
+          if (!window._dfzShopifyGql) window._dfzShopifyGql = gql;
+        })
+        .catch(function(e) { console.warn('Error producto ' + p.productId, e); });
     });
 
   })();
@@ -1041,7 +1013,7 @@ button{font-family:inherit;cursor:pointer}
     wrap.addEventListener('touchend', function(e) {
       e.preventDefault();
       var now = Date.now();
-      if (now - lastTap < 400) return; // ignorar doble tap
+      if (now - lastTap < 400) return;
       lastTap = now;
       wrap.classList.toggle('touched');
     }, { passive: false });
@@ -2388,18 +2360,37 @@ initProfileBtn();</script>
 
   // ── Checkout ─────────────────────────────────────────────
   function syncCheckout(cb) {
-    if(!window._dfzShopifyClient) { if(cb) cb(); return; }
-    var client = window._dfzShopifyClient;
     var lineItems = _items.map(function(i){ return { variantId: i.variantId, quantity: i.qty }; });
+    if (lineItems.length === 0) { _checkout = null; if(cb) cb(); return; }
 
-    if(lineItems.length === 0) { _checkout = null; if(cb) cb(); return; }
+    var DOMAIN = 'szs0ek-1b.myshopify.com';
+    var TOKEN  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
+    var API_URL = 'https://' + DOMAIN + '/api/2024-01/graphql.json';
 
-    // Siempre crear checkout nuevo con el estado completo actual
-    client.checkout.create({ lineItems: lineItems }).then(function(co){
-      _checkout = co;
-      window._dfzCheckoutUrl = co.webUrl;
+    var lineItemsGql = lineItems.map(function(i){
+      return '{ variantId: "' + i.variantId + '", quantity: ' + i.quantity + ' }';
+    }).join(',');
+
+    var mutation = 'mutation { checkoutCreate(input: { lineItems: [' + lineItemsGql + '] }) { checkout { webUrl } checkoutUserErrors { message } } }';
+
+    fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Storefront-Access-Token': TOKEN
+      },
+      body: JSON.stringify({ query: mutation })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(res){
+      var co = res && res.data && res.data.checkoutCreate && res.data.checkoutCreate.checkout;
+      if (co) {
+        _checkout = co;
+        window._dfzCheckoutUrl = co.webUrl;
+      }
       if(cb) cb();
-    }).catch(function(e){ console.error('checkout error:', e); if(cb) cb(); });
+    })
+    .catch(function(e){ console.error('checkout error:', e); if(cb) cb(); });
   }
 
   window.dfzGoCheckout = function() {
