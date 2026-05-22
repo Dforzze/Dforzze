@@ -634,7 +634,42 @@ button{font-family:inherit;cursor:pointer}
       background:transparent;
       padding:0 32px;
     }
-    @media(max-width:767px){ .dfz-grid { grid-template-columns:1fr; gap:14px; padding:0 16px; } }
+    @media(max-width:767px){
+      .dfz-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        padding: 0;
+        background: #e5e5e5;
+      }
+      .dfz-card {
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      .dfz-img-wrap {
+        aspect-ratio: 3/4 !important;
+      }
+      .dfz-card-body {
+        padding: 10px 10px 14px !important;
+      }
+      .dfz-prod-name {
+        font-size: 10px !important;
+        letter-spacing: .04em !important;
+      }
+      .dfz-prod-price {
+        font-size: 13px !important;
+        margin-bottom: 8px !important;
+      }
+      .dfz-size-btn {
+        font-size: 10px !important;
+        padding: 5px 8px !important;
+      }
+      .dfz-add-btn {
+        font-size: 9px !important;
+        padding: 11px 8px !important;
+        border-radius: 6px !important;
+        letter-spacing: .06em !important;
+      }
+    }
 
     .dfz-card {
       background:#fff;
