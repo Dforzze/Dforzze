@@ -879,45 +879,71 @@ button{font-family:inherit;cursor:pointer}
     </div>
   </div><!-- /padding wrapper -->
 
-  <div id="dfz-toast">✓ Agregado al carrito</div>
-
-  <!-- Shopify Storefront API — fetch directo, sin SDK externo -->
+  <!-- Shopify Buy Button SDK — carrito lateral nativo -->
   <script>
   (function() {
     var DOMAIN = 'szs0ek-1b.myshopify.com';
     var TOKEN  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
-    var API_URL = 'https://' + DOMAIN + '/api/2024-01/graphql.json';
 
+    // Variant IDs reales de Shopify
     var PRODUCTS = [
-      { productId: '8223930351705', bodyId: 'dfz-body-0' },
-      { productId: '8223833751641', bodyId: 'dfz-body-1' },
-      { productId: '8223930777689', bodyId: 'dfz-body-2' }
+      {
+        bodyId: 'dfz-body-0',
+        title: 'HOODIE NARANJA',
+        price: '95.0',
+        variants: [
+          { id: 'gid://shopify/ProductVariant/43331057451097', title: 'L', available: true },
+          { id: 'gid://shopify/ProductVariant/43331057483865', title: 'M', available: true }
+        ]
+      },
+      {
+        bodyId: 'dfz-body-1',
+        title: 'HOODIE ROSA',
+        price: '95.0',
+        variants: []  // se cargan dinámicamente
+      },
+      {
+        bodyId: 'dfz-body-2',
+        title: 'HOODIE ROJA',
+        price: '95.0',
+        variants: []  // se cargan dinámicamente
+      }
     ];
+
+    var PRODUCT_IDS = ['8223930351705','8223833751641','8223930777689'];
 
     var SVG_CART = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>';
     var SVG_SPIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
     var SVG_OK   = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
 
-    function gql(query, variables) {
-      return fetch(API_URL, {
+    var API_URL = 'https://' + DOMAIN + '/api/2024-01/graphql.json';
+
+    function formatPrice(val) { return 'S/. ' + parseFloat(val).toFixed(2); }
+
+    // Cargar variantes de cada producto via GraphQL
+    function loadProduct(productId, bodyId, cb) {
+      var query = '{"query":"query{product(id:\\"gid://shopify/Product/' + productId + '\\"){title variants(first:10){edges{node{id title availableForSale priceV2{amount}}}}}}"}';
+      fetch(API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Storefront-Access-Token': TOKEN
-        },
-        body: JSON.stringify({ query: query, variables: variables || {} })
-      }).then(function(r) { return r.json(); });
+        headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': TOKEN },
+        body: query
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        var prod = res && res.data && res.data.product;
+        if (!prod) return;
+        var variants = prod.variants.edges.map(function(e){
+          return { id: e.node.id, title: e.node.title, available: e.node.availableForSale, price: e.node.priceV2.amount };
+        });
+        renderCard(bodyId, prod.title, variants);
+        if (cb) cb(variants);
+      })
+      .catch(function(e){ console.warn('Error cargando producto', e); });
     }
 
-    function formatPrice(val) {
-      return 'S/. ' + parseFloat(val).toFixed(2);
-    }
-
-    function renderCard(p, product) {
-      var body = document.getElementById(p.bodyId);
+    function renderCard(bodyId, title, variants) {
+      var body = document.getElementById(bodyId);
       if (!body) return;
-
-      var variants = product.variants;
       var selected = variants[0];
 
       var sizeHTML = '';
@@ -925,89 +951,141 @@ button{font-family:inherit;cursor:pointer}
         sizeHTML = '<span class="dfz-size-label">Talla</span><div class="dfz-size-options">';
         variants.forEach(function(v, i) {
           var cls = 'dfz-size-btn' + (!v.available ? ' unavailable' : '') + (i === 0 ? ' selected' : '');
-          sizeHTML += '<button class="' + cls + '" data-variant-id="' + v.id + '">' + v.title + '</button>';
+          sizeHTML += '<button class="' + cls + '" data-variant-id="' + v.id + '" data-price="' + v.price + '">' + v.title + '</button>';
         });
         sizeHTML += '</div>';
       }
 
       body.innerHTML =
-        '<p class="dfz-prod-name">' + product.title + '</p>' +
-        '<p class="dfz-prod-price" id="price-' + p.bodyId + '">' + formatPrice(selected.price) + '</p>' +
+        '<p class="dfz-prod-name">' + title + '</p>' +
+        '<p class="dfz-prod-price" id="price-' + bodyId + '">' + formatPrice(selected.price) + '</p>' +
         sizeHTML +
-        '<button class="dfz-add-btn" id="btn-' + p.bodyId + '" data-variant-id="' + selected.id + '">' +
+        '<button class="dfz-add-btn" id="btn-' + bodyId + '" data-variant-id="' + selected.id + '">' +
           SVG_CART + ' Agregar al carrito' +
         '</button>';
 
       var sizeBtns = body.querySelectorAll('.dfz-size-btn');
-      var addBtn   = document.getElementById('btn-' + p.bodyId);
+      var addBtn   = document.getElementById('btn-' + bodyId);
 
       sizeBtns.forEach(function(btn) {
         btn.addEventListener('click', function() {
           if (btn.classList.contains('unavailable')) return;
-          sizeBtns.forEach(function(b) { b.classList.remove('selected'); });
+          sizeBtns.forEach(function(b){ b.classList.remove('selected'); });
           btn.classList.add('selected');
-          var vid = btn.getAttribute('data-variant-id');
-          addBtn.setAttribute('data-variant-id', vid);
-          var v = variants.find(function(x) { return x.id === vid; });
-          if (v) document.getElementById('price-' + p.bodyId).textContent = formatPrice(v.price);
+          addBtn.setAttribute('data-variant-id', btn.getAttribute('data-variant-id'));
+          document.getElementById('price-' + bodyId).textContent = formatPrice(btn.getAttribute('data-price'));
         });
       });
 
       addBtn.addEventListener('click', function() {
         var variantId = addBtn.getAttribute('data-variant-id');
-        var card      = addBtn.closest('.dfz-card');
-        var imgSrc    = card ? (card.querySelector('.dfz-img-front') || {src:''}).src : '';
-        var sizeBtn   = body.querySelector('.dfz-size-btn.selected');
-        var sizeName  = sizeBtn ? sizeBtn.textContent.trim() : 'Única';
-        var priceEl   = document.getElementById('price-' + p.bodyId);
-        var priceNum  = priceEl ? parseFloat(priceEl.textContent.replace('S/. ', '')) || 0 : 0;
-
         addBtn.disabled = true;
         addBtn.classList.add('loading');
         addBtn.innerHTML = SVG_SPIN + ' Agregando...';
 
-        window.dfzAddToCart(variantId, product.title, sizeName, priceNum, imgSrc, function() {
+        // Crear cart y redirigir a checkout
+        var mutation = '{"query":"mutation{cartCreate(input:{lines:[{merchandiseId:\\"' + variantId + '\\",quantity:1}]}){cart{checkoutUrl}userErrors{message}}}"}';
+        fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': TOKEN },
+          body: mutation
+        })
+        .then(function(r){ return r.json(); })
+        .then(function(res){
+          var cart = res && res.data && res.data.cartCreate && res.data.cartCreate.cart;
+          if (cart && cart.checkoutUrl) {
+            addBtn.classList.remove('loading');
+            addBtn.classList.add('success');
+            addBtn.innerHTML = SVG_OK + ' Agregado — Ir a pagar';
+            // Guardar URL y abrir drawer
+            window._lastCheckoutUrl = cart.checkoutUrl;
+            openDfzDrawer(cart.checkoutUrl, variantId, title, body);
+            setTimeout(function(){
+              addBtn.disabled = false;
+              addBtn.classList.remove('success');
+              addBtn.innerHTML = SVG_CART + ' Agregar al carrito';
+            }, 3000);
+          } else {
+            throw new Error('No checkout URL');
+          }
+        })
+        .catch(function(e){
+          console.error(e);
+          addBtn.disabled = false;
           addBtn.classList.remove('loading');
-          addBtn.classList.add('success');
-          addBtn.innerHTML = SVG_OK + ' Agregado';
-          if (window.openDfzCart) window.openDfzCart();
-          setTimeout(function() {
-            addBtn.disabled = false;
-            addBtn.classList.remove('success');
-            addBtn.innerHTML = SVG_CART + ' Agregar al carrito';
-          }, 2000);
+          addBtn.innerHTML = SVG_CART + ' Agregar al carrito';
+          alert('Error al conectar con Shopify. Intenta de nuevo.');
         });
       });
     }
 
-    // Cargar cada producto via Storefront GraphQL
-    PRODUCTS.forEach(function(p) {
-      var gid = 'gid://shopify/Product/' + p.productId;
-      var query = 'query($id:ID!){product(id:$id){title variants(first:10){edges{node{id title availableForSale priceV2{amount}}}}}}';
-      gql(query, { id: gid })
-        .then(function(res) {
-          var prod = res && res.data && res.data.product;
-          if (!prod) return;
-          var variants = prod.variants.edges.map(function(e) {
-            return {
-              id:        e.node.id,
-              title:     e.node.title,
-              available: e.node.availableForSale,
-              price:     e.node.priceV2.amount
-            };
-          });
-          renderCard(p, { title: prod.title, variants: variants });
-          // Exponer cliente simulado para syncCheckout
-          if (!window._dfzShopifyGql) window._dfzShopifyGql = gql;
-        })
-        .catch(function(e) { console.warn('Error producto ' + p.productId, e); });
+    // Drawer simple con checkout URL
+    function openDfzDrawer(checkoutUrl, variantId, productTitle, body) {
+      var sizeBtn = body.querySelector('.dfz-size-btn.selected');
+      var sizeName = sizeBtn ? sizeBtn.textContent.trim() : '';
+      var priceEl = body.querySelector('.dfz-prod-price');
+      var price = priceEl ? priceEl.textContent : '';
+
+      var drawer = document.getElementById('dfz-simple-drawer');
+      if (!drawer) {
+        drawer = document.createElement('div');
+        drawer.id = 'dfz-simple-drawer';
+        drawer.style.cssText = 'position:fixed;top:0;right:0;bottom:0;width:380px;max-width:100vw;background:#fff;z-index:9999;box-shadow:-4px 0 40px rgba(0,0,0,.15);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .35s cubic-bezier(.16,1,.3,1)';
+        document.body.appendChild(drawer);
+        var overlay = document.createElement('div');
+        overlay.id = 'dfz-simple-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9998;opacity:0;transition:opacity .35s;pointer-events:none';
+        overlay.onclick = closeDfzDrawer;
+        document.body.appendChild(overlay);
+      }
+
+      drawer.innerHTML =
+        '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #f0f0f0">' +
+          '<h3 style="font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase">Tu carrito</h3>' +
+          '<button onclick="closeDfzDrawer()" style="background:none;border:none;cursor:pointer;font-size:22px;color:#999;line-height:1">×</button>' +
+        '</div>' +
+        '<div style="flex:1;padding:24px;overflow-y:auto">' +
+          '<div style="display:flex;gap:16px;align-items:flex-start">' +
+            '<div style="width:80px;height:96px;background:#f5f5f5;border-radius:8px;flex-shrink:0"></div>' +
+            '<div style="flex:1">' +
+              '<p style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px">' + productTitle + '</p>' +
+              (sizeName ? '<p style="font-size:11px;color:rgba(0,0,0,.4);margin-bottom:8px">Talla: ' + sizeName + '</p>' : '') +
+              '<p style="font-size:15px;font-weight:800">' + price + '</p>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="padding:20px 24px;border-top:1px solid #f0f0f0">' +
+          '<a href="' + checkoutUrl + '" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#000;color:#fff;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:17px;border-radius:12px;text-decoration:none;transition:background .2s" onmouseover="this.style.background=\'#222\'" onmouseout="this.style.background=\'#000\'">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>' +
+            'Finalizar compra en Shopify' +
+          '</a>' +
+          '<p style="text-align:center;font-size:10px;color:rgba(0,0,0,.3);margin-top:10px;letter-spacing:.03em">Pago seguro · Mercado Pago · Powered by Shopify</p>' +
+        '</div>';
+
+      setTimeout(function(){
+        drawer.style.transform = 'translateX(0)';
+        var ov = document.getElementById('dfz-simple-overlay');
+        if (ov) { ov.style.opacity = '1'; ov.style.pointerEvents = 'auto'; }
+      }, 10);
+    }
+
+    window.closeDfzDrawer = function() {
+      var drawer = document.getElementById('dfz-simple-drawer');
+      var ov = document.getElementById('dfz-simple-overlay');
+      if (drawer) drawer.style.transform = 'translateX(100%)';
+      if (ov) { ov.style.opacity = '0'; ov.style.pointerEvents = 'none'; }
+    };
+
+    // Cargar los 3 productos
+    PRODUCT_IDS.forEach(function(id, i) {
+      loadProduct(id, 'dfz-body-' + i);
     });
 
   })();
   </script>
 
   <script>
-  // Efecto touch en mobile — tap para alternar imagen (debounce para evitar doble disparo)
+  // Efecto touch en mobile — tap para alternar imagen
   document.querySelectorAll('.dfz-img-wrap').forEach(function(wrap) {
     var lastTap = 0;
     wrap.addEventListener('touchend', function(e) {
@@ -2140,296 +2218,6 @@ updateCartCount();
 initProfileBtn();</script>
 
 
-<!-- ══ DFZ CART DRAWER ══════════════════════════════════════ -->
-<style>
-  #dfz-overlay {
-    position:fixed;inset:0;background:rgba(0,0,0,.45);
-    opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:10000;
-    backdrop-filter:blur(2px);
-  }
-  #dfz-overlay.open { opacity:1;pointer-events:auto; }
-
-  #dfz-drawer {
-    position:fixed;top:0;right:0;bottom:0;width:420px;max-width:100vw;
-    background:#fff;z-index:10001;
-    transform:translateX(100%);transition:transform .38s cubic-bezier(.16,1,.3,1);
-    display:flex;flex-direction:column;
-    box-shadow:-8px 0 40px rgba(0,0,0,.12);
-  }
-  #dfz-drawer.open { transform:translateX(0); }
-
-  .dfz-drawer-head {
-    display:flex;align-items:center;justify-content:space-between;
-    padding:20px 24px;border-bottom:1px solid #f0f0f0;flex-shrink:0;
-  }
-  .dfz-drawer-head h3 {
-    font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
-  }
-  .dfz-drawer-close {
-    width:36px;height:36px;border-radius:50%;border:none;background:#f5f5f5;
-    cursor:pointer;display:flex;align-items:center;justify-content:center;
-    transition:background .2s;
-  }
-  .dfz-drawer-close:hover { background:#e5e5e5; }
-
-  #dfz-drawer-items {
-    flex:1;overflow-y:auto;padding:0;
-    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.1) transparent;
-  }
-
-  .dfz-cart-item {
-    display:flex;align-items:center;gap:16px;
-    padding:18px 24px;border-bottom:1px solid #f5f5f5;
-  }
-  .dfz-cart-item-img {
-    width:72px;height:88px;object-fit:cover;border-radius:8px;background:#f5f5f5;flex-shrink:0;
-  }
-  .dfz-cart-item-info { flex:1;min-width:0; }
-  .dfz-cart-item-name {
-    font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
-    margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  }
-  .dfz-cart-item-size {
-    font-size:11px;color:rgba(0,0,0,.4);margin-bottom:10px;
-  }
-  .dfz-qty-wrap {
-    display:flex;align-items:center;gap:0;
-    border:1.5px solid #e5e5e5;border-radius:8px;width:fit-content;overflow:hidden;
-  }
-  .dfz-qty-btn {
-    width:32px;height:32px;border:none;background:#fff;cursor:pointer;
-    font-size:16px;font-weight:300;color:#000;transition:background .15s;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .dfz-qty-btn:hover { background:#f5f5f5; }
-  .dfz-qty-num {
-    width:32px;text-align:center;font-size:13px;font-weight:700;
-    border-left:1.5px solid #e5e5e5;border-right:1.5px solid #e5e5e5;
-    height:32px;display:flex;align-items:center;justify-content:center;
-  }
-  .dfz-cart-item-price {
-    font-size:14px;font-weight:800;flex-shrink:0;
-  }
-  .dfz-cart-item-remove {
-    width:28px;height:28px;border:none;background:none;cursor:pointer;
-    color:rgba(0,0,0,.25);transition:color .15s;padding:0;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .dfz-cart-item-remove:hover { color:#000; }
-
-  .dfz-drawer-empty {
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    height:100%;padding:40px;text-align:center;color:rgba(0,0,0,.35);gap:12px;
-  }
-  .dfz-drawer-empty p { font-size:13px;line-height:1.6; }
-
-  .dfz-drawer-foot {
-    padding:20px 24px;border-top:1px solid #f0f0f0;flex-shrink:0;background:#fff;
-  }
-  .dfz-subtotal-row {
-    display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;
-  }
-  .dfz-subtotal-row span:first-child {
-    font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.4);
-  }
-  .dfz-subtotal-row span:last-child {
-    font-size:16px;font-weight:800;color:#000;
-  }
-  .dfz-checkout-btn {
-    width:100%;background:#000;color:#fff;border:none;border-radius:12px;
-    font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
-    padding:17px;cursor:pointer;transition:all .2s ease;
-    display:flex;align-items:center;justify-content:center;gap:8px;
-  }
-  .dfz-checkout-btn:hover { background:#222; }
-  .dfz-checkout-btn:active { transform:scale(.98); }
-  .dfz-checkout-btn:disabled { background:#ccc;cursor:not-allowed; }
-  .dfz-note {
-    text-align:center;font-size:10px;color:rgba(0,0,0,.3);margin-top:10px;
-    letter-spacing:.03em;
-  }
-
-  @media(max-width:480px){
-    #dfz-drawer { width:100vw; }
-  }
-</style>
-
-<div id="dfz-overlay" onclick="closeDfzCart()"></div>
-<div id="dfz-drawer">
-  <div class="dfz-drawer-head">
-    <h3>Tu carrito <span id="dfz-cart-count-head" style="color:rgba(0,0,0,.35);font-weight:500"></span></h3>
-    <button class="dfz-drawer-close" onclick="closeDfzCart()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div id="dfz-drawer-items"></div>
-  <div class="dfz-drawer-foot" id="dfz-drawer-foot" style="display:none">
-    <div class="dfz-subtotal-row">
-      <span>Subtotal</span>
-      <span id="dfz-subtotal">S/. 0.00</span>
-    </div>
-    <button class="dfz-checkout-btn" id="dfz-checkout-btn" onclick="dfzGoCheckout()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      Finalizar compra en Shopify
-    </button>
-    <p class="dfz-note">Pago seguro · Tarjeta, Yape y más · Powered by Shopify</p>
-  </div>
-</div>
-
-<script>
-// ════════════════════════════════════════════════════════════
-//  CARRITO DFORZZE — usa Shopify Buy Button SDK
-//  Un solo script, sin duplicados, sin conflictos
-// ════════════════════════════════════════════════════════════
-(function(){
-  // ── Estado ──────────────────────────────────────────────
-  var _items = [];      // [{variantId, title, size, price, qty, img}]
-  var _checkout = null; // objeto checkout de Shopify SDK
-
-  // ── Badge ────────────────────────────────────────────────
-  function updateBadge() {
-    var total = _items.reduce(function(s,i){ return s+i.qty; }, 0);
-    ['cartCount','shopifyCartCount'].forEach(function(id){
-      var el = document.getElementById(id);
-      if(!el) return;
-      el.textContent = total;
-      el.style.display = total > 0 ? 'flex' : 'none';
-    });
-    var h = document.getElementById('dfz-cart-count-head');
-    if(h) h.textContent = total > 0 ? '('+total+')' : '';
-  }
-
-  // ── Drawer ───────────────────────────────────────────────
-  window.openDfzCart = function() {
-    renderDrawer();
-    document.getElementById('dfz-overlay').classList.add('open');
-    document.getElementById('dfz-drawer').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  };
-  window.closeDfzCart = function() {
-    document.getElementById('dfz-overlay').classList.remove('open');
-    document.getElementById('dfz-drawer').classList.remove('open');
-    document.body.style.overflow = '';
-  };
-
-  function renderDrawer() {
-    var container = document.getElementById('dfz-drawer-items');
-    var foot = document.getElementById('dfz-drawer-foot');
-    if(_items.length === 0) {
-      container.innerHTML = '<div class="dfz-drawer-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><p>Tu carrito está vacío</p></div>';
-      foot.style.display = 'none';
-      return;
-    }
-    var subtotal = _items.reduce(function(s,i){ return s + i.price * i.qty; }, 0);
-    container.innerHTML = _items.map(function(item, idx){
-      return '<div class="dfz-cart-item">' +
-        '<img class="dfz-cart-item-img" src="'+(item.img||'')+'" onerror="this.style.display='none'">' +
-        '<div class="dfz-cart-item-info">' +
-          '<p class="dfz-cart-item-name">'+item.title+'</p>' +
-          '<p class="dfz-cart-item-size">Talla: '+item.size+'</p>' +
-          '<div class="dfz-qty-wrap">' +
-            '<button class="dfz-qty-btn" onclick="dfzChangeQty('+idx+',-1)">−</button>' +
-            '<span class="dfz-qty-num">'+item.qty+'</span>' +
-            '<button class="dfz-qty-btn" onclick="dfzChangeQty('+idx+',1)">+</button>' +
-          '</div>' +
-        '</div>' +
-        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">' +
-          '<button class="dfz-cart-item-remove" onclick="dfzRemoveItem('+idx+')" title="Eliminar">' +
-            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-          '</button>' +
-          '<span class="dfz-cart-item-price">S/. '+(item.price*item.qty).toFixed(2)+'</span>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-    document.getElementById('dfz-subtotal').textContent = 'S/. ' + subtotal.toFixed(2);
-    foot.style.display = 'block';
-  }
-
-  window.dfzChangeQty = function(idx, delta) {
-    if(!_items[idx]) return;
-    _items[idx].qty += delta;
-    if(_items[idx].qty <= 0) _items.splice(idx, 1);
-    updateBadge();
-    syncCheckout(function(){ renderDrawer(); });
-  };
-  window.dfzRemoveItem = function(idx) {
-    _items.splice(idx, 1);
-    updateBadge();
-    syncCheckout(function(){ renderDrawer(); });
-  };
-
-  // ── Checkout via Cart API (Shopify 2024) ─────────────────
-  function syncCheckout(cb) {
-    var lineItems = _items.map(function(i){ return { variantId: i.variantId, quantity: i.qty }; });
-    if (lineItems.length === 0) { _checkout = null; if(cb) cb(); return; }
-
-    var DOMAIN  = 'szs0ek-1b.myshopify.com';
-    var TOKEN   = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
-    var API_URL = 'https://' + DOMAIN + '/api/2024-01/graphql.json';
-
-    var linesGql = lineItems.map(function(i){
-      return '{ merchandiseId: "' + i.variantId + '", quantity: ' + i.qty + ' }';
-    }).join(',');
-
-    var mutation = 'mutation { cartCreate(input: { lines: [' + linesGql + '] }) { cart { checkoutUrl } userErrors { message } } }';
-
-    fetch(API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Shopify-Storefront-Access-Token': TOKEN
-      },
-      body: JSON.stringify({ query: mutation })
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(res){
-      var cart = res && res.data && res.data.cartCreate && res.data.cartCreate.cart;
-      if (cart && cart.checkoutUrl) {
-        _checkout = cart;
-        window._dfzCheckoutUrl = cart.checkoutUrl;
-      }
-      if(cb) cb();
-    })
-    .catch(function(e){ console.error('cart error:', e); if(cb) cb(); });
-  }
-
-  window.dfzGoCheckout = function() {
-    var btn = document.getElementById('dfz-checkout-btn');
-    var url = (_checkout && _checkout.checkoutUrl) ? _checkout.checkoutUrl : window._dfzCheckoutUrl;
-
-    if (url) {
-      if (btn) { btn.disabled = true; btn.innerHTML = 'Redirigiendo a Shopify...'; }
-      window.location.href = url;
-    } else if (_items.length > 0) {
-      if (btn) { btn.disabled = true; btn.innerHTML = 'Preparando checkout...'; }
-      syncCheckout(function() {
-        var freshUrl = (_checkout && _checkout.checkoutUrl) ? _checkout.checkoutUrl : window._dfzCheckoutUrl;
-        if (freshUrl) {
-          window.location.href = freshUrl;
-        } else {
-          if (btn) { btn.disabled = false; btn.innerHTML = 'Finalizar compra en Shopify'; }
-          alert('No se pudo conectar con Shopify. Intenta de nuevo.');
-        }
-      });
-    }
-  };
-
-  // ── API pública — llamada desde las cards ─────────────────
-  // variantId: string GID, title, size, price (número), img, cb(ok)
-  window.dfzAddToCart = function(variantId, title, size, price, img, cb) {
-    var existing = _items.find(function(i){ return i.variantId === variantId; });
-    if(existing) { existing.qty++; }
-    else { _items.push({ variantId:variantId, title:title, size:size, price:parseFloat(price)||0, qty:1, img:img }); }
-    updateBadge();
-    renderDrawer();
-    syncCheckout(function(){
-      renderDrawer();
-      if(cb) cb(true);
-    });
-  };
-
-})();
-</script>
 
 </body>
 </html>
