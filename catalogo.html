@@ -2225,10 +2225,26 @@ initProfileBtn();</script>
 </div>
 
 <script>
+// ── Shopify Storefront API global helper ────────────────────────────────────
+// Se define fuera de cualquier IIFE para que todos los scripts lo puedan usar
+window._dfzShopifyDomain = 'szs0ek-1b.myshopify.com';
+window._dfzShopifyToken  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
+window.dfzGql = function(query, variables) {
+  return fetch('https://' + window._dfzShopifyDomain + '/api/2024-01/graphql.json', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Shopify-Storefront-Access-Token': window._dfzShopifyToken
+    },
+    body: JSON.stringify({ query: query, variables: variables || {} })
+  }).then(function(r){ return r.json(); });
+};
+
 (function(){
   // ── Estado del carrito ──────────────────────────────
   var _cartItems = []; // [{variantId, title, size, price, qty, img}]
   var _checkoutUrl = null;
+  var _shopifyCartId = null; // guardamos el ID para reusar con cartLinesAdd
 
   window.openDfzCart = function() {
     renderDrawer();
@@ -2266,19 +2282,40 @@ initProfileBtn();</script>
   }
 
   function syncWithShopify(cb) {
-    var lines = _cartItems.map(function(i){ return {merchandiseId:i.variantId, quantity:i.qty}; });
-    if(lines.length === 0){ if(cb) cb(true); return; }
-    gql('mutation($lines:[CartLineInput!]!){cartCreate(input:{lines:$lines}){cart{id checkoutUrl}userErrors{message}}}', {lines:lines})
-      .then(function(r){
-        if(!r.data || !r.data.cartCreate || !r.data.cartCreate.cart){
-          console.error('Shopify error:', JSON.stringify(r));
-          if(cb) cb(false); return;
-        }
-        window._dfzCartId = r.data.cartCreate.cart.id;
-        _checkoutUrl = r.data.cartCreate.cart.checkoutUrl;
-        window._dfzCheckoutUrl = _checkoutUrl;
-        if(cb) cb(true);
-      }).catch(function(e){ console.error('syncWithShopify error:', e); if(cb) cb(false); });
+    // Recalculamos las lines con el estado actual completo
+    var allLines = _cartItems.map(function(i){ return {merchandiseId:i.variantId, quantity:i.qty}; });
+    if(allLines.length === 0){ if(cb) cb(true); return; }
+
+    if(!_shopifyCartId) {
+      // Primera vez: crear carrito nuevo
+      window.dfzGql('mutation($lines:[CartLineInput!]!){cartCreate(input:{lines:$lines}){cart{id checkoutUrl}userErrors{message}}}', {lines:allLines})
+        .then(function(r){
+          if(!r.data || !r.data.cartCreate || !r.data.cartCreate.cart){
+            console.error('cartCreate Shopify error:', JSON.stringify(r));
+            if(cb) cb(false); return;
+          }
+          _shopifyCartId = r.data.cartCreate.cart.id;
+          window._dfzCartId = _shopifyCartId;
+          _checkoutUrl = r.data.cartCreate.cart.checkoutUrl;
+          window._dfzCheckoutUrl = _checkoutUrl;
+          if(cb) cb(true);
+        }).catch(function(e){ console.error('syncWithShopify (create) error:', e); if(cb) cb(false); });
+    } else {
+      // Carrito ya existe: obtener líneas actuales y reemplazar
+      // Usamos cartCreate nuevo con el estado completo (más simple que manejar lineIds)
+      window.dfzGql('mutation($lines:[CartLineInput!]!){cartCreate(input:{lines:$lines}){cart{id checkoutUrl}userErrors{message}}}', {lines:allLines})
+        .then(function(r){
+          if(!r.data || !r.data.cartCreate || !r.data.cartCreate.cart){
+            console.error('cartCreate (update) Shopify error:', JSON.stringify(r));
+            if(cb) cb(false); return;
+          }
+          _shopifyCartId = r.data.cartCreate.cart.id;
+          window._dfzCartId = _shopifyCartId;
+          _checkoutUrl = r.data.cartCreate.cart.checkoutUrl;
+          window._dfzCheckoutUrl = _checkoutUrl;
+          if(cb) cb(true);
+        }).catch(function(e){ console.error('syncWithShopify (recreate) error:', e); if(cb) cb(false); });
+    }
   }
 
   function renderDrawer() {
