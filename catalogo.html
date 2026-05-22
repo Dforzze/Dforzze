@@ -836,31 +836,34 @@ button{font-family:inherit;cursor:pointer}
 
   <div id="dfz-toast">✓ Agregado al carrito</div>
 
+  <!-- Shopify Buy Button SDK -->
   <script>
-  (function(){
-    var DOMAIN = 'szs0ek-1b.myshopify.com';
-    var TOKEN  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
-    var PRODUCTS = [
-      { id: 'gid://shopify/Product/8223930351705', bodyId: 'dfz-body-0' }, // Naranja
-      { id: 'gid://shopify/Product/8223833751641', bodyId: 'dfz-body-1' }, // Rosa
-      { id: 'gid://shopify/Product/8223930777689', bodyId: 'dfz-body-2' }  // Roja
-    ];
-
-    var cartId = null;
-
-    function gql(query, variables) {
-      return fetch('https://' + DOMAIN + '/api/2024-01/graphql.json', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Shopify-Storefront-Access-Token': TOKEN
-        },
-        body: JSON.stringify({ query: query, variables: variables || {} })
-      }).then(function(r){ return r.json(); });
+  (function() {
+    var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+    function loadSDK(cb) {
+      if (window.ShopifyBuy && window.ShopifyBuy.UI) { cb(); return; }
+      var s = document.createElement('script');
+      s.async = true; s.src = scriptURL;
+      s.onload = cb;
+      document.head.appendChild(s);
     }
 
-    function formatPrice(amount, currency) {
-      return 'S/. ' + parseFloat(amount).toFixed(2);
+    var DOMAIN = 'szs0ek-1b.myshopify.com';
+    var TOKEN  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
+
+    // IDs numéricos de variantes por producto (Naranja, Rosa, Roja)
+    // Shopify variant IDs — se cargan via Storefront con el SDK
+    var PRODUCTS = [
+      { variantGids: [], productId: '8223930351705', bodyId: 'dfz-body-0' },
+      { variantGids: [], productId: '8223833751641', bodyId: 'dfz-body-1' },
+      { variantGids: [], productId: '8223930777689', bodyId: 'dfz-body-2' }
+    ];
+
+    var _shopifyClient = null;
+    var _shopifyCart   = null;
+
+    function formatPrice(cents) {
+      return 'S/. ' + (parseFloat(cents)).toFixed(2);
     }
 
     function showToast(msg) {
@@ -870,37 +873,44 @@ button{font-family:inherit;cursor:pointer}
       setTimeout(function(){ t.classList.remove('show'); }, 3500);
     }
 
-    function renderCard(bodyId, product) {
-      var body = document.getElementById(bodyId);
+    function updateBadge() {
+      var total = _shopifyCart ? _shopifyCart.lineItems.reduce(function(s,i){ return s+i.quantity; },0) : 0;
+      ['cartCount','shopifyCartCount'].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el){ el.textContent = total; el.style.display = total > 0 ? 'flex' : 'none'; }
+      });
+    }
+
+    function renderCard(p, product) {
+      var body = document.getElementById(p.bodyId);
       if(!body) return;
 
-      var variants = product.variants.edges.map(function(e){ return e.node; });
-      var hasMultipleSizes = variants.length > 1;
-      var selectedVariant = variants[0];
+      var variants = product.variants;
+      var selected = variants[0];
 
       var sizeHTML = '';
-      if(hasMultipleSizes) {
+      if(variants.length > 1) {
         sizeHTML = '<span class="dfz-size-label">Talla</span><div class="dfz-size-options">';
         variants.forEach(function(v, i) {
-          var unavailable = !v.availableForSale ? ' unavailable' : '';
-          var selected = i === 0 ? ' selected' : '';
-          sizeHTML += '<button class="dfz-size-btn' + unavailable + selected + '" data-variant-id="' + v.id + '" data-available="' + v.availableForSale + '">' + v.title + '</button>';
+          var unavail = !v.available ? ' unavailable' : '';
+          var sel     = i === 0 ? ' selected' : '';
+          sizeHTML += '<button class="dfz-size-btn' + unavail + sel + '" data-variant-id="' + v.id + '">' + v.title + '</button>';
         });
         sizeHTML += '</div>';
       }
 
       body.innerHTML =
         '<p class="dfz-prod-name">' + product.title + '</p>' +
-        '<p class="dfz-prod-price" id="price-' + bodyId + '">' + formatPrice(selectedVariant.price.amount) + '</p>' +
+        '<p class="dfz-prod-price" id="price-' + p.bodyId + '">' + formatPrice(selected.price) + '</p>' +
         sizeHTML +
-        '<button class="dfz-add-btn" id="btn-' + bodyId + '" data-variant-id="' + selectedVariant.id + '">' +
+        '<button class="dfz-add-btn" id="btn-' + p.bodyId + '" data-variant-id="' + selected.id + '">' +
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>' +
           'Agregar al carrito' +
         '</button>';
 
-      // Eventos tallas
       var sizeBtns = body.querySelectorAll('.dfz-size-btn');
-      var addBtn = document.getElementById('btn-' + bodyId);
+      var addBtn   = document.getElementById('btn-' + p.bodyId);
+
       sizeBtns.forEach(function(btn) {
         btn.addEventListener('click', function() {
           if(btn.classList.contains('unavailable')) return;
@@ -908,61 +918,104 @@ button{font-family:inherit;cursor:pointer}
           btn.classList.add('selected');
           var vid = btn.getAttribute('data-variant-id');
           addBtn.setAttribute('data-variant-id', vid);
-          // Actualizar precio
           var v = variants.find(function(x){ return x.id === vid; });
-          if(v) document.getElementById('price-' + bodyId).textContent = formatPrice(v.price.amount);
+          if(v) document.getElementById('price-' + p.bodyId).textContent = formatPrice(v.price);
         });
       });
 
-      // Evento agregar al carrito
       addBtn.addEventListener('click', function() {
         var variantId = addBtn.getAttribute('data-variant-id');
         addBtn.disabled = true;
         addBtn.classList.add('loading');
         addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Agregando...';
 
-        // Obtener imagen del card
-        var card = addBtn.closest('.dfz-card');
-        var imgEl = card ? card.querySelector('.dfz-img-front') : null;
-        var imgSrc = imgEl ? imgEl.src : '';
-        var selectedSizeBtn = body.querySelector('.dfz-size-btn.selected');
-        var sizeName = selectedSizeBtn ? selectedSizeBtn.textContent : 'Única';
+        function doAdd() {
+          var lineItems = [{ variantId: variantId, quantity: 1 }];
+          var cartPromise = _shopifyCart
+            ? _shopifyClient.checkout.addLineItems(_shopifyCart.id, lineItems)
+            : _shopifyClient.checkout.create().then(function(cart){
+                _shopifyCart = cart;
+                return _shopifyClient.checkout.addLineItems(cart.id, lineItems);
+              });
 
-        var priceEl = document.getElementById('price-' + bodyId);
-        var priceText = priceEl ? priceEl.textContent.replace('S/. ','') : '0';
-        window.dfzAddToCart(variantId, product.title, sizeName, priceText, imgSrc, function(ok) {
-          if(ok) {
+          cartPromise.then(function(cart) {
+            _shopifyCart = cart;
+            window._dfzCheckoutUrl = cart.webUrl;
+            updateBadge();
+
+            // Sincronizar con el drawer custom si existe
+            if(window.dfzAddToCart) {
+              var card = addBtn.closest('.dfz-card');
+              var imgSrc = card ? (card.querySelector('.dfz-img-front')||{}).src||'' : '';
+              var sizeBtn = body.querySelector('.dfz-size-btn.selected');
+              var sizeName = sizeBtn ? sizeBtn.textContent : 'Única';
+              var priceEl = document.getElementById('price-' + p.bodyId);
+              var priceText = priceEl ? priceEl.textContent.replace('S/. ','') : '0';
+              // Actualizar estado visual del drawer sin re-llamar a Shopify
+              window._dfzCartItems = window._dfzCartItems || [];
+              var existing = window._dfzCartItems.find(function(i){ return i.variantId === variantId; });
+              if(existing) existing.qty++; else window._dfzCartItems.push({variantId:variantId, title:product.title, size:sizeName, price:parseFloat(priceText), qty:1, img:imgSrc});
+              if(window.updateCartBadgeLocal) window.updateCartBadgeLocal();
+            }
+
             addBtn.classList.remove('loading');
             addBtn.classList.add('success');
             addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Agregado';
-            // Abrir drawer del carrito
             if(window.openDfzCart) window.openDfzCart();
             setTimeout(function(){
               addBtn.disabled = false;
               addBtn.classList.remove('success');
               addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> Agregar al carrito';
             }, 2000);
-          } else {
+
+          }).catch(function(e) {
+            console.error('Shopify addLineItems error:', e);
             addBtn.disabled = false;
             addBtn.classList.remove('loading');
             addBtn.innerHTML = 'Error — reintentar';
             setTimeout(function(){
               addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> Agregar al carrito';
             }, 2000);
-          }
-        });
+          });
+        }
+
+        if(_shopifyClient) {
+          doAdd();
+        } else {
+          addBtn.disabled = false;
+          addBtn.classList.remove('loading');
+          addBtn.innerHTML = 'Cargando...';
+        }
       });
     }
 
-    // Cart manejado por dfz-drawer global
+    loadSDK(function() {
+      _shopifyClient = ShopifyBuy.buildClient({ domain: DOMAIN, storefrontAccessToken: TOKEN });
 
-    // Cargar productos
-    var query = 'query($id:ID!){product(id:$id){title variants(first:10){edges{node{id title availableForSale price{amount currencyCode}}}}}}';
-    PRODUCTS.forEach(function(p) {
-      gql(query, { id: p.id }).then(function(r) {
-        if(r.data && r.data.product) renderCard(p.bodyId, r.data.product);
-      }).catch(function(e){ console.warn('Shopify error:', e); });
+      PRODUCTS.forEach(function(p) {
+        _shopifyClient.product.fetch('gid://shopify/Product/' + p.productId).then(function(product) {
+          if(!product) return;
+          // Normalizar variantes al formato que usa renderCard
+          var variants = product.variants.map(function(v) {
+            return {
+              id: v.id,
+              title: v.title,
+              available: v.available,
+              price: v.price.amount !== undefined ? v.price.amount : v.price
+            };
+          });
+          renderCard(p, { title: product.title, variants: variants });
+        }).catch(function(e){ console.warn('Error cargando producto ' + p.productId, e); });
+      });
     });
+
+    // Exponer checkout URL para el botón del drawer
+    window.dfzGoCheckout = function() {
+      var url = _shopifyCart ? _shopifyCart.webUrl : null;
+      if(url) { window.location.href = url; }
+      else { alert('Agrega productos al carrito primero'); }
+    };
+
   })();
   </script>
 
@@ -2366,14 +2419,14 @@ window.dfzGql = function(query, variables) {
 
   window.dfzGoCheckout = function() {
     var btn = document.getElementById('dfz-checkout-btn');
-    if(_checkoutUrl) {
-      btn.disabled = true;
-      btn.textContent = 'Redirigiendo...';
-      window.location.href = _checkoutUrl;
+    // Usar la URL real de Shopify generada por el SDK
+    var url = window._dfzCheckoutUrl || _checkoutUrl;
+    if(url) {
+      if(btn){ btn.disabled = true; btn.textContent = 'Redirigiendo...'; }
+      window.location.href = url;
     } else {
-      syncWithShopify(function(ok){
-        if(ok && _checkoutUrl) window.location.href = _checkoutUrl;
-      });
+      if(btn){ btn.textContent = 'Sin productos'; }
+      setTimeout(function(){ if(btn){ btn.disabled=false; btn.textContent='Pagar'; } }, 1500);
     }
   };
 
