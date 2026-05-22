@@ -1019,11 +1019,16 @@ button{font-family:inherit;cursor:pointer}
   </script>
 
   <script>
-  // Efecto touch en mobile — tap para alternar imagen
+  // Efecto touch en mobile — tap para alternar imagen (debounce para evitar doble disparo)
   document.querySelectorAll('.dfz-img-wrap').forEach(function(wrap) {
-    wrap.addEventListener('click', function() {
+    var lastTap = 0;
+    wrap.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      var now = Date.now();
+      if (now - lastTap < 400) return; // ignorar doble tap
+      lastTap = now;
       wrap.classList.toggle('touched');
-    });
+    }, { passive: false });
   });
   </script>
 
