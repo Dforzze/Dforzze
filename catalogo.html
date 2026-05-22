@@ -1021,8 +1021,7 @@ button{font-family:inherit;cursor:pointer}
   <script>
   // Efecto touch en mobile — tap para ver imagen trasera, tap de nuevo para volver
   document.querySelectorAll('.dfz-img-wrap').forEach(function(wrap) {
-    wrap.addEventListener('touchstart', function(e) {
-      e.preventDefault();
+    wrap.addEventListener('click', function(e) {
       var isOpen = wrap.classList.contains('touched');
       // Cerrar todos primero
       document.querySelectorAll('.dfz-img-wrap.touched').forEach(function(w) {
@@ -1030,7 +1029,7 @@ button{font-family:inherit;cursor:pointer}
       });
       // Si no estaba abierto, abrirlo
       if (!isOpen) wrap.classList.add('touched');
-    }, { passive: false });
+    });
   });
   </script>
 
