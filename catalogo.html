@@ -943,25 +943,26 @@ button{font-family:inherit;cursor:pointer}
             window._dfzCheckoutUrl = cart.webUrl;
             updateBadge();
 
-            // Sincronizar con el drawer custom si existe
-            if(window.dfzAddToCart) {
-              var card = addBtn.closest('.dfz-card');
-              var imgSrc = card ? (card.querySelector('.dfz-img-front')||{}).src||'' : '';
-              var sizeBtn = body.querySelector('.dfz-size-btn.selected');
-              var sizeName = sizeBtn ? sizeBtn.textContent : 'Única';
-              var priceEl = document.getElementById('price-' + p.bodyId);
-              var priceText = priceEl ? priceEl.textContent.replace('S/. ','') : '0';
-              // Actualizar estado visual del drawer sin re-llamar a Shopify
-              window._dfzCartItems = window._dfzCartItems || [];
-              var existing = window._dfzCartItems.find(function(i){ return i.variantId === variantId; });
-              if(existing) existing.qty++; else window._dfzCartItems.push({variantId:variantId, title:product.title, size:sizeName, price:parseFloat(priceText), qty:1, img:imgSrc});
-              if(window.updateCartBadgeLocal) window.updateCartBadgeLocal();
-            }
+            // Datos para el drawer
+            var card = addBtn.closest('.dfz-card');
+            var imgSrc = card ? ((card.querySelector('.dfz-img-front')||{src:''}).src) : '';
+            var sizeBtn = body.querySelector('.dfz-size-btn.selected');
+            var sizeName = sizeBtn ? sizeBtn.textContent.trim() : 'Única';
+            var priceEl = document.getElementById('price-' + p.bodyId);
+            var priceNum = priceEl ? parseFloat(priceEl.textContent.replace('S/. ',''))||0 : 0;
 
             addBtn.classList.remove('loading');
             addBtn.classList.add('success');
             addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Agregado';
-            if(window.openDfzCart) window.openDfzCart();
+
+            // Agregar al drawer con callback — abre DESPUÉS de que el estado está listo
+            if(window.dfzAddToCart) {
+              window.dfzAddToCart(variantId, product.title, sizeName, priceNum, imgSrc, function(){
+                if(window.openDfzCart) window.openDfzCart();
+              });
+            } else {
+              if(window.openDfzCart) window.openDfzCart();
+            }
             setTimeout(function(){
               addBtn.disabled = false;
               addBtn.classList.remove('success');
@@ -2385,7 +2386,9 @@ initProfileBtn();</script>
     if(existing) { existing.qty++; }
     else { _items.push({ variantId:variantId, title:title, size:size, price:parseFloat(price)||0, qty:1, img:img }); }
     updateBadge();
+    renderDrawer();
     syncCheckout(function(){
+      renderDrawer();
       if(cb) cb(true);
     });
   };
