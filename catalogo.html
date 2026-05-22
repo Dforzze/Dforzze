@@ -571,7 +571,7 @@ button{font-family:inherit;cursor:pointer}
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       </button>
       <!-- Carrito Shopify -->
-      <button onclick="openShopifyCart()" class="header-icon" aria-label="Ver carrito">
+      <button onclick="openDfzCart()" class="header-icon" aria-label="Ver carrito">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span id="shopifyCartCount" class="header-badge">0</span>
       </button>
@@ -753,21 +753,25 @@ button{font-family:inherit;cursor:pointer}
     /* Toast */
     #dfz-toast {
       position:fixed;
-      bottom:28px;
+      bottom:32px;
       left:50%;
       transform:translateX(-50%) translateY(20px);
-      background:#000;
+      background:#111;
       color:#fff;
-      font-size:12px;
+      font-size:13px;
       font-weight:600;
-      letter-spacing:.05em;
-      padding:12px 24px;
+      letter-spacing:.03em;
+      padding:14px 28px;
       border-radius:100px;
+      box-shadow:0 8px 32px rgba(0,0,0,.25);
       opacity:0;
-      transition:all .3s ease;
+      transition:all .35s cubic-bezier(.16,1,.3,1);
       z-index:9999;
-      pointer-events:none;
+      pointer-events:auto;
       white-space:nowrap;
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
     #dfz-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
@@ -860,9 +864,9 @@ button{font-family:inherit;cursor:pointer}
 
     function showToast(msg) {
       var t = document.getElementById('dfz-toast');
-      t.textContent = msg;
+      t.innerHTML = msg;
       t.classList.add('show');
-      setTimeout(function(){ t.classList.remove('show'); }, 2800);
+      setTimeout(function(){ t.classList.remove('show'); }, 3500);
     }
 
     function renderCard(bodyId, product) {
@@ -916,12 +920,20 @@ button{font-family:inherit;cursor:pointer}
         addBtn.classList.add('loading');
         addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Agregando...';
 
-        addToCart(variantId, function(ok) {
+        // Obtener imagen del card
+        var card = addBtn.closest('.dfz-card');
+        var imgEl = card ? card.querySelector('.dfz-img-front') : null;
+        var imgSrc = imgEl ? imgEl.src : '';
+        var selectedSizeBtn = body.querySelector('.dfz-size-btn.selected');
+        var sizeName = selectedSizeBtn ? selectedSizeBtn.textContent : 'Única';
+
+        window.dfzAddToCart(variantId, product.title, sizeName, selectedVariant.price.amount, imgSrc, function(ok) {
           if(ok) {
             addBtn.classList.remove('loading');
             addBtn.classList.add('success');
             addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Agregado';
-            showToast('✓ Agregado al carrito');
+            // Abrir drawer del carrito
+            if(window.openDfzCart) window.openDfzCart();
             setTimeout(function(){
               addBtn.disabled = false;
               addBtn.classList.remove('success');
@@ -939,35 +951,7 @@ button{font-family:inherit;cursor:pointer}
       });
     }
 
-    function addToCart(variantId, cb) {
-      if(cartId) {
-        addLineToCart(variantId, cb);
-      } else {
-        gql('mutation { cartCreate { cart { id checkoutUrl } } }').then(function(r) {
-          cartId = r.data.cartCreate.cart.id;
-          window._dfzCheckoutUrl = r.data.cartCreate.cart.checkoutUrl;
-          addLineToCart(variantId, cb);
-        }).catch(function(){ cb(false); });
-      }
-    }
-
-    function addLineToCart(variantId, cb) {
-      var mutation = 'mutation cartAdd($cartId:ID!,$lines:[CartLineInput!]!){cartLinesAdd(cartId:$cartId,lines:$lines){cart{id totalQuantity}}}';
-      gql(mutation, { cartId: cartId, lines: [{ merchandiseId: variantId, quantity: 1 }] })
-        .then(function(r){
-          var qty = r.data.cartLinesAdd.cart.totalQuantity;
-          updateCartBadge(qty);
-          cb(true);
-        })
-        .catch(function(){ cb(false); });
-    }
-
-    function updateCartBadge(qty) {
-      ['cartCount','shopifyCartCount'].forEach(function(id){
-        var el = document.getElementById(id);
-        if(el){ el.textContent = qty; el.style.display = qty > 0 ? 'flex' : 'none'; }
-      });
-    }
+    // Cart manejado por dfz-drawer global
 
     // Cargar productos
     var query = 'query($id:ID!){product(id:$id){title variants(first:10){edges{node{id title availableForSale price{amount currencyCode}}}}}}';
@@ -2099,6 +2083,299 @@ setTimeout(function(){
 }, 2000);
 updateCartCount();
 initProfileBtn();</script>
+
+
+<!-- ══ DFZ CART DRAWER ══════════════════════════════════════ -->
+<style>
+  #dfz-overlay {
+    position:fixed;inset:0;background:rgba(0,0,0,.45);
+    opacity:0;pointer-events:none;transition:opacity .35s ease;z-index:10000;
+    backdrop-filter:blur(2px);
+  }
+  #dfz-overlay.open { opacity:1;pointer-events:auto; }
+
+  #dfz-drawer {
+    position:fixed;top:0;right:0;bottom:0;width:420px;max-width:100vw;
+    background:#fff;z-index:10001;
+    transform:translateX(100%);transition:transform .38s cubic-bezier(.16,1,.3,1);
+    display:flex;flex-direction:column;
+    box-shadow:-8px 0 40px rgba(0,0,0,.12);
+  }
+  #dfz-drawer.open { transform:translateX(0); }
+
+  .dfz-drawer-head {
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 24px;border-bottom:1px solid #f0f0f0;flex-shrink:0;
+  }
+  .dfz-drawer-head h3 {
+    font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  }
+  .dfz-drawer-close {
+    width:36px;height:36px;border-radius:50%;border:none;background:#f5f5f5;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:background .2s;
+  }
+  .dfz-drawer-close:hover { background:#e5e5e5; }
+
+  #dfz-drawer-items {
+    flex:1;overflow-y:auto;padding:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.1) transparent;
+  }
+
+  .dfz-cart-item {
+    display:flex;align-items:center;gap:16px;
+    padding:18px 24px;border-bottom:1px solid #f5f5f5;
+  }
+  .dfz-cart-item-img {
+    width:72px;height:88px;object-fit:cover;border-radius:8px;background:#f5f5f5;flex-shrink:0;
+  }
+  .dfz-cart-item-info { flex:1;min-width:0; }
+  .dfz-cart-item-name {
+    font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .dfz-cart-item-size {
+    font-size:11px;color:rgba(0,0,0,.4);margin-bottom:10px;
+  }
+  .dfz-qty-wrap {
+    display:flex;align-items:center;gap:0;
+    border:1.5px solid #e5e5e5;border-radius:8px;width:fit-content;overflow:hidden;
+  }
+  .dfz-qty-btn {
+    width:32px;height:32px;border:none;background:#fff;cursor:pointer;
+    font-size:16px;font-weight:300;color:#000;transition:background .15s;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .dfz-qty-btn:hover { background:#f5f5f5; }
+  .dfz-qty-num {
+    width:32px;text-align:center;font-size:13px;font-weight:700;
+    border-left:1.5px solid #e5e5e5;border-right:1.5px solid #e5e5e5;
+    height:32px;display:flex;align-items:center;justify-content:center;
+  }
+  .dfz-cart-item-price {
+    font-size:14px;font-weight:800;flex-shrink:0;
+  }
+  .dfz-cart-item-remove {
+    width:28px;height:28px;border:none;background:none;cursor:pointer;
+    color:rgba(0,0,0,.25);transition:color .15s;padding:0;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .dfz-cart-item-remove:hover { color:#000; }
+
+  .dfz-drawer-empty {
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    height:100%;padding:40px;text-align:center;color:rgba(0,0,0,.35);gap:12px;
+  }
+  .dfz-drawer-empty p { font-size:13px;line-height:1.6; }
+
+  .dfz-drawer-foot {
+    padding:20px 24px;border-top:1px solid #f0f0f0;flex-shrink:0;background:#fff;
+  }
+  .dfz-subtotal-row {
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;
+  }
+  .dfz-subtotal-row span:first-child {
+    font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.4);
+  }
+  .dfz-subtotal-row span:last-child {
+    font-size:16px;font-weight:800;color:#000;
+  }
+  .dfz-checkout-btn {
+    width:100%;background:#000;color:#fff;border:none;border-radius:12px;
+    font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+    padding:17px;cursor:pointer;transition:all .2s ease;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .dfz-checkout-btn:hover { background:#222; }
+  .dfz-checkout-btn:active { transform:scale(.98); }
+  .dfz-checkout-btn:disabled { background:#ccc;cursor:not-allowed; }
+  .dfz-note {
+    text-align:center;font-size:10px;color:rgba(0,0,0,.3);margin-top:10px;
+    letter-spacing:.03em;
+  }
+
+  @media(max-width:480px){
+    #dfz-drawer { width:100vw; }
+  }
+</style>
+
+<div id="dfz-overlay" onclick="closeDfzCart()"></div>
+<div id="dfz-drawer">
+  <div class="dfz-drawer-head">
+    <h3>Tu carrito <span id="dfz-cart-count-head" style="color:rgba(0,0,0,.35);font-weight:500"></span></h3>
+    <button class="dfz-drawer-close" onclick="closeDfzCart()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div id="dfz-drawer-items"></div>
+  <div class="dfz-drawer-foot" id="dfz-drawer-foot" style="display:none">
+    <div class="dfz-subtotal-row">
+      <span>Subtotal</span>
+      <span id="dfz-subtotal">S/. 0.00</span>
+    </div>
+    <button class="dfz-checkout-btn" id="dfz-checkout-btn" onclick="dfzGoCheckout()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      Finalizar compra
+    </button>
+    <p class="dfz-note">Pago seguro · Tarjeta, Yape, y más</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  // ── Estado del carrito ──────────────────────────────
+  var _cartItems = []; // [{variantId, title, size, price, qty, img}]
+  var _checkoutUrl = null;
+
+  window.openDfzCart = function() {
+    renderDrawer();
+    document.getElementById('dfz-overlay').classList.add('open');
+    document.getElementById('dfz-drawer').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeDfzCart = function() {
+    document.getElementById('dfz-overlay').classList.remove('open');
+    document.getElementById('dfz-drawer').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+
+  // Llamado desde el botón "Agregar al carrito" de cada card
+  window.dfzAddToCart = function(variantId, title, size, price, img, onDone) {
+    var existing = _cartItems.find(function(i){ return i.variantId === variantId; });
+    if(existing) {
+      existing.qty++;
+    } else {
+      _cartItems.push({ variantId:variantId, title:title, size:size, price:parseFloat(price), qty:1, img:img });
+    }
+    updateCartBadgeLocal();
+    syncWithShopify(onDone);
+  };
+
+  function updateCartBadgeLocal() {
+    var total = _cartItems.reduce(function(s,i){ return s+i.qty; }, 0);
+    ['cartCount','shopifyCartCount'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el){ el.textContent = total; el.style.display = total > 0 ? 'flex' : 'none'; }
+    });
+    var head = document.getElementById('dfz-cart-count-head');
+    if(head) head.textContent = total > 0 ? '(' + total + ')' : '';
+  }
+
+  function syncWithShopify(cb) {
+    var DOMAIN = 'szs0ek-1b.myshopify.com';
+    var TOKEN  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
+    function gql(query, variables) {
+      return fetch('https://' + DOMAIN + '/api/2024-01/graphql.json', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-Shopify-Storefront-Access-Token':TOKEN},
+        body:JSON.stringify({query:query, variables:variables||{}})
+      }).then(function(r){ return r.json(); });
+    }
+    var lines = _cartItems.map(function(i){ return {merchandiseId:i.variantId, quantity:i.qty}; });
+    if(!window._dfzCartId) {
+      gql('mutation($lines:[CartLineInput!]!){cartCreate(input:{lines:$lines}){cart{id checkoutUrl}}}', {lines:lines})
+        .then(function(r){
+          window._dfzCartId = r.data.cartCreate.cart.id;
+          _checkoutUrl = r.data.cartCreate.cart.checkoutUrl;
+          window._dfzCheckoutUrl = _checkoutUrl;
+          if(cb) cb(true);
+        }).catch(function(){ if(cb) cb(false); });
+    } else {
+      // Actualizar líneas completas
+      gql('query($id:ID!){cart(id:$id){lines(first:20){edges{node{id}}}}}', {id:window._dfzCartId})
+        .then(function(r){
+          var existingLines = (r.data.cart.lines.edges||[]).map(function(e){ return e.node.id; });
+          var removeM = existingLines.length > 0
+            ? 'mutation($cartId:ID!,$lineIds:[ID!]!){cartLinesRemove(cartId:$cartId,lineIds:$lineIds){cart{id}}}'
+            : null;
+          var doAdd = function(){
+            gql('mutation($cartId:ID!,$lines:[CartLineInput!]!){cartLinesAdd(cartId:$cartId,lines:$lines){cart{id checkoutUrl}}}',
+              {cartId:window._dfzCartId, lines:lines})
+              .then(function(r2){
+                _checkoutUrl = r2.data.cartLinesAdd.cart.checkoutUrl;
+                window._dfzCheckoutUrl = _checkoutUrl;
+                if(cb) cb(true);
+              }).catch(function(){ if(cb) cb(false); });
+          };
+          if(removeM && existingLines.length > 0) {
+            gql(removeM, {cartId:window._dfzCartId, lineIds:existingLines}).then(doAdd).catch(doAdd);
+          } else {
+            doAdd();
+          }
+        }).catch(function(){ if(cb) cb(false); });
+    }
+  }
+
+  function renderDrawer() {
+    var container = document.getElementById('dfz-drawer-items');
+    var foot = document.getElementById('dfz-drawer-foot');
+    if(_cartItems.length === 0) {
+      container.innerHTML = '<div class="dfz-drawer-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,.2)" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><p>Tu carrito está vacío</p></div>';
+      foot.style.display = 'none';
+      return;
+    }
+    var subtotal = _cartItems.reduce(function(s,i){ return s + i.price * i.qty; }, 0);
+    container.innerHTML = _cartItems.map(function(item, idx) {
+      return '<div class="dfz-cart-item">' +
+        '<img class="dfz-cart-item-img" src="' + (item.img||'') + '" onerror="this.style.background='#f0f0f0';this.style.display='block'">' +
+        '<div class="dfz-cart-item-info">' +
+          '<p class="dfz-cart-item-name">' + item.title + '</p>' +
+          '<p class="dfz-cart-item-size">Talla: ' + item.size + '</p>' +
+          '<div class="dfz-qty-wrap">' +
+            '<button class="dfz-qty-btn" onclick="dfzChangeQty(' + idx + ',-1)">−</button>' +
+            '<span class="dfz-qty-num">' + item.qty + '</span>' +
+            '<button class="dfz-qty-btn" onclick="dfzChangeQty(' + idx + ',1)">+</button>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">' +
+          '<button class="dfz-cart-item-remove" onclick="dfzRemoveItem(' + idx + ')" title="Eliminar">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+          '</button>' +
+          '<span class="dfz-cart-item-price">S/. ' + (item.price * item.qty).toFixed(2) + '</span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+    document.getElementById('dfz-subtotal').textContent = 'S/. ' + subtotal.toFixed(2);
+    foot.style.display = 'block';
+  }
+
+  window.dfzChangeQty = function(idx, delta) {
+    _cartItems[idx].qty += delta;
+    if(_cartItems[idx].qty <= 0) _cartItems.splice(idx, 1);
+    updateCartBadgeLocal();
+    syncWithShopify(function(){ renderDrawer(); });
+  };
+
+  window.dfzRemoveItem = function(idx) {
+    _cartItems.splice(idx, 1);
+    updateCartBadgeLocal();
+    syncWithShopify(function(){ renderDrawer(); });
+  };
+
+  window.dfzGoCheckout = function() {
+    var btn = document.getElementById('dfz-checkout-btn');
+    if(_checkoutUrl) {
+      btn.disabled = true;
+      btn.textContent = 'Redirigiendo...';
+      window.location.href = _checkoutUrl;
+    } else {
+      syncWithShopify(function(ok){
+        if(ok && _checkoutUrl) window.location.href = _checkoutUrl;
+      });
+    }
+  };
+
+  // Exponer toast propio del drawer
+  window._dfzShowToast = function(msg) {
+    var t = document.getElementById('dfz-toast');
+    if(!t) return;
+    t.innerHTML = msg;
+    t.classList.add('show');
+    setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  };
+})();
+</script>
 
 </body>
 </html>
