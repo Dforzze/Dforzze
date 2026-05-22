@@ -1019,16 +1019,10 @@ button{font-family:inherit;cursor:pointer}
   </script>
 
   <script>
-  // Efecto touch en mobile — tap para ver imagen trasera, tap de nuevo para volver
+  // Efecto touch en mobile — tap para alternar imagen
   document.querySelectorAll('.dfz-img-wrap').forEach(function(wrap) {
-    wrap.addEventListener('click', function(e) {
-      var isOpen = wrap.classList.contains('touched');
-      // Cerrar todos primero
-      document.querySelectorAll('.dfz-img-wrap.touched').forEach(function(w) {
-        w.classList.remove('touched');
-      });
-      // Si no estaba abierto, abrirlo
-      if (!isOpen) wrap.classList.add('touched');
+    wrap.addEventListener('click', function() {
+      wrap.classList.toggle('touched');
     });
   });
   </script>
