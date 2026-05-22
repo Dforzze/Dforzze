@@ -955,10 +955,8 @@ button{font-family:inherit;cursor:pointer}
         });
       });
 
-      // Agregar al carrito — delega todo al drawer (dfzAddToCart)
+      // Agregar al carrito
       addBtn.addEventListener('click', function() {
-        if (!window.dfzAddToCart) return; // drawer aún no listo
-
         var variantId = addBtn.getAttribute('data-variant-id');
         var card      = addBtn.closest('.dfz-card');
         var imgSrc    = card ? (card.querySelector('.dfz-img-front') || {src:''}).src : '';
@@ -972,23 +970,41 @@ button{font-family:inherit;cursor:pointer}
         addBtn.classList.add('loading');
         addBtn.innerHTML = SVG_SPIN + ' Agregando...';
 
-        // Agregar al drawer + sincronizar checkout Shopify
-        window.dfzAddToCart(variantId, product.title, sizeName, priceNum, imgSrc, function() {
-          // Estado visual: éxito
-          addBtn.classList.remove('loading');
-          addBtn.classList.add('success');
-          addBtn.innerHTML = SVG_OK + ' Agregado';
+        function doAdd() {
+          window.dfzAddToCart(variantId, product.title, sizeName, priceNum, imgSrc, function() {
+            addBtn.classList.remove('loading');
+            addBtn.classList.add('success');
+            addBtn.innerHTML = SVG_OK + ' Agregado';
+            if (window.openDfzCart) window.openDfzCart();
+            setTimeout(function() {
+              addBtn.disabled = false;
+              addBtn.classList.remove('success');
+              addBtn.innerHTML = SVG_CART + ' Agregar al carrito';
+            }, 2000);
+          });
+        }
 
-          // Abrir drawer
-          if (window.openDfzCart) window.openDfzCart();
+        // Si el drawer ya está listo, agregar directo
+        if (window.dfzAddToCart) {
+          doAdd();
+          return;
+        }
 
-          // Restaurar botón después de 2s
-          setTimeout(function() {
+        // Si no, esperar hasta 5s a que cargue
+        var tries = 0;
+        var wait = setInterval(function() {
+          tries++;
+          if (window.dfzAddToCart) {
+            clearInterval(wait);
+            doAdd();
+          } else if (tries > 50) {
+            // Timeout — restaurar botón
+            clearInterval(wait);
             addBtn.disabled = false;
-            addBtn.classList.remove('success');
+            addBtn.classList.remove('loading');
             addBtn.innerHTML = SVG_CART + ' Agregar al carrito';
-          }, 2000);
-        });
+          }
+        }, 100);
       });
     }
 
