@@ -625,28 +625,29 @@ button{font-family:inherit;cursor:pointer}
 <!-- MAIN -->
 <main style="max-width:1400px;margin:0 auto;padding:32px 0 80px;background:#fff">
 
-  <!-- Products grid — imágenes custom con hover + Shopify para talla/carrito -->
+  <!-- Products grid — Storefront API custom -->
   <style>
-    .shopify-buy__product-img-wrapper,
-    .shopify-buy__product__variant-img-wrapper { display:none!important; }
     .dfz-grid {
       display:grid;
       grid-template-columns:repeat(3,1fr);
-      gap:16px;
+      gap:20px;
       background:transparent;
       padding:0 32px;
     }
-    @media(max-width:767px){ .dfz-grid { grid-template-columns:1fr; gap:12px; padding:0 16px; } }
+    @media(max-width:767px){ .dfz-grid { grid-template-columns:1fr; gap:14px; padding:0 16px; } }
+
     .dfz-card {
       background:#fff;
-      border-radius:12px;
+      border-radius:14px;
       overflow:hidden;
-      box-shadow:0 2px 12px rgba(0,0,0,.07);
+      box-shadow:0 2px 16px rgba(0,0,0,.08);
       transition:transform .25s ease, box-shadow .25s ease;
+      display:flex;
+      flex-direction:column;
     }
     .dfz-card:hover {
-      transform:translateY(-4px);
-      box-shadow:0 8px 32px rgba(0,0,0,.13);
+      transform:translateY(-5px);
+      box-shadow:0 12px 40px rgba(0,0,0,.14);
     }
     .dfz-img-wrap {
       position:relative;
@@ -668,72 +669,118 @@ button{font-family:inherit;cursor:pointer}
     .dfz-img-wrap .dfz-img-back  { opacity:0; z-index:2; }
     .dfz-img-wrap:hover .dfz-img-front { opacity:0; }
     .dfz-img-wrap:hover .dfz-img-back  { opacity:1; }
+
+    /* Info debajo de imagen */
+    .dfz-card-body {
+      padding:16px 16px 0;
+      flex:1;
+      display:flex;
+      flex-direction:column;
+    }
     .dfz-prod-name {
-      font-size:13px;
+      font-size:12px;
       font-weight:700;
-      letter-spacing:.06em;
+      letter-spacing:.08em;
       text-transform:uppercase;
-      padding:16px 16px 4px;
+      color:#000;
+      margin-bottom:4px;
+    }
+    .dfz-prod-price {
+      font-size:16px;
+      font-weight:800;
+      color:#000;
+      margin-bottom:14px;
+    }
+
+    /* Selector tallas */
+    .dfz-size-label {
+      font-size:9px;
+      font-weight:700;
+      letter-spacing:.15em;
+      text-transform:uppercase;
+      color:rgba(0,0,0,.4);
+      margin-bottom:8px;
+      display:block;
+    }
+    .dfz-size-options {
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-bottom:14px;
+    }
+    .dfz-size-btn {
+      border:1.5px solid #e5e5e5;
+      background:#fff;
+      border-radius:7px;
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.04em;
+      padding:7px 12px;
+      cursor:pointer;
+      transition:all .18s ease;
       color:#000;
     }
-    /* ── Shopify dentro de card ── */
-    .shopify-buy__product__title { display:none!important; }
-    .shopify-buy__product { background:#fff!important; padding:0!important; border-radius:0!important; box-shadow:none!important; }
-    .shopify-buy__product:hover { transform:none!important; box-shadow:none!important; }
-    .shopify-buy__product-set .shopify-buy__product { max-width:100%!important; width:100%!important; margin:0!important; }
+    .dfz-size-btn:hover { border-color:#000; background:#f5f5f5; }
+    .dfz-size-btn.selected { border-color:#000; background:#000; color:#fff; }
+    .dfz-size-btn.unavailable { opacity:.3; cursor:not-allowed; text-decoration:line-through; }
 
-    /* Precio */
-    .shopify-buy__product__actual-price {
-      font-size:15px!important; font-weight:800!important; color:#000!important;
-      margin:12px 16px 6px!important; display:block!important;
+    /* Botón agregar */
+    .dfz-add-btn {
+      width:100%;
+      background:#000;
+      color:#fff;
+      border:none;
+      border-radius:10px;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      padding:15px;
+      cursor:pointer;
+      transition:all .2s ease;
+      margin:0 0 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
     }
+    .dfz-add-btn:hover { background:#222; }
+    .dfz-add-btn:active { transform:scale(.98); background:#111; }
+    .dfz-add-btn:disabled { background:#ccc; cursor:not-allowed; transform:none; }
+    .dfz-add-btn.loading { background:#444; }
+    .dfz-add-btn.success { background:#16a34a; }
 
-    /* Label talla */
-    .shopify-buy__option-select__label {
-      font-size:10px!important; font-weight:700!important; letter-spacing:.12em!important;
-      text-transform:uppercase!important; color:rgba(0,0,0,.4)!important;
-      margin:0 16px 6px!important; display:block!important;
+    /* Toast */
+    #dfz-toast {
+      position:fixed;
+      bottom:28px;
+      left:50%;
+      transform:translateX(-50%) translateY(20px);
+      background:#000;
+      color:#fff;
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:.05em;
+      padding:12px 24px;
+      border-radius:100px;
+      opacity:0;
+      transition:all .3s ease;
+      z-index:9999;
+      pointer-events:none;
+      white-space:nowrap;
     }
+    #dfz-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-    /* Selector de talla — pill buttons si los hay, o select limpio */
-    .shopify-buy__option-select-wrapper {
-      margin:0 16px 12px!important;
-      border:1.5px solid #e5e5e5!important;
-      border-radius:10px!important;
-      background:#fafafa!important;
-      overflow:hidden!important;
+    /* Loading skeleton */
+    .dfz-skeleton {
+      background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);
+      background-size:200% 100%;
+      animation:dfz-shimmer 1.2s infinite;
+      border-radius:6px;
+      height:14px;
+      margin-bottom:8px;
     }
-    .shopify-buy__option-select {
-      font-size:13px!important; font-weight:600!important;
-      padding:11px 14px!important;
-      background:transparent!important;
-      border:none!important;
-      width:100%!important;
-      cursor:pointer!important;
-      color:#000!important;
-      appearance:auto!important;
-    }
-    .shopify-buy__option-select:focus { outline:none!important; }
-
-    /* Botón agregar al carrito */
-    .shopify-buy__btn {
-      background:#000!important;
-      color:#fff!important;
-      border-radius:10px!important;
-      margin:0 16px 18px!important;
-      width:calc(100% - 32px)!important;
-      font-size:11px!important;
-      font-weight:800!important;
-      letter-spacing:.1em!important;
-      text-transform:uppercase!important;
-      padding:14px!important;
-      border:none!important;
-      transition:background .2s ease!important;
-    }
-    .shopify-buy__btn:hover { background:#222!important; }
-    .shopify-buy__btn:active { background:#111!important; transform:scale(.98)!important; }
-
-    .dfz-shopify-slot { width:100%; }
+    @keyframes dfz-shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
   </style>
 
   <div style="padding:24px 0 0">
@@ -744,54 +791,193 @@ button{font-family:inherit;cursor:pointer}
 
     <div class="dfz-grid">
       <!-- PRODUCTO 1: HOODIE NARANJA -->
-      <div class="dfz-card">
+      <div class="dfz-card" id="dfz-card-0">
         <div class="dfz-img-wrap">
           <img class="dfz-img-front" src="images/naranja 16.jpg" alt="Hoodie Naranja">
           <img class="dfz-img-back"  src="images/14.jpg" alt="Hoodie Naranja detalle">
         </div>
-        <p class="dfz-prod-name">Hoodie Naranja</p>
-        <div class="dfz-shopify-slot" id="shopify-prod-1"></div>
+        <div class="dfz-card-body" id="dfz-body-0">
+          <div class="dfz-skeleton" style="width:60%"></div>
+          <div class="dfz-skeleton" style="width:35%"></div>
+          <div class="dfz-skeleton" style="width:100%;height:40px;border-radius:10px;margin-top:8px"></div>
+        </div>
       </div>
       <!-- PRODUCTO 2: HOODIE ROSA -->
-      <div class="dfz-card">
+      <div class="dfz-card" id="dfz-card-1">
         <div class="dfz-img-wrap">
           <img class="dfz-img-front" src="images/12.jpg" alt="Hoodie Rosa">
           <img class="dfz-img-back"  src="images/rosa 17.jpg" alt="Hoodie Rosa detalle">
         </div>
-        <p class="dfz-prod-name">Hoodie Rosa</p>
-        <div class="dfz-shopify-slot" id="shopify-prod-2"></div>
+        <div class="dfz-card-body" id="dfz-body-1">
+          <div class="dfz-skeleton" style="width:60%"></div>
+          <div class="dfz-skeleton" style="width:35%"></div>
+          <div class="dfz-skeleton" style="width:100%;height:40px;border-radius:10px;margin-top:8px"></div>
+        </div>
       </div>
       <!-- PRODUCTO 3: HOODIE ROJA -->
-      <div class="dfz-card">
+      <div class="dfz-card" id="dfz-card-2">
         <div class="dfz-img-wrap">
           <img class="dfz-img-front" src="images/rojo 18.jpg" alt="Hoodie Roja">
           <img class="dfz-img-back"  src="images/15.jpg" alt="Hoodie Roja detalle">
         </div>
-        <p class="dfz-prod-name">Hoodie Roja</p>
-        <div class="dfz-shopify-slot" id="shopify-prod-3"></div>
+        <div class="dfz-card-body" id="dfz-body-2">
+          <div class="dfz-skeleton" style="width:60%"></div>
+          <div class="dfz-skeleton" style="width:35%"></div>
+          <div class="dfz-skeleton" style="width:100%;height:40px;border-radius:10px;margin-top:8px"></div>
+        </div>
       </div>
     </div>
-
-    <div id='collection-component-1779304204891' style="display:none"></div>
-    <script type="text/javascript">/*<![CDATA[*/(function () {var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';if (window.ShopifyBuy) {if (window.ShopifyBuy.UI) {ShopifyBuyInit();} else {loadScript();}} else {loadScript();}function loadScript() {var script = document.createElement('script');script.async = true;script.src = scriptURL;(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);script.onload = ShopifyBuyInit;}function ShopifyBuyInit() {var client = ShopifyBuy.buildClient({domain: 'szs0ek-1b.myshopify.com',storefrontAccessToken: 'c2afaf3671fe2814d1fcd9dd1e3f69cb',});ShopifyBuy.UI.onReady(client).then(function (ui) {window._shopifyUI = ui; ui.createComponent('collection', {id: '468307574873',node: document.getElementById('collection-component-1779304204891'),moneyFormat: 'S%2F.%20%7B%7Bamount%7D%7D',options: {"product": {"order": ["title","price","options","button"],"contents": {"img": false,"imgWithCarousel": false,"title": false,"price": true,"options": true,"button": true},"styles": {"product": {"@media (min-width: 601px)": {"max-width": "100%","margin-left": "0","margin-bottom": "0","margin-top": "0","margin-right": "0","width": "100%"}},"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"},"border-radius": "0","font-size": "11px","font-weight": "700","letter-spacing": ".08em","padding": "12px","width": "calc(100% - 24px)","margin": "0 12px 12px"}},"text": {"button": "Agregar al carrito"}},"productSet": {"styles": {"products": {"@media (min-width: 601px)": {"margin-left": "0","margin-top": "0","margin-bottom": "0","margin-right": "0","display": "flex","flex-wrap": "wrap","gap": "0","background": "#fff"}}}},"modalProduct": {"contents": {"img": true,"imgWithCarousel": true,"button": false,"buttonWithQuantity": true},"styles": {"product": {"@media (min-width: 601px)": {"max-width": "100%","margin-left": "0px","margin-bottom": "0px"}},"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"button": "Agregar al carrito"}},"option": {},"cart": {"styles": {"button": {":hover": {"background-color": "#222222"},"background-color": "#000000",":focus": {"background-color": "#000000"}}},"text": {"total": "Subtotal","button": "Finalizar compra"}},"toggle": {"styles": {"toggle": {"background-color": "#000000",":hover": {"background-color": "#000000"},":focus": {"background-color": "#000000"}}}}}});
-    var slots=['shopify-prod-1','shopify-prod-2','shopify-prod-3'];
-    var slotObs=new MutationObserver(function(){
-      var prods=document.querySelectorAll('#collection-component-1779304204891 .shopify-buy__product');
-      if(prods.length>=3){
-        slotObs.disconnect();
-        prods.forEach(function(prod,i){
-          if(slots[i]){var slot=document.getElementById(slots[i]);if(slot&&!slot.contains(prod))slot.appendChild(prod);}
-        });
-      }
-    });
-    slotObs.observe(document.getElementById('collection-component-1779304204891'),{childList:true,subtree:true});
-    setTimeout(function(){
-      var prods=document.querySelectorAll('#collection-component-1779304204891 .shopify-buy__product');
-      prods.forEach(function(prod,i){if(slots[i]){var slot=document.getElementById(slots[i]);if(slot&&!slot.contains(prod))slot.appendChild(prod);}});
-    },4000);
-    });}})();/*]]>*/</script>
-
   </div><!-- /padding wrapper -->
+
+  <div id="dfz-toast">✓ Agregado al carrito</div>
+
+  <script>
+  (function(){
+    var DOMAIN = 'szs0ek-1b.myshopify.com';
+    var TOKEN  = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
+    var PRODUCTS = [
+      { id: 'gid://shopify/Product/8223930351705', bodyId: 'dfz-body-0' }, // Naranja
+      { id: 'gid://shopify/Product/8223833751641', bodyId: 'dfz-body-1' }, // Rosa
+      { id: 'gid://shopify/Product/8223930777689', bodyId: 'dfz-body-2' }  // Roja
+    ];
+
+    var cartId = null;
+
+    function gql(query, variables) {
+      return fetch('https://' + DOMAIN + '/api/2024-01/graphql.json', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Storefront-Access-Token': TOKEN
+        },
+        body: JSON.stringify({ query: query, variables: variables || {} })
+      }).then(function(r){ return r.json(); });
+    }
+
+    function formatPrice(amount, currency) {
+      return 'S/. ' + parseFloat(amount).toFixed(2);
+    }
+
+    function showToast(msg) {
+      var t = document.getElementById('dfz-toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(function(){ t.classList.remove('show'); }, 2800);
+    }
+
+    function renderCard(bodyId, product) {
+      var body = document.getElementById(bodyId);
+      if(!body) return;
+
+      var variants = product.variants.edges.map(function(e){ return e.node; });
+      var hasMultipleSizes = variants.length > 1;
+      var selectedVariant = variants[0];
+
+      var sizeHTML = '';
+      if(hasMultipleSizes) {
+        sizeHTML = '<span class="dfz-size-label">Talla</span><div class="dfz-size-options">';
+        variants.forEach(function(v, i) {
+          var unavailable = !v.availableForSale ? ' unavailable' : '';
+          var selected = i === 0 ? ' selected' : '';
+          sizeHTML += '<button class="dfz-size-btn' + unavailable + selected + '" data-variant-id="' + v.id + '" data-available="' + v.availableForSale + '">' + v.title + '</button>';
+        });
+        sizeHTML += '</div>';
+      }
+
+      body.innerHTML =
+        '<p class="dfz-prod-name">' + product.title + '</p>' +
+        '<p class="dfz-prod-price" id="price-' + bodyId + '">' + formatPrice(selectedVariant.price.amount) + '</p>' +
+        sizeHTML +
+        '<button class="dfz-add-btn" id="btn-' + bodyId + '" data-variant-id="' + selectedVariant.id + '">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>' +
+          'Agregar al carrito' +
+        '</button>';
+
+      // Eventos tallas
+      var sizeBtns = body.querySelectorAll('.dfz-size-btn');
+      var addBtn = document.getElementById('btn-' + bodyId);
+      sizeBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          if(btn.classList.contains('unavailable')) return;
+          sizeBtns.forEach(function(b){ b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          var vid = btn.getAttribute('data-variant-id');
+          addBtn.setAttribute('data-variant-id', vid);
+          // Actualizar precio
+          var v = variants.find(function(x){ return x.id === vid; });
+          if(v) document.getElementById('price-' + bodyId).textContent = formatPrice(v.price.amount);
+        });
+      });
+
+      // Evento agregar al carrito
+      addBtn.addEventListener('click', function() {
+        var variantId = addBtn.getAttribute('data-variant-id');
+        addBtn.disabled = true;
+        addBtn.classList.add('loading');
+        addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Agregando...';
+
+        addToCart(variantId, function(ok) {
+          if(ok) {
+            addBtn.classList.remove('loading');
+            addBtn.classList.add('success');
+            addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Agregado';
+            showToast('✓ Agregado al carrito');
+            setTimeout(function(){
+              addBtn.disabled = false;
+              addBtn.classList.remove('success');
+              addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> Agregar al carrito';
+            }, 2000);
+          } else {
+            addBtn.disabled = false;
+            addBtn.classList.remove('loading');
+            addBtn.innerHTML = 'Error — reintentar';
+            setTimeout(function(){
+              addBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg> Agregar al carrito';
+            }, 2000);
+          }
+        });
+      });
+    }
+
+    function addToCart(variantId, cb) {
+      if(cartId) {
+        addLineToCart(variantId, cb);
+      } else {
+        gql('mutation { cartCreate { cart { id checkoutUrl } } }').then(function(r) {
+          cartId = r.data.cartCreate.cart.id;
+          window._dfzCheckoutUrl = r.data.cartCreate.cart.checkoutUrl;
+          addLineToCart(variantId, cb);
+        }).catch(function(){ cb(false); });
+      }
+    }
+
+    function addLineToCart(variantId, cb) {
+      var mutation = 'mutation cartAdd($cartId:ID!,$lines:[CartLineInput!]!){cartLinesAdd(cartId:$cartId,lines:$lines){cart{id totalQuantity}}}';
+      gql(mutation, { cartId: cartId, lines: [{ merchandiseId: variantId, quantity: 1 }] })
+        .then(function(r){
+          var qty = r.data.cartLinesAdd.cart.totalQuantity;
+          updateCartBadge(qty);
+          cb(true);
+        })
+        .catch(function(){ cb(false); });
+    }
+
+    function updateCartBadge(qty) {
+      ['cartCount','shopifyCartCount'].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el){ el.textContent = qty; el.style.display = qty > 0 ? 'flex' : 'none'; }
+      });
+    }
+
+    // Cargar productos
+    var query = 'query($id:ID!){product(id:$id){title variants(first:10){edges{node{id title availableForSale price{amount currencyCode}}}}}}';
+    PRODUCTS.forEach(function(p) {
+      gql(query, { id: p.id }).then(function(r) {
+        if(r.data && r.data.product) renderCard(p.bodyId, r.data.product);
+      }).catch(function(e){ console.warn('Shopify error:', e); });
+    });
+  })();
+  </script>
 
 </main>
 
