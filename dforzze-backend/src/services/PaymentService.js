@@ -35,7 +35,7 @@ class PaymentService {
     const client = getMPClient();
     const preference = new Preference(client);
 
-    const backendUrl = process.env.BACKEND_URL || 'https://dforzze-backend-production.up.railway.app';
+    const backendUrl = process.env.BACKEND_URL || 'https://dforzze-backend.onrender.com';
     const frontendUrl = process.env.FRONTEND_URL || 'https://dforzze.com';
 
     // Construir items para MP

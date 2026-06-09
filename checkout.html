@@ -961,7 +961,7 @@ async function placeOrder(){
   // ── Intentar con Mercado Pago (backend real) ──────────────────
   if(typeof DforzzeAPI !== 'undefined' && DforzzeAPI.isLoggedIn()){
     try{
-      const API_URL = window.DFORZZE_API_URL || 'https://dforzze-backend-production.up.railway.app/api';
+      const API_URL = window.DFORZZE_API_URL || 'https://dforzze-backend.onrender.com/api';
       const token = localStorage.getItem('dforzze_token');
       const res = await fetch(API_URL + '/payments/create-preference', {
         method: 'POST',

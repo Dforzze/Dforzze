@@ -5,7 +5,7 @@
  */
 
 const DforzzeAPI = (() => {
-  const BASE_URL = window.DFORZZE_API_URL || 'https://dforzze-backend-production.up.railway.app/api';
+  const BASE_URL = window.DFORZZE_API_URL || 'https://dforzze-backend.onrender.com/api';
   let _token = localStorage.getItem('dforzze_token') || null;
   let _refreshToken = localStorage.getItem('dforzze_refresh_token') || null;
   let _socket = null;
@@ -187,7 +187,7 @@ const DforzzeAPI = (() => {
       return;
     }
 
-    const wsUrl = window.DFORZZE_WS_URL || 'https://dforzze-backend-production.up.railway.app';
+    const wsUrl = window.DFORZZE_WS_URL || 'https://dforzze-backend.onrender.com';
     _socket = io(wsUrl, {
       auth: { token: _token },
       reconnectionAttempts: 5,
