@@ -20,6 +20,7 @@ const inventoryRoutes = require('./routes/inventory.routes');
 const stickersRoutes = require('./routes/stickers.routes');
 const alertsRoutes = require('./routes/alerts.routes');
 const paymentsRoutes = require('./routes/payments.routes');
+const shopifyRoutes = require('./routes/shopify.routes');
 
 const app = express();
 const httpServer = createServer(app);
@@ -38,6 +39,9 @@ const inventoryService = require('./services/InventoryService');
 inventoryService.setBroadcast((productId) => {
   io.emit('stock_update', { productId, timestamp: new Date().toISOString() });
 });
+
+// ⚠ Shopify webhook ANTES de express.json() — necesita body raw para verificar HMAC
+app.use('/api/shopify', shopifyRoutes);
 
 // Middlewares de seguridad
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
