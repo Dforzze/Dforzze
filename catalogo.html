@@ -839,38 +839,34 @@ button{font-family:inherit;cursor:pointer}
       <span style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.3)">Disponible ahora</span>
     </div>
 
-    <div class="dfz-grid">
-      <!-- PRODUCTO 1: HOODIE NARANJA -->
-      <div class="dfz-card" id="dfz-card-0">
-        <div class="dfz-img-wrap">
-          <img class="dfz-img-front" src="images/naranja 16.jpg" alt="Hoodie Naranja">
-          <img class="dfz-img-back"  src="images/14.jpg" alt="Hoodie Naranja detalle">
+    <!-- Las cards se generan dinámicamente desde Shopify -->
+    <div class="dfz-grid" id="dfz-products-grid">
+      <!-- Skeletons de carga iniciales -->
+      <div class="dfz-card">
+        <div class="dfz-img-wrap" style="background:#f0f0f0;height:380px">
+          <div class="dfz-skeleton" style="width:100%;height:100%;margin:0;border-radius:0"></div>
         </div>
-        <div class="dfz-card-body" id="dfz-body-0">
+        <div class="dfz-card-body">
           <div class="dfz-skeleton" style="width:60%"></div>
           <div class="dfz-skeleton" style="width:35%"></div>
           <div class="dfz-skeleton" style="width:100%;height:40px;border-radius:10px;margin-top:8px"></div>
         </div>
       </div>
-      <!-- PRODUCTO 2: HOODIE ROSA -->
-      <div class="dfz-card" id="dfz-card-1">
-        <div class="dfz-img-wrap">
-          <img class="dfz-img-front" src="images/12.jpg" alt="Hoodie Rosa">
-          <img class="dfz-img-back"  src="images/rosa 17.jpg" alt="Hoodie Rosa detalle">
+      <div class="dfz-card">
+        <div class="dfz-img-wrap" style="background:#f0f0f0;height:380px">
+          <div class="dfz-skeleton" style="width:100%;height:100%;margin:0;border-radius:0"></div>
         </div>
-        <div class="dfz-card-body" id="dfz-body-1">
+        <div class="dfz-card-body">
           <div class="dfz-skeleton" style="width:60%"></div>
           <div class="dfz-skeleton" style="width:35%"></div>
           <div class="dfz-skeleton" style="width:100%;height:40px;border-radius:10px;margin-top:8px"></div>
         </div>
       </div>
-      <!-- PRODUCTO 3: HOODIE ROJA -->
-      <div class="dfz-card" id="dfz-card-2">
-        <div class="dfz-img-wrap">
-          <img class="dfz-img-front" src="images/rojo 18.jpg" alt="Hoodie Roja">
-          <img class="dfz-img-back"  src="images/15.jpg" alt="Hoodie Roja detalle">
+      <div class="dfz-card">
+        <div class="dfz-img-wrap" style="background:#f0f0f0;height:380px">
+          <div class="dfz-skeleton" style="width:100%;height:100%;margin:0;border-radius:0"></div>
         </div>
-        <div class="dfz-card-body" id="dfz-body-2">
+        <div class="dfz-card-body">
           <div class="dfz-skeleton" style="width:60%"></div>
           <div class="dfz-skeleton" style="width:35%"></div>
           <div class="dfz-skeleton" style="width:100%;height:40px;border-radius:10px;margin-top:8px"></div>
@@ -879,36 +875,12 @@ button{font-family:inherit;cursor:pointer}
     </div>
   </div><!-- /padding wrapper -->
 
-  <!-- Shopify — datos hardcodeados, sin CORS, checkout via Cart API -->
+  <!-- Shopify — carga dinámica de productos + stock real por variante -->
   <script>
   (function() {
     var DOMAIN  = 'szs0ek-1b.myshopify.com';
     var TOKEN   = 'c2afaf3671fe2814d1fcd9dd1e3f69cb';
     var API_URL = 'https://' + DOMAIN + '/api/2024-01/graphql.json';
-
-    var PRODUCTS = [
-      {
-        bodyId: 'dfz-body-0', title: 'HOODIE NARANJA', price: '95.00',
-        variants: [
-          { id: 'gid://shopify/ProductVariant/43331057451097', title: 'L', available: true },
-          { id: 'gid://shopify/ProductVariant/43331057483865', title: 'M', available: true }
-        ]
-      },
-      {
-        bodyId: 'dfz-body-1', title: 'HOODIE ROSA', price: '95.00',
-        variants: [
-          { id: 'gid://shopify/ProductVariant/43330483552345', title: 'M', available: true },
-          { id: 'gid://shopify/ProductVariant/43330483585113', title: 'L', available: true }
-        ]
-      },
-      {
-        bodyId: 'dfz-body-2', title: 'HOODIE ROJA', price: '95.00',
-        variants: [
-          { id: 'gid://shopify/ProductVariant/43331058434137', title: 'M', available: true },
-          { id: 'gid://shopify/ProductVariant/43331058466905', title: 'L', available: true }
-        ]
-      }
-    ];
 
     var SVG_CART = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>';
     var SVG_SPIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin .7s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>';
@@ -916,37 +888,137 @@ button{font-family:inherit;cursor:pointer}
 
     function fmt(v) { return 'S/. ' + parseFloat(v).toFixed(2); }
 
+    // ── CARGAR PRODUCTOS DESDE SHOPIFY ──────────────────────────────
+    var QUERY_PRODUCTS = JSON.stringify({
+      query: '{ products(first: 20, sortKey: CREATED_AT, reverse: true) { edges { node { id title images(first:2){edges{node{url}}} variants(first:20){ edges { node { id title availableForSale quantityAvailable priceV2{amount} } } } } } } }'
+    });
+
+    function loadProducts() {
+      fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': TOKEN },
+        body: QUERY_PRODUCTS
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(res){
+        var edges = res && res.data && res.data.products && res.data.products.edges;
+        if (!edges || edges.length === 0) { showFallback(); return; }
+        var products = edges.map(function(e){ return e.node; });
+        renderGrid(products);
+      })
+      .catch(function(){ showFallback(); });
+    }
+
+    function showFallback() {
+      var grid = document.getElementById('dfz-products-grid');
+      if (!grid) return;
+      grid.innerHTML = '<p style="padding:40px 32px;color:rgba(0,0,0,.4);font-size:13px">No se pudieron cargar los productos. Recarga la página.</p>';
+    }
+
+    // ── RENDERIZAR GRID DINÁMICO ────────────────────────────────────
+    function renderGrid(products) {
+      var grid = document.getElementById('dfz-products-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      products.forEach(function(p, i) {
+        var imgs = p.images.edges.map(function(e){ return e.node.url; });
+        var imgFront = imgs[0] || '';
+        var imgBack  = imgs[1] || imgs[0] || '';
+        var variants = p.variants.edges.map(function(e){ return e.node; });
+        var price = variants[0] ? variants[0].priceV2.amount : '0';
+        var bodyId = 'dfz-body-dyn-' + i;
+
+        // Construir card HTML
+        var card = document.createElement('div');
+        card.className = 'dfz-card';
+        card.innerHTML =
+          '<div class="dfz-img-wrap">' +
+            (imgFront ? '<img class="dfz-img-front" src="' + imgFront + '" alt="' + p.title + '" loading="lazy">' : '') +
+            (imgBack  ? '<img class="dfz-img-back" src="'  + imgBack  + '" alt="' + p.title + ' detalle" loading="lazy">' : '') +
+          '</div>' +
+          '<div class="dfz-card-body" id="' + bodyId + '">' +
+            '<div class="dfz-skeleton" style="width:60%"></div>' +
+            '<div class="dfz-skeleton" style="width:35%"></div>' +
+            '<div class="dfz-skeleton" style="width:100%;height:40px;border-radius:10px;margin-top:8px"></div>' +
+          '</div>';
+        grid.appendChild(card);
+
+        // Renderizar contenido de la card con sus variantes
+        renderCard({ bodyId: bodyId, title: p.title, price: price, variants: variants });
+      });
+
+      // Habilitar swipe en móvil para las nuevas cards
+      document.querySelectorAll('.dfz-img-wrap').forEach(function(wrap) {
+        var lastTap = 0;
+        wrap.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          var now = Date.now();
+          if (now - lastTap < 400) return;
+          lastTap = now;
+          wrap.classList.toggle('touched');
+        }, { passive: false });
+      });
+    }
+
+    // ── RENDERIZAR CARD ─────────────────────────────────────────────
     function renderCard(p) {
       var body = document.getElementById(p.bodyId);
       if (!body) return;
-      var sel = p.variants[0];
+
+      // Variantes disponibles (con stock > 0)
+      var availableVariants = p.variants.filter(function(v){ return v.availableForSale; });
+      var allUnavailable = availableVariants.length === 0;
+
+      // Seleccionar primera variante disponible (o la primera si todo agotado)
+      var sel = availableVariants[0] || p.variants[0];
+
       var sizes = '';
-      if (p.variants.length > 1) {
+      if (p.variants.length > 0) {
         sizes = '<span class="dfz-size-label">Talla</span><div class="dfz-size-options">';
         p.variants.forEach(function(v, i) {
-          sizes += '<button class="dfz-size-btn' + (!v.available ? ' unavailable' : '') + (i===0?' selected':'') + '" data-vid="' + v.id + '">' + v.title + '</button>';
+          var isUnavailable = !v.availableForSale;
+          var isSelected = (v.id === sel.id);
+          // Mostrar stock real si es bajo (≤ 5)
+          var stockHint = '';
+          if (!isUnavailable && v.quantityAvailable !== null && v.quantityAvailable <= 5 && v.quantityAvailable > 0) {
+            stockHint = ' <span style="font-size:8px;opacity:.6">(' + v.quantityAvailable + ')</span>';
+          }
+          sizes += '<button class="dfz-size-btn' + (isUnavailable ? ' unavailable' : '') + (isSelected ? ' selected' : '') + '"'
+            + ' data-vid="' + v.id + '"'
+            + ' data-stock="' + (v.quantityAvailable || 0) + '">'
+            + v.title + stockHint
+            + '</button>';
         });
         sizes += '</div>';
       }
+
       body.innerHTML =
         '<p class="dfz-prod-name">' + p.title + '</p>' +
         '<p class="dfz-prod-price">' + fmt(p.price) + '</p>' +
         sizes +
-        '<button class="dfz-add-btn" id="btn-' + p.bodyId + '" data-vid="' + sel.id + '">' + SVG_CART + ' Agregar al carrito</button>';
+        (allUnavailable
+          ? '<button class="dfz-add-btn" disabled style="background:#ccc;cursor:not-allowed">' + SVG_CART + ' Agotado</button>'
+          : '<button class="dfz-add-btn" id="btn-' + p.bodyId + '" data-vid="' + sel.id + '" data-stock="' + (sel.quantityAvailable || 0) + '">' + SVG_CART + ' Agregar al carrito</button>');
+
+      if (allUnavailable) return;
 
       var btns = body.querySelectorAll('.dfz-size-btn');
       var addBtn = document.getElementById('btn-' + p.bodyId);
+
       btns.forEach(function(b) {
         b.addEventListener('click', function() {
           if (b.classList.contains('unavailable')) return;
           btns.forEach(function(x){ x.classList.remove('selected'); });
           b.classList.add('selected');
           addBtn.setAttribute('data-vid', b.getAttribute('data-vid'));
+          addBtn.setAttribute('data-stock', b.getAttribute('data-stock'));
         });
       });
 
       addBtn.addEventListener('click', function() {
-        var vid = addBtn.getAttribute('data-vid');
+        var vid   = addBtn.getAttribute('data-vid');
+        var stock = parseInt(addBtn.getAttribute('data-stock')) || 999;
         var sizeBtn = body.querySelector('.dfz-size-btn.selected');
         var sizeName = sizeBtn ? sizeBtn.textContent.trim() : '';
         var card = body.closest('.dfz-card');
@@ -968,7 +1040,7 @@ button{font-family:inherit;cursor:pointer}
           addBtn.classList.remove('loading');
           addBtn.classList.add('success');
           addBtn.innerHTML = SVG_OK + ' Agregado';
-          openDrawer(cart.checkoutUrl, vid, p.title, sizeName, p.price, imgSrc);
+          openDrawer(cart.checkoutUrl, vid, p.title, sizeName, p.price, imgSrc, stock);
           setTimeout(function(){
             addBtn.disabled = false;
             addBtn.classList.remove('success');
@@ -984,9 +1056,13 @@ button{font-family:inherit;cursor:pointer}
       });
     }
 
-    function openDrawer(url, vid, title, size, price, img) {
+    // ── DRAWER CON LÍMITE DE STOCK ──────────────────────────────────
+    function openDrawer(url, vid, title, size, price, img, maxStock) {
       var priceNum = parseFloat(price) || 0;
+      // maxStock: stock real de Shopify para esta variante; 0 = sin info = permitir hasta 30
+      var stockLimit = (maxStock && maxStock > 0) ? Math.min(maxStock, 30) : 30;
       var qty = 1;
+
       var drawer = document.getElementById('dfz-drawer-el');
       if (!drawer) {
         drawer = document.createElement('div');
@@ -1002,6 +1078,7 @@ button{font-family:inherit;cursor:pointer}
 
       function render() {
         var total = fmt(priceNum * qty);
+        var atMax = qty >= stockLimit;
         drawer.innerHTML =
           '<div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #f0f0f0;flex-shrink:0">' +
             '<h3 style="font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase">Tu carrito</h3>' +
@@ -1012,13 +1089,19 @@ button{font-family:inherit;cursor:pointer}
               '<img src="' + img + '" style="width:88px;height:108px;object-fit:cover;border-radius:10px;background:#f5f5f5;flex-shrink:0">' +
               '<div style="flex:1">' +
                 '<p style="font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px">' + title + '</p>' +
-                (size ? '<p style="font-size:11px;color:rgba(0,0,0,.4);margin-bottom:12px">Talla: ' + size + '</p>' : '') +
+                (size ? '<p style="font-size:11px;color:rgba(0,0,0,.4);margin-bottom:4px">Talla: ' + size + '</p>' : '') +
+                '<p style="font-size:10px;color:rgba(0,0,0,.35);margin-bottom:12px">' +
+                  (stockLimit <= 5
+                    ? '⚠ Solo quedan ' + stockLimit + ' en stock'
+                    : 'Stock disponible: ' + stockLimit) +
+                '</p>' +
                 '<p style="font-size:15px;font-weight:800;margin-bottom:16px">' + total + '</p>' +
                 '<div style="display:inline-flex;align-items:center;border:1.5px solid #e5e5e5;border-radius:8px;overflow:hidden">' +
                   '<button id="dfz-q-minus" style="width:36px;height:36px;border:none;background:#fff;cursor:pointer;font-size:20px;color:#000">−</button>' +
                   '<span id="dfz-q-num" style="width:36px;text-align:center;font-size:13px;font-weight:700;border-left:1.5px solid #e5e5e5;border-right:1.5px solid #e5e5e5;height:36px;display:inline-flex;align-items:center;justify-content:center">' + qty + '</span>' +
-                  '<button id="dfz-q-plus" style="width:36px;height:36px;border:none;background:#fff;cursor:pointer;font-size:20px;color:#000">+</button>' +
+                  '<button id="dfz-q-plus" ' + (atMax ? 'disabled ' : '') + 'style="width:36px;height:36px;border:none;background:' + (atMax ? '#f5f5f5' : '#fff') + ';cursor:' + (atMax ? 'not-allowed' : 'pointer') + ';font-size:20px;color:' + (atMax ? '#ccc' : '#000') + '">+</button>' +
                 '</div>' +
+                (atMax ? '<p style="font-size:10px;color:#dc2626;font-weight:600;margin-top:8px">Máximo disponible alcanzado</p>' : '') +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -1033,13 +1116,16 @@ button{font-family:inherit;cursor:pointer}
             '<p style="text-align:center;font-size:10px;color:rgba(0,0,0,.3);margin-top:10px">Pago seguro · Mercado Pago · Powered by Shopify</p>' +
           '</div>';
 
-        document.getElementById('dfz-q-minus').onclick = function(){ if(qty>1){qty--;upd();} };
-        document.getElementById('dfz-q-plus').onclick  = function(){ qty++;upd(); };
+        document.getElementById('dfz-q-minus').onclick = function(){ if(qty>1){ qty--; render(); upd(); } };
+        document.getElementById('dfz-q-plus').onclick  = function(){
+          if(qty >= stockLimit) return;
+          qty++;
+          render();
+          upd();
+        };
       }
 
       function upd() {
-        document.getElementById('dfz-q-num').textContent = qty;
-        document.getElementById('dfz-q-total').textContent = fmt(priceNum * qty);
         fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Shopify-Storefront-Access-Token': TOKEN },
@@ -1067,24 +1153,13 @@ button{font-family:inherit;cursor:pointer}
       if (o) { o.style.opacity='0'; o.style.pointerEvents='none'; }
     };
 
-    // Renderizar inmediatamente — sin llamada a API
-    PRODUCTS.forEach(function(p){ renderCard(p); });
+    // Cargar productos desde Shopify al iniciar
+    loadProducts();
 
   })();
   </script>
 
-  <script>
-  document.querySelectorAll('.dfz-img-wrap').forEach(function(wrap) {
-    var lastTap = 0;
-    wrap.addEventListener('touchend', function(e) {
-      e.preventDefault();
-      var now = Date.now();
-      if (now - lastTap < 400) return;
-      lastTap = now;
-      wrap.classList.toggle('touched');
-    }, { passive: false });
-  });
-  </script>
+
 
 
 <!-- SECCIÓN INFO — envíos, piezas limitadas -->
