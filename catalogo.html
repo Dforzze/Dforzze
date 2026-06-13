@@ -564,7 +564,7 @@ button{font-family:inherit;cursor:pointer}
       <a href="dforzze.html" class="nav-link">Membership</a>
       <a href="tienda.html" class="nav-link">Tienda</a>
     </nav>
-    <a href="tienda.html" style="color:rgba(0,0,0,.5);font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:color .3s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.5)'">? Volver</a>
+    <a href="tienda.html" style="color:rgba(0,0,0,.5);font-size:12px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;transition:color .3s" onmouseover="this.style.color='#000'" onmouseout="this.style.color='rgba(0,0,0,.5)'">← Volver</a>
     <div style="display:flex;align-items:center;gap:16px">
       <!-- Búsqueda -->
       <button onclick="toggleSearch()" class="header-icon" aria-label="Buscar">
@@ -575,9 +575,38 @@ button{font-family:inherit;cursor:pointer}
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         <span id="shopifyCartCount" class="header-badge">0</span>
       </button>
+      <!-- Menú hamburguesa (solo móvil) -->
+      <button id="catMobMenuBtn" onclick="toggleCatMenu()" style="display:none;background:none;border:none;cursor:pointer;padding:4px" aria-label="Menú">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <!-- Menú móvil desplegable -->
+  <div id="catMobMenu" style="max-height:0;overflow:hidden;transition:max-height .3s ease;background:#fff;border-top:1px solid #f0f0f0">
+    <div style="padding:16px 24px;display:flex;flex-direction:column;gap:16px">
+      <a href="tienda.html" style="color:rgba(0,0,0,.7);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">Tienda</a>
+      <a href="dforzze.html" style="color:rgba(0,0,0,.7);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">Membership</a>
+      <a href="about.html" style="color:rgba(0,0,0,.7);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">About</a>
+      <a href="catalogo.html" style="color:rgba(0,0,0,.7);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">Catálogo</a>
     </div>
   </div>
 </header>
+<script>
+var _catMenuOpen = false;
+function toggleCatMenu(){
+  _catMenuOpen = !_catMenuOpen;
+  document.getElementById('catMobMenu').style.maxHeight = _catMenuOpen ? '200px' : '0';
+}
+// Mostrar botón hamburguesa solo en móvil
+(function(){
+  function checkCatW(){
+    var btn = document.getElementById('catMobMenuBtn');
+    if(btn) btn.style.display = window.innerWidth < 768 ? 'block' : 'none';
+  }
+  checkCatW();
+  window.addEventListener('resize', checkCatW);
+})();
+</script>
 
 <!-- SEARCH BAR (oculta por defecto) -->
 <div id="searchBar" style="display:none;background:#fff;border-bottom:1px solid rgba(0,0,0,.08);padding:12px 32px">
