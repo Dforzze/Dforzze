@@ -2,11 +2,16 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0;url=tienda.html">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>DFORZZE</title>
 </head>
 <body>
-<script>window.location.replace('tienda.html');</script>
+<script>
+if(window.innerWidth < 768){
+  window.location.replace('tienda.html');
+} else {
+  window.location.replace('dforzze.html');
+}
+</script>
 </body>
 </html>
