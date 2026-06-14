@@ -978,17 +978,8 @@ function toggleCatMenu(){
         renderCard({ bodyId: bodyId, title: p.title, price: price, variants: variants });
       });
 
-      // Habilitar swipe en móvil para las nuevas cards
-      document.querySelectorAll('.dfz-img-wrap').forEach(function(wrap) {
-        var lastTap = 0;
-        wrap.addEventListener('touchend', function(e) {
-          e.preventDefault();
-          var now = Date.now();
-          if (now - lastTap < 400) return;
-          lastTap = now;
-          wrap.classList.toggle('touched');
-        }, { passive: false });
-      });
+      // En móvil: la imagen es un link, no interceptar el tap
+      // El efecto hover de la segunda foto solo funciona en desktop
     }
 
     // -- RENDERIZAR CARD ---------------------------------------------
