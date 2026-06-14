@@ -919,7 +919,7 @@ function toggleCatMenu(){
 
     // -- CARGAR PRODUCTOS DESDE SHOPIFY ------------------------------
     var QUERY_PRODUCTS = JSON.stringify({
-      query: '{ products(first: 20, sortKey: CREATED_AT, reverse: true) { edges { node { id title images(first:2){edges{node{url}}} variants(first:20){ edges { node { id title availableForSale currentlyNotInStock priceV2{amount} } } } } } } }'
+      query: '{ products(first: 20, sortKey: CREATED_AT, reverse: true) { edges { node { id title handle onlineStoreUrl images(first:2){edges{node{url}}} variants(first:20){ edges { node { id title availableForSale currentlyNotInStock priceV2{amount} } } } } } } }'
     });
 
     function loadProducts() {
@@ -958,14 +958,15 @@ function toggleCatMenu(){
         var price = variants[0] ? variants[0].priceV2.amount : '0';
         var bodyId = 'dfz-body-dyn-' + i;
 
-        // Construir card HTML
+        // Construir card HTML — imagen clickeable va a página del producto en Shopify
+        var productUrl = p.onlineStoreUrl || ('https://' + DOMAIN + '/products/' + p.handle);
         var card = document.createElement('div');
         card.className = 'dfz-card';
         card.innerHTML =
-          '<div class="dfz-img-wrap">' +
+          '<a href="' + productUrl + '" target="_blank" class="dfz-img-wrap" style="display:block;text-decoration:none">' +
             (imgFront ? '<img class="dfz-img-front" src="' + imgFront + '" alt="' + p.title + '" loading="lazy">' : '') +
             (imgBack  ? '<img class="dfz-img-back" src="'  + imgBack  + '" alt="' + p.title + ' detalle" loading="lazy">' : '') +
-          '</div>' +
+          '</a>' +
           '<div class="dfz-card-body" id="' + bodyId + '">' +
             '<div class="dfz-skeleton" style="width:60%"></div>' +
             '<div class="dfz-skeleton" style="width:35%"></div>' +
