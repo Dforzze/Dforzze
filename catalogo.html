@@ -14,21 +14,14 @@
     c.width = 64; c.height = 64;
     var ctx = c.getContext('2d');
     ctx.beginPath();
-    ctx.arc(32, 32, 32, 0, Math.PI * 2);
-    ctx.fillStyle = '#000';
+    ctx.roundRect(0,0,64,64,14);
+    ctx.fillStyle='#fff';
     ctx.fill();
-    var off = document.createElement('canvas');
-    off.width = 64; off.height = 64;
-    var octx = off.getContext('2d');
-    octx.drawImage(img, 10, 10, 44, 44);
-    octx.globalCompositeOperation = 'source-in';
-    octx.fillStyle = '#fff';
-    octx.fillRect(0, 0, 64, 64);
-    ctx.drawImage(off, 0, 0);
-    var link = document.getElementById('dfz-favicon');
-    if(link) link.href = c.toDataURL('image/png');
+    ctx.drawImage(img,10,10,44,44);
+    var link=document.getElementById('dfz-favicon');
+    if(link) link.href=c.toDataURL('image/png');
   };
-  img.src = 'images/logo.png';
+  img.src='images/logo.png';
 })();
 </script>
 <style>

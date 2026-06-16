@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -12,23 +12,11 @@
     var c = document.createElement('canvas');
     c.width = 64; c.height = 64;
     var ctx = c.getContext('2d');
-    // Círculo negro
     ctx.beginPath();
-    ctx.arc(32,32,32,0,Math.PI*2);
-    ctx.fillStyle='#000';
-    ctx.fill();
-    // Logo encima
-    ctx.drawImage(img,8,8,48,48);
-    // Teñir logo de blanco (source-atop pinta solo donde hay píxeles del logo)
-    ctx.globalCompositeOperation='source-atop';
+    ctx.roundRect(0,0,64,64,14);
     ctx.fillStyle='#fff';
-    ctx.fillRect(0,0,64,64);
-    // Círculo negro de fondo (destination-over pone detrás)
-    ctx.globalCompositeOperation='destination-over';
-    ctx.beginPath();
-    ctx.arc(32,32,32,0,Math.PI*2);
-    ctx.fillStyle='#000';
     ctx.fill();
+    ctx.drawImage(img,10,10,44,44);
     var link=document.getElementById('dfz-favicon');
     if(link) link.href=c.toDataURL('image/png');
   };
