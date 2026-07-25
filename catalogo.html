@@ -636,11 +636,11 @@ button{font-family:inherit;cursor:pointer}
 
   <!-- Menú móvil desplegable -->
   <div id="catMobMenu" style="max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1);background:#fff;border-top:1px solid #f0f0f0;position:absolute;top:100%;left:0;right:0;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.15)">
-    <div style="padding:8px 0;display:flex;flex-direction:column">
-      <a href="about.html" style="display:block;color:#000;font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:16px 24px;border-bottom:1px solid #f0f0f0;background:#fff">About</a>
-      <a href="dforzze.html" style="display:block;color:#000;font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:16px 24px;border-bottom:1px solid #f0f0f0;background:#fff">Membership</a>
-      <a href="tienda.html" style="display:block;color:#000;font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:16px 24px;border-bottom:1px solid #f0f0f0;background:#fff">Tienda</a>
-      <a href="catalogo.html" style="display:block;color:#000;font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:16px 24px;background:#fff">Catálogo</a>
+    <div style="display:flex;flex-direction:column">
+      <a href="about.html" style="display:block;color:#000;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:13px 20px;border-bottom:1px solid #f0f0f0;background:#fff">About</a>
+      <a href="dforzze.html" style="display:block;color:#000;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:13px 20px;border-bottom:1px solid #f0f0f0;background:#fff">Membership</a>
+      <a href="tienda.html" style="display:block;color:#000;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:13px 20px;border-bottom:1px solid #f0f0f0;background:#fff">Tienda</a>
+      <a href="catalogo.html" style="display:block;color:#000;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:13px 20px;background:#fff">Catálogo</a>
     </div>
   </div>
 </header>
@@ -648,7 +648,7 @@ button{font-family:inherit;cursor:pointer}
 var _catMenuOpen = false;
 function toggleCatMenu(){
   _catMenuOpen = !_catMenuOpen;
-  document.getElementById('catMobMenu').style.maxHeight = _catMenuOpen ? '220px' : '0';
+  document.getElementById('catMobMenu').style.maxHeight = _catMenuOpen ? '300px' : '0';
 }
 </script>
 
