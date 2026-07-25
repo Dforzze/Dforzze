@@ -578,7 +578,7 @@ button{font-family:inherit;cursor:pointer}
   .cat-mob-logo  { display:flex;align-items:center;justify-content:center; }
 }
 </style>
-<header style="background:#fff;box-shadow:0 1px 8px rgba(0,0,0,.07);border-bottom:1px solid rgba(0,0,0,.07);position:sticky;top:0;z-index:50">
+<header style="background:#fff;box-shadow:0 1px 8px rgba(0,0,0,.07);border-bottom:1px solid rgba(0,0,0,.07);position:sticky;top:0;z-index:50;overflow:visible">
 
   <!-- DESKTOP -->
   <div class="cat-header-inner">
@@ -635,12 +635,12 @@ button{font-family:inherit;cursor:pointer}
   </div>
 
   <!-- Menú móvil desplegable -->
-  <div id="catMobMenu" style="max-height:0;overflow:hidden;transition:max-height .3s ease;background:#fff;border-top:1px solid #f0f0f0">
-    <div style="padding:16px 24px;display:flex;flex-direction:column;gap:16px">
-      <a href="tienda.html" style="color:rgba(0,0,0,.7);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">Tienda</a>
-      <a href="dforzze.html" style="color:rgba(0,0,0,.7);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">Membership</a>
-      <a href="about.html" style="color:rgba(0,0,0,.7);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">About</a>
-      <a href="catalogo.html" style="color:rgba(0,0,0,.7);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase">Catálogo</a>
+  <div id="catMobMenu" style="max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1);background:#fff;border-top:1px solid #f0f0f0;position:absolute;top:100%;left:0;right:0;z-index:49;box-shadow:0 8px 24px rgba(0,0,0,.1)">
+    <div style="padding:20px 24px;display:flex;flex-direction:column;gap:0">
+      <a href="about.html" style="color:#000;font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:14px 0;border-bottom:1px solid #f0f0f0">About</a>
+      <a href="dforzze.html" style="color:#000;font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:14px 0;border-bottom:1px solid #f0f0f0">Membership</a>
+      <a href="tienda.html" style="color:#000;font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:14px 0;border-bottom:1px solid #f0f0f0">Tienda</a>
+      <a href="catalogo.html" style="color:#000;font-weight:700;font-size:15px;letter-spacing:.04em;text-transform:uppercase;padding:14px 0">Catálogo</a>
     </div>
   </div>
 </header>
