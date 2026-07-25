@@ -913,10 +913,10 @@ function toggleCatMenu(){
   </style>
 
   <div style="padding:24px 0 0">
-  <div style="padding:0 32px 20px;display:flex;align-items:baseline;gap:16px">
-      <h2 style="font-weight:900;font-size:clamp(22px,3vw,32px);letter-spacing:-.02em;text-transform:uppercase;color:#000">Lo nuevo</h2>
-      <span style="font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.3)">Disponible ahora</span>
-    </div>
+  <div style="padding:0 16px 16px;display:flex;align-items:baseline;gap:12px">
+    <h2 style="font-family:Georgia,'Times New Roman',serif;font-weight:900;font-size:clamp(28px,6vw,42px);letter-spacing:-.01em;text-transform:uppercase;color:#000;line-height:1">LO NUEVO</h2>
+    <span style="font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:rgba(0,0,0,.3)">Disponible ahora</span>
+  </div>
 
     <!-- Las cards se generan dinámicamente desde Shopify -->
     <div class="dfz-grid" id="dfz-products-grid">
@@ -983,6 +983,14 @@ function toggleCatMenu(){
         var edges = res && res.data && res.data.products && res.data.products.edges;
         if (!edges || edges.length === 0) { showFallback(); return; }
         var products = edges.map(function(e){ return e.node; });
+        // Ordenar: pantalones/shorts primero, polos/tees después
+        products.sort(function(a, b) {
+          var aIsBottom = /short|pant|jogg/i.test(a.title);
+          var bIsBottom = /short|pant|jogg/i.test(b.title);
+          if (aIsBottom && !bIsBottom) return -1;
+          if (!aIsBottom && bIsBottom) return 1;
+          return 0;
+        });
         renderGrid(products);
       })
       .catch(function(){ showFallback(); });
@@ -1016,6 +1024,7 @@ function toggleCatMenu(){
           '<a href="' + productUrl + '" target="_blank" class="dfz-img-wrap" style="display:block;text-decoration:none">' +
             (imgFront ? '<img class="dfz-img-front" src="' + imgFront + '" alt="' + p.title + '" loading="lazy">' : '') +
             (imgBack  ? '<img class="dfz-img-back" src="'  + imgBack  + '" alt="' + p.title + ' detalle" loading="lazy">' : '') +
+            '<span style="position:absolute;top:10px;right:10px;z-index:3;background:#fff;color:#000;font-size:10px;font-weight:800;letter-spacing:.06em;padding:4px 10px;border-radius:4px;text-transform:uppercase;box-shadow:0 1px 4px rgba(0,0,0,.12)">Oferta</span>' +
           '</a>' +
           '<div class="dfz-card-body" id="' + bodyId + '">' +
             '<div class="dfz-skeleton" style="width:60%"></div>' +
@@ -1066,7 +1075,7 @@ function toggleCatMenu(){
 
       body.innerHTML =
         '<p class="dfz-prod-name">' + p.title + '</p>' +
-        '<p class="dfz-prod-price">' + fmt(p.price) + '</p>' +
+        '<p class="dfz-prod-price">S/. ' + parseFloat(p.price).toFixed(2) + ' <span style="font-size:11px;font-weight:500;color:rgba(0,0,0,.35);text-decoration:line-through">S/. ' + (parseFloat(p.price) * 1.1).toFixed(2) + '</span></p>' +
         sizes +
         (allUnavailable
           ? '<button class="dfz-add-btn" disabled style="background:#ccc;cursor:not-allowed">' + SVG_CART + ' Agotado</button>'
