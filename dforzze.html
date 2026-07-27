@@ -235,33 +235,72 @@ input{font-family:inherit}
 <script>
 function killSplash(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){try{s.remove()}catch(e){}},600)}}
 
-// Mantener splash hasta que el video está listo para reproducir
+// ── Video de fondo ────────────────────────────────────────────────────────────
+// Mismo approach que about.html: src en data-src, atributos anti-WebView,
+// fallback al poster si el autoplay está bloqueado (TikTok in-app browser).
 (function(){
-  var killed = false;
-  var vid = null;
+  var killed  = false;
+  var started = false;
+  var vid     = null;
+
   function kill(){
     if(killed) return;
     killed = true;
     killSplash();
   }
-  function setupVideo(){
-    if(vid) return;
+
+  function playBgVideo(){
+    if(started) return;
     vid = document.getElementById('heroVid');
     if(!vid) return;
+    started = true;
+
+    // Atributos extra para WebView TikTok / IG / X5
+    vid.setAttribute('playsinline', '');
+    vid.setAttribute('webkit-playsinline', '');
+    vid.setAttribute('disableremoteplayback', '');
+    vid.setAttribute('x5-playsinline', '');
+    vid.setAttribute('x5-video-player-type', 'h5');
+    vid.setAttribute('x5-video-player-fullscreen', 'false');
+    vid.controls = false;
+    vid.muted    = true;
+    vid.loop     = true;
+    vid.style.pointerEvents = 'none';
+
+    // Escuchar cuando el video arranca para quitar el splash
+    vid.addEventListener('playing', function(){ setTimeout(kill, 400); });
     vid.addEventListener('canplaythrough', function(){ kill(); });
-    vid.addEventListener('playing', function(){ setTimeout(kill, 800); });
+
+    // Cargar src desde data-src
+    var source = vid.querySelector('source[data-src]');
+    if(source && !source.src){
+      source.src = source.getAttribute('data-src');
+      vid.load();
+    }
+
+    var p = vid.play();
+    if(p !== undefined){
+      p.then(function(){ setTimeout(kill, 400); })
+       .catch(function(){
+         // Autoplay bloqueado (TikTok) — el poster se muestra como fondo,
+         // que igual se ve bien. Quitar splash para que la página sea usable.
+         kill();
+       });
+    }
   }
-  function tryPlay(){
-    setupVideo();
-    if(!vid) return;
-    vid.play().then(function(){ kill(); }).catch(function(){});
+
+  // Arrancar lo antes posible
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', playBgVideo);
+  } else {
+    playBgVideo();
   }
-  // Máximo 8 segundos de espera
-  setTimeout(kill, 8000);
-  window.addEventListener('load', tryPlay);
-  document.addEventListener('touchstart', tryPlay, {once:true});
-  document.addEventListener('click', tryPlay, {once:true});
-  document.addEventListener('keydown', tryPlay, {once:true});
+  // Segundo intento con interacción del usuario
+  document.addEventListener('touchstart', playBgVideo, {once:true});
+  document.addEventListener('click',      playBgVideo, {once:true});
+
+  // Máximo 5 segundos de splash — no dejar al usuario esperando
+  setTimeout(kill, 5000);
 })();
 </script>
 
@@ -307,8 +346,8 @@ function killSplash(){var s=document.getElementById('splash');if(s){s.style.opac
 <!-- HERO -->
 <section style="position:relative;flex:1;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden">
 <div style="position:absolute;inset:0;overflow:hidden">
-<video preload="auto" autoplay loop muted playsinline poster="images/video-poster.jpg" id="heroVid" style="width:100%;height:100%;object-fit:cover;will-change:transform">
-<source src="https://res.cloudinary.com/dbn4m7yet/video/upload/v1778550253/promo_n9bj8f.mp4" type="video/mp4">
+<video loop muted playsinline webkit-playsinline disableremoteplayback poster="images/video-poster.jpg" id="heroVid" style="width:100%;height:100%;object-fit:cover;will-change:transform;pointer-events:none">
+<source data-src="https://res.cloudinary.com/dbn4m7yet/video/upload/v1778550253/promo_n9bj8f.mp4" type="video/mp4">
 </video><div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),rgba(0,0,0,.5) 50%,rgba(0,0,0,.3))"></div>
 </div>
 <div style="position:relative;z-index:10;max-width:1280px;margin:0 auto;padding:80px 24px 0;width:100%" class="hero-content-pad">
