@@ -640,12 +640,28 @@ button{font-family:inherit;cursor:pointer}
 <!-- MENU MOBILE — fuera del header para no ser tapado -->
 <div id="catMobMenu" style="display:none;position:fixed;top:76px;left:0;right:0;z-index:9998;background:#fff;border-bottom:2px solid #000;box-shadow:0 8px 32px rgba(0,0,0,.18)">
   <div style="display:flex;flex-direction:column">
-    <a href="about.html" style="display:block;color:#000;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:16px 24px;border-bottom:1px solid #eee">About</a>
-    <a href="dforzze.html" style="display:block;color:#000;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:16px 24px;border-bottom:1px solid #eee">Membership</a>
-    <a href="tienda.html" style="display:block;color:#000;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:16px 24px;border-bottom:1px solid #eee">Tienda</a>
+    <a href="#" onclick="showProximamente(event)" style="display:block;color:#000;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:16px 24px;border-bottom:1px solid #eee">About</a>
+    <a href="#" onclick="showProximamente(event)" style="display:block;color:#000;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:16px 24px;border-bottom:1px solid #eee">Membership</a>
+    <a href="#" onclick="showProximamente(event)" style="display:block;color:#000;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:16px 24px;border-bottom:1px solid #eee">Tienda</a>
     <a href="catalogo.html" style="display:block;color:#000;font-weight:700;font-size:14px;letter-spacing:.08em;text-transform:uppercase;padding:16px 24px">Catálogo</a>
   </div>
 </div>
+
+<!-- MODAL PRÓXIMAMENTE -->
+<div id="proxModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:24px">
+  <div style="background:#fff;border-radius:20px;padding:48px 32px;max-width:340px;width:100%;text-align:center;position:relative">
+    <button onclick="closeProximamente()" style="position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:20px;color:rgba(0,0,0,.4);line-height:1">✕</button>
+    <div style="font-size:36px;margin-bottom:16px">◆</div>
+    <p style="font-size:10px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;color:rgba(0,0,0,.35);margin-bottom:12px">DFORZZE</p>
+    <h2 style="font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:16px">NUESTRA TIENDA SERÁ<br>ANUNCIADA PRÓXIMAMENTE</h2>
+    <p style="font-size:13px;color:rgba(0,0,0,.5);line-height:1.7;margin-bottom:28px">Seguinos en nuestras redes para enterarte primero del lanzamiento.</p>
+    <a href="https://www.instagram.com/dforzze/" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#000;color:#fff;font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:14px 28px;border-radius:9999px;text-decoration:none">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5" fill="currentColor"/></svg>
+      @dforzze
+    </a>
+  </div>
+</div>
+
 <script>
 var _catMenuOpen = false;
 var _isTikTok = /musical_ly|TikTok/i.test(navigator.userAgent);
@@ -655,6 +671,22 @@ function toggleCatMenu(){
   var m = document.getElementById('catMobMenu');
   m.style.display = _catMenuOpen ? 'block' : 'none';
 }
+function showProximamente(e){
+  e.preventDefault();
+  // cerrar menú
+  _catMenuOpen = false;
+  document.getElementById('catMobMenu').style.display = 'none';
+  // mostrar modal
+  var modal = document.getElementById('proxModal');
+  modal.style.display = 'flex';
+}
+function closeProximamente(){
+  document.getElementById('proxModal').style.display = 'none';
+}
+// cerrar tocando el fondo
+document.getElementById('proxModal').addEventListener('click', function(e){
+  if(e.target === this) closeProximamente();
+});
 </script>
 
 <!-- SEARCH BAR (oculta por defecto) -->
