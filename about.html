@@ -160,8 +160,8 @@ button{font-family:inherit;cursor:pointer}
 <!-- HERO -->
 <section style="min-height:100vh;display:flex;align-items:flex-end;position:relative;overflow:hidden;padding-top:60px">
   <!-- VIDEO BACKGROUND dforzze x 26 -->
-  <video preload="auto" id="vid1" autoplay loop muted playsinline class="hero-video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(.45)" poster="images/video-poster.jpg">
-    <source src="https://res.cloudinary.com/dbn4m7yet/video/upload/q_auto:low,w_720,vc_auto/v1779221787/Dforzze_X_26is________fyp_parati_dios_viral_1_epls54.mp4" type="video/mp4">
+  <video id="vid1" loop muted playsinline webkit-playsinline disableremoteplayback class="hero-video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 15%;filter:brightness(.45);pointer-events:none" poster="images/video-poster.jpg">
+    <source data-src="https://res.cloudinary.com/dbn4m7yet/video/upload/q_auto:low,w_720,vc_auto/v1779221787/Dforzze_X_26is________fyp_parati_dios_viral_1_epls54.mp4" type="video/mp4">
   </video>
   <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,rgba(0,0,0,.3) 50%,rgba(0,0,0,.2) 100%)"></div>
 
@@ -323,8 +323,8 @@ button{font-family:inherit;cursor:pointer}
 
 <!-- VIDEO — DFORZZE x HADES -->
 <section style="position:relative;height:100vh;overflow:hidden;display:flex;align-items:center;justify-content:center">
-  <video preload="auto" id="vid2" autoplay loop muted playsinline class="hades-video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;filter:brightness(.6)" poster="images/video-poster.jpg">
-    <source src="https://res.cloudinary.com/dbn4m7yet/video/upload/q_auto:low,w_720,vc_auto/v1779221775/Dforzze_X_hades66_fyp_viral_liqu2n.mp4" type="video/mp4">
+  <video id="vid2" loop muted playsinline webkit-playsinline disableremoteplayback class="hades-video" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 20%;filter:brightness(.6);pointer-events:none" poster="images/video-poster.jpg">
+    <source data-src="https://res.cloudinary.com/dbn4m7yet/video/upload/q_auto:low,w_720,vc_auto/v1779221775/Dforzze_X_hades66_fyp_viral_liqu2n.mp4" type="video/mp4">
   </video>
   <div style="position:absolute;inset:0;background:linear-gradient(to bottom,#000 0%,transparent 15%,transparent 80%,#000 100%)"></div>
   <div style="position:relative;z-index:10;text-align:center;padding:0 24px">
@@ -383,59 +383,62 @@ document.querySelectorAll('.fade-up,.fade-in').forEach(el=>obs.observe(el));
 const heroLine = document.getElementById('heroLine');
 if(heroLine) obs.observe(heroLine);
 
-// Lazy load videos — cargan cuando el usuario llega a la sección
-function lazyLoadVideo(vid){
-  if(!vid) return;
-  var src = vid.querySelector('source');
-  if(!src) return;
-  if(!src.src && src.dataset.src){
-    src.src = src.dataset.src;
+// ── Video de fondo ───────────────────────────────────────────────
+// Carga y reproduce un <video> de fondo sin dejar que el browser
+// lo trate como video interactivo (in-app browsers de TikTok / IG).
+function playBgVideo(vid) {
+  if (!vid) return;
+  // Propiedades que suprimen controles en WebView TikTok / IG
+  vid.setAttribute('playsinline', '');
+  vid.setAttribute('webkit-playsinline', '');
+  vid.setAttribute('disableremoteplayback', '');
+  vid.setAttribute('x5-playsinline', '');        // UC Browser / TikTok Android
+  vid.setAttribute('x5-video-player-type', 'h5');// evita player nativo Android
+  vid.setAttribute('x5-video-player-fullscreen', 'false');
+  vid.controls = false;
+  vid.muted    = true;
+  vid.loop     = true;
+  vid.style.pointerEvents = 'none';
+
+  // Cargar src desde data-src (nunca puesto en el HTML → el browser
+  // no pre-registra el recurso como "video de usuario")
+  var source = vid.querySelector('source[data-src]');
+  if (source && !source.src) {
+    source.src = source.getAttribute('data-src');
     vid.load();
   }
-  vid.play().catch(function(){});
+
+  var p = vid.play();
+  if (p !== undefined) p.catch(function(){});
 }
 
-function setMobileFallback(vid, fallbackSelector){
-  if(!vid) return;
-  var fallback = document.querySelector(fallbackSelector);
-  if(!fallback) return;
-  vid.addEventListener('playing', function(){
-    fallback.style.display = 'none';
-  });
-  vid.addEventListener('error', function(){
-    fallback.style.display = 'block';
-  });
+// Hero (vid1) — arrancar lo antes posible
+function startVid1() {
+  playBgVideo(document.getElementById('vid1'));
 }
-
-function triggerMobileVideoPlay(){
-  var vid1 = document.getElementById('vid1');
-  var vid2 = document.getElementById('vid2');
-  setMobileFallback(vid1, '.hero-bg-mobile');
-  setMobileFallback(vid2, '.hades-bg-mobile');
-  lazyLoadVideo(vid1);
-  lazyLoadVideo(vid2);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', startVid1);
+} else {
+  startVid1();
 }
+// Segundo intento en touchstart (iOS Safari a veces lo necesita)
+document.addEventListener('touchstart', startVid1, { once: true });
 
-// Video 1 — hero (carga al entrar a la página)
-window.addEventListener('load', function(){
-  triggerMobileVideoPlay();
-});
-
-document.addEventListener('touchstart', function(){
-  triggerMobileVideoPlay();
-},{once:true});
-
-// Video 2 — hades (carga cuando el usuario llega a esa sección)
-var vid2obs = new IntersectionObserver(function(entries){
-  entries.forEach(function(e){
-    if(e.isIntersecting){
-      lazyLoadVideo(document.getElementById('vid2'));
-      vid2obs.disconnect();
-    }
-  });
-}, {threshold: 0.1});
-var vid2 = document.getElementById('vid2');
-if(vid2) vid2obs.observe(vid2);
+// Hades (vid2) — arrancar cuando llega al viewport
+var _vid2Started = false;
+var vid2el = document.getElementById('vid2');
+if (vid2el) {
+  var vid2obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting && !_vid2Started) {
+        _vid2Started = true;
+        playBgVideo(vid2el);
+        vid2obs.disconnect();
+      }
+    });
+  }, { threshold: 0.05 });
+  vid2obs.observe(vid2el);
+}
 </script>
 
 </body>
